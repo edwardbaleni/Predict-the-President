@@ -8,14 +8,13 @@ bibliography: references.bib
 
 ## Quarto
 
-
 ```{r Data, echo=FALSE}
 # Obtain dataset
 dir       <- paste0(getwd(), "/Data/") 
 ldf       <- list.files(path = dir, pattern = "*.txt")
 
 collectData <- function(fileName){
-    read.table(fileName)
+    readLines(fileName, warn = F)
     get(ls()[ls() != "fileName"])
 }
 
@@ -30,8 +29,16 @@ Quarto enables you to weave together content and executable code into a finished
 
 When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
 
-```{r}
-1 + 1
+```{r Cleaning}
+# Remove first line as that's the date
+
+# remove cells that are just a space
+
+# put everything in lower case
+
+# Remove spaces next to spaces, or long whitespaces that aren't a single space
+
+# tokenize. Maay not have to tokenize
 ```
 
 You can add options to executable code like this
@@ -40,4 +47,3 @@ You can add options to executable code like this
 #| echo: false
 2 * 2
 ```
-
