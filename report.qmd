@@ -6,37 +6,53 @@ editor: visual
 bibliography: references.bib
 ---
 
-## Quarto
+```{r}
+require(dplyr)
+require(stringr)
+```
+
+
+# Predict the President
+
 
 ```{r Data, echo=FALSE}
 # Obtain dataset
 dir       <- paste0(getwd(), "/Data/") 
 ldf       <- list.files(path = dir, pattern = "*.txt")
+data      <- data.frame() 
 
 collectData <- function(fileName){
-    readLines(fileName, warn = F)
-    get(ls()[ls() != "fileName"])
+    dat     <- data.frame(readLines(fileName, warn = F))
+    strings <- unlist(strsplit(fileName, "_"))
+    string  <- gsub(".txt", "", strings[length(strings)])
+    dat$President <- string
+    # Remove first line as that's the date
+    dat <- dat[-1,]
 }
 
 for (i in 1:length(ldf)){
-  data <- collectData(paste0(dir ,ldf[i]))
+  if (i == 1){
+    data <- collectData(paste0(dir ,ldf[i]))
   }
+  else {
+    data <- rbind(data, collectData(paste0(dir ,ldf[i])))
+  }
+}
 ```
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
 
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
 
 ```{r Cleaning}
-# Remove first line as that's the date
-
 # remove cells that are just a space
-
 # put everything in lower case
+colnames(data) <- c("Text", "President")
+data <- data %>% 
+  select(President, Text) %>%
+  filter(!(Text %in% ""))
 
-# Remove spaces next to spaces, or long whitespaces that aren't a single space
+data <- data.frame(lapply(data, str_to_lower))
+
+############### May have to remove punctuation
 
 # tokenize. Maay not have to tokenize
 ```
