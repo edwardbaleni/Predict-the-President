@@ -71,8 +71,8 @@ sona <-sona %>%
          ,date = str_replace_all(date, '-----', '')
          ,date = str_replace_all(date, '----', '')
          ,date = str_replace_all(date, '---', '')
-         ,date = str_replace_all(date, '--', '')
-  )
+         ,date = str_replace_all(date, '--', '')) %>%
+  rename(president = president_13)
 
 # Remove date from speech
 extr <- function(x){
@@ -81,5 +81,6 @@ extr <- function(x){
 }
 
 sona$speech <- sapply(sona$speech, extr)
-
 sona$speech <- gsub("\n", " ", sona$speech)
+sona$speech <- str_to_lower(sona$speech)
+sona$speech <- str_trim(sona$speech)

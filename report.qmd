@@ -23,11 +23,6 @@ sys.source("sona-first-steps.R" , envir = knitr::knit_global())
 
 
 ```{r Cleaning}
-sona <- sona %>% rename(president = president_13)
-sona$speech <- str_to_lower(sona$speech)
-sona$speech <- str_trim(sona$speech)
-
-
 tokens <- unnest_tokens(tbl = sona, input = speech, output = text, token = "words")
 
 ############### May have to remove punctuation
