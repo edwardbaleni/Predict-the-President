@@ -23,19 +23,12 @@ sys.source("sona-first-steps.R" , envir = knitr::knit_global())
 
 
 ```{r Cleaning}
-# remove cells that are just a space
-# put everything in lower case
-# remove any whitespaces
-colnames(data) <- c("Text", "President")
-data <- data %>% 
-  select(President, Text) %>%
-  filter(!(Text %in% "")) 
+sona <- sona %>% rename(president = president_13)
+sona$speech <- str_to_lower(sona$speech)
+sona$speech <- str_trim(sona$speech)
 
-data <- data.frame(lapply(data, str_to_lower))
-data <- data.frame(lapply(data, str_trim))
 
-# tokenizing already removes punctuation
-aa <- unnest_tokens(tbl = data, input = Text, output = text, token = "words")
+tokens <- unnest_tokens(tbl = sona, input = speech, output = text, token = "words")
 
 ############### May have to remove punctuation
 

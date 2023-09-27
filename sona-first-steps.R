@@ -47,6 +47,15 @@ this_speech[34] <- readChar('https://raw.githubusercontent.com/iandurbach/datasc
 this_speech[35] <- readChar('https://raw.githubusercontent.com/iandurbach/datasci-fi/master/data/sona/2022_Ramaphosa.txt', nchars = 52972)
 this_speech[36] <- readChar('https://raw.githubusercontent.com/iandurbach/datasci-fi/master/data/sona/2022_Ramaphosa.txt', nchars = 52972)
 
+# Remove date from speech
+
+extr <- function(x){
+  pos <- regexpr("\n\n", x)
+  substr(x, pos + 2, nchar(x))
+}
+
+this_speech <- sapply(this_speech, extr)
+
 sona <- data.frame(filename = filenames, speech = this_speech, stringsAsFactors = FALSE)
 
 # extract year and president for each speech
