@@ -47,14 +47,6 @@ this_speech[34] <- readChar('https://raw.githubusercontent.com/iandurbach/datasc
 this_speech[35] <- readChar('https://raw.githubusercontent.com/iandurbach/datasci-fi/master/data/sona/2022_Ramaphosa.txt', nchars = 52972)
 this_speech[36] <- readChar('https://raw.githubusercontent.com/iandurbach/datasci-fi/master/data/sona/2022_Ramaphosa.txt', nchars = 52972)
 
-# Remove date from speech
-
-extr <- function(x){
-  pos <- regexpr("\n\n", x)
-  substr(x, pos + 2, nchar(x))
-}
-
-this_speech <- sapply(this_speech, extr)
 
 sona <- data.frame(filename = filenames, speech = this_speech, stringsAsFactors = FALSE)
 
@@ -63,7 +55,7 @@ sona$year <- str_sub(sona$filename, start = 1, end = 4)
 sona$president_13 <- str_remove_all(str_extract(sona$filename, "[dA-Z].*\\."), "\\.")
 
 # clean the sona dataset by adding the date and removing unnecessary text
-replace_reg <- '(http.*?(\\s|.$))|(www.*?(\\s|.$))|&amp;|&lt;|&gt;|\n'
+replace_reg <- '(http.*?(\\s|.$))|(www.*?(\\s|.$))|&amp;|&lt;|&gt;'
 
 sona <-sona %>%
   mutate(speech = str_replace_all(speech, replace_reg , ' ')
@@ -81,3 +73,13 @@ sona <-sona %>%
          ,date = str_replace_all(date, '---', '')
          ,date = str_replace_all(date, '--', '')
   )
+
+# Remove date from speech
+extr <- function(x){
+  pos <- regexpr("\n\n", x)
+  substr(x, pos + 2, nchar(x))
+}
+
+sona$speech <- sapply(sona$speech, extr)
+
+sona$speech <- gsub("\n", " ", sona$speech)
