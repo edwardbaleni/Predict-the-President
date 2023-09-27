@@ -1,10 +1,9 @@
 ---
-title: "Predict the President"
-author: "Edward Baleni, BLNEDW003"
+title: "DataClean - MyWay"
 format: html
 editor: visual
-bibliography: references.bib
 ---
+
 
 ```{r}
 require(dplyr)
@@ -17,7 +16,28 @@ require(tidytext)
 
 
 ```{r Data, echo=FALSE}
-sys.source("sona-first-steps.R" , envir = knitr::knit_global())
+# Obtain dataset
+dir       <- paste0(getwd(), "/Data/") 
+ldf       <- list.files(path = dir, pattern = "*.txt")
+data      <- data.frame() 
+
+collectData <- function(fileName){
+    dat     <- data.frame(readLines(fileName, warn = F))
+    strings <- unlist(strsplit(fileName, "_"))
+    string  <- gsub(".txt", "", strings[length(strings)])
+    dat$date <- dat[1,]
+    dat$President <- string
+    dat <- dat[-1,]
+}
+
+for (i in 1:length(ldf)){
+  if (i == 1){
+    data <- collectData(paste0(dir ,ldf[i]))
+  }
+  else {
+    data <- rbind(data, collectData(paste0(dir ,ldf[i])))
+  }
+}
 ```
 
 
