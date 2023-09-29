@@ -49,13 +49,14 @@ this_speech[36] <- readChar('https://raw.githubusercontent.com/iandurbach/datasc
 
 
 sona <- data.frame(filename = filenames, speech = this_speech, stringsAsFactors = FALSE)
+speech_extr <-  this_speech
 
 # extract year and president for each speech
 sona$year <- str_sub(sona$filename, start = 1, end = 4)
 sona$president_13 <- str_remove_all(str_extract(sona$filename, "[dA-Z].*\\."), "\\.")
 
 # clean the sona dataset by adding the date and removing unnecessary text
-replace_reg <- '(http.*?(\\s|.$))|(www.*?(\\s|.$))|&amp;|&lt;|&gt;'
+replace_reg <- '(http.*?(\\s|.$))|(www.*?(\\s|.$))|&amp;|&lt;|&gt;|\n'
 
 sona <-sona %>%
   mutate(speech = str_replace_all(speech, replace_reg , ' ')
@@ -80,7 +81,6 @@ extr <- function(x){
   substr(x, pos + 2, nchar(x))
 }
 
-sona$speech <- sapply(sona$speech, extr)
+sona$speech <- sapply(speech_extr, extr)
 sona$speech <- gsub("\n", " ", sona$speech)
-sona$speech <- str_to_lower(sona$speech)
 sona$speech <- str_trim(sona$speech)

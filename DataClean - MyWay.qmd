@@ -4,16 +4,13 @@ format: html
 editor: visual
 ---
 
-
 ```{r}
 require(dplyr)
 require(stringr)
 require(tidytext)
 ```
 
-
 # Predict the President
-
 
 ```{r Data, echo=FALSE}
 # Obtain dataset
@@ -40,8 +37,6 @@ for (i in 1:length(ldf)){
 }
 ```
 
-
-
 ```{r Cleaning}
 # remove cells that are just a space
 # put everything in lower case
@@ -61,4 +56,3 @@ aa <- unnest_tokens(tbl = data, input = Text, output = text, token = "words")
 
 # tokenize. Maay not have to tokenize
 ```
-
