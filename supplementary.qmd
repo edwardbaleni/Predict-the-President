@@ -294,27 +294,27 @@ tri_tf_idf %>%
 ```
 
 ```{r Quick analysis to compare uni and bi using random forests}
-require(naivebayes)
-trainer <- uni_tf_idf %>%
-  select(ids, token, tf_idf) %>%
-  pivot_wider(names_from = token, values_from = tf_idf, values_fill = 0) 
-
-trainer <- uni_tf_idf %>%
-  select(ids, president) %>%
-  rename (Response_President = president) %>%
-  left_join(trainer, by = "ids")%>%
-  select(-ids)
-  
-model <- naive_bayes(Response_President ~., data = trainer, usekernal = T)
-model <- rpart(Response_President ~ ., method="class", data = trainer[samp,], control =rpart.control(minsplit =1, cp=0))
-
-
-plot(model)
-text(model, use.n = TRUE, all = TRUE, cex=.8)
-val <- trainer[-samp,]
-
-p1 <- predict(model, trainer[,-1])
-(tab1 <- table(trainer$Response_President, p1))
+# require(naivebayes)
+# trainer <- uni_tf_idf %>%
+#   select(ids, token, tf_idf) %>%
+#   pivot_wider(names_from = token, values_from = tf_idf, values_fill = 0) 
+# 
+# trainer <- uni_tf_idf %>%
+#   select(ids, president) %>%
+#   rename (Response_President = president) %>%
+#   left_join(trainer, by = "ids")%>%
+#   select(-ids)
+#   
+# model <- naive_bayes(Response_President ~., data = trainer, usekernal = T)
+# model <- rpart(Response_President ~ ., method="class", data = trainer[samp,], control =rpart.control(minsplit =1, cp=0))
+# 
+# 
+# plot(model)
+# text(model, use.n = TRUE, all = TRUE, cex=.8)
+# val <- trainer[-samp,]
+# 
+# p1 <- predict(model, trainer[,-1])
+# (tab1 <- table(trainer$Response_President, p1))
 ```
 
 
@@ -382,24 +382,23 @@ wordcloud(train$token, max.words = 100, colors = c("grey80", "darkgoldenrod1", "
 ```{r}
 
 # Create a document term matrix
-test_dtm <- DocumentTermMatrix(Data_test_corpus_clean, control = list(weighting =
-                                         function(x)
-                                         weightTfIdf(x, normalize =
-                                                     T),
-                                         stopwords = TRUE))
+test_dtm <- DocumentTermMatrix(Data_test_corpus_clean, 
+                               control = list(weighting =
+                                                function(x)
+                                                  weightTfIdf(x, normalize = F),
+                                              stopwords = TRUE))
 
 #train_dtm2 <- DocumentTermMatrix(Corpus(VectorSource(train$token)))
 #tdformat <- TermDocumentMatrix()
 #train_dtm <- DocumentTermMatrix(Data_train_corpus_clean, control = list(weightTfIdf(m, normalize = TRUE)))
 
 train_dtm <- DocumentTermMatrix(Data_train_corpus_clean,
-                          control = list(weighting =
-                                         function(x)
-                                         weightTfIdf(x, normalize =
-                                                     F),
-                                         stopwords = TRUE))
+                                control = list(weighting =
+                                                 function(x)
+                                                   weightTfIdf(x, normalize = F),
+                                               stopwords = TRUE))
 
-#inspect(test_dtm)
+inspect(test_dtm)
 inspect(train_dtm)
 ```
 
@@ -419,14 +418,14 @@ inspect(train_dtm)
 # 
 # data_dict <- Dictionary(findFreqTerms(train_dtm, 5))
 # 
-# #Appending Document Term Matrix to Train and Test Dataset 
+# #Appending Document Term Matrix to Train and Test Dataset
 # data_train <- DocumentTermMatrix(Data_train_corpus_clean, list(data_dict))
 # data_test <- DocumentTermMatrix(Data_test_corpus_clean, list(data_dict))
 # 
 # #Converting the frequency of word to count
 # convert_counts <- function(x) {
 #         x <- ifelse(x > 0, 1, 0)
-#         x <- factor(x, levels = c(0, 1), labels = c("No", "Yes")) 
+#         x <- factor(x, levels = c(0, 1), labels = c("No", "Yes"))
 #         return(x)
 # }
 # 
@@ -436,23 +435,32 @@ inspect(train_dtm)
 ```
 
 ```{r}
-data_train <- as.matrix(train_dtm)
-data_test <- as.matrix(test_dtm)
+# data_train <- as.matrix(train_dtm)
+
+samp <- sample(1:nrow(data_train), size = 6000)
+# 
+# data_test <- as.matrix(test_dtm)
 
 library(e1071)
-data_classifier <- naiveBayes(data_train, Data_train$president, laplace = 1)
+data_classifier <- naiveBayes(data_train[samp,], Data_train$president[samp], laplace = 0)
 
 library(gmodels)
-data_test_pred <- predict(data_classifier, data_test)
-CrossTable(data_test_pred, Data_test$president,
-           prop.chisq = FALSE, prop.t = FALSE,
-           dnn = c('predicted', 'actual'))
+data_val_pred <- predict(data_classifier, data_train[-samp,] )
+CrossTable(data_val_pred, Data_train$president[-samp],
+          prop.chisq = FALSE, prop.t = FALSE,
+          dnn = c('predicted', 'actual'))
+#data_test_pred <- predict(data_classifier, data_test)
+#CrossTable(data_test_pred, Data_test$president,
+#           prop.chisq = FALSE, prop.t = FALSE,
+#           dnn = c('predicted', 'actual'))
 
 
-
+(tab1 <- table(Data_train$president[-samp], data_val_pred))
 ```
 
 ```{r}
+
+(207 + 124 + 98 + 168 + 126 + 130) / 1200
 # No laplace
 (15 + 475 + 512 + 14 + 662 + 799) / 4800
 
