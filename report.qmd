@@ -56,38 +56,59 @@ It may be necessary to perform lemmatization as commonly appearing words may app
 ```{r Cleaning Data}
 # Remove numbers
 sona$speech = gsub('[0-9]+', '', sona$speech)
-data(presidential_debates_2012)
 sona$speech <- lemmatize_strings(sona$speech)
 sona$speech <- replace_contraction(sona$speech)
 ```
 
+
+Unfortunately, for this data split, even for unigrams, we see very small frequencies even for words that are specific to one journal. This may mean that we will have to look at a different way to obtain an inverse weighted distribution of samples.
 ```{r Split Data}
 # Need to keep some sentences separate.
-train <- sona %>%
-  unnest_sentences(token, speech)
-test <- 
+sentences <- sona %>%
+  unnest_sentences(speech, speech)
+
+table(sentences$president)
+
+# Let's say each president has 70 sentences (that's close to 1000 words each.)
+# for each president, I would advise removing their first sentence as it appears in all statements in some way.
+
+train <- sentences %>% 
+  group_by(president) %>%
+  slice_sample(n = 70) %>% 
+  ungroup() %>%
+  rename( token = speech )
+
+table(train$president)
+
+test <- sentences %>%
+  unnest_sentences(token, speech) %>%
+  anti_join(train)
 ```
 
 
 ```{r Tokenization}
 # Unigram
-uni <- sona %>%
+uni <- train %>%
+  rename( speech = token) %>%
   unnest_tokens(token, speech) %>%
   #filter(!token %in% stop_words$word) %>%
   count(president, token)
 
 # Bigram
-bigram <- sona %>% 
+bigram <- train %>% 
+    rename( speech = token) %>%
   unnest_tokens(token, speech, token = 'ngrams', n = 2) %>%
   count(president, token)
 
 # Trigram
-trigram <- sona %>% 
+trigram <- train %>% 
+    rename( speech = token) %>%
   unnest_tokens(token, speech, token = 'ngrams', n = 3) %>%
   count(president, token)
 
 # Pentagram
-pentagram <- sona%>% 
+pentagram <- train%>% 
+    rename( speech = token) %>%
   unnest_tokens(input = speech, output = token, token = 'ngrams', n = 3) %>%
   count(president, token)
 ```
@@ -105,7 +126,7 @@ uni_tf_idf <- uni %>%
 
 uni_tf_idf %>% 
   group_by(president) %>% 
-  slice_max(tf_idf, n = 15) %>% 
+  slice_max(tf_idf, n = 10) %>% 
   ungroup() %>%
   mutate(token = reorder(token, tf_idf, decreasing = F)) %>%
   ggplot(aes(tf_idf, token, fill = president)) +
@@ -113,6 +134,14 @@ uni_tf_idf %>%
   labs(x = "tf-idf", y = NULL) +
   facet_wrap(~president, ncol = 2, scales = "free")
 
+uni_tf_idf %>%
+  group_by(president) %>%
+  slice_max(tf_idf, n= 10)%>%
+  ungroup() %>%
+  ggplot(aes(n, fct_reorder(token, n), fill = president)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~president, ncol = 2, scales = "free") +
+  labs(x = "Count", y = NULL)
 ```
 
 For the bigrams below, we see very useless words come into play that could be used to characterise presidents, it may be useful to consider removing stop words to improve the goodness of this study. However, these minute differences may be just a manner of speaking for some of these presidents and as such are necessary to the text. Like it could be a personality trait specific to that president.
@@ -146,23 +175,6 @@ bigram_tf_idf %>%
   geom_col(show.legend = FALSE) +
   facet_wrap(~president, ncol = 2, scales = "free") +
   labs(x = "Count", y = NULL)
-
-
-bigram_tf_idf %>%
-    group_by(president) %>%
-    top_n(15) %>%
-    ungroup %>%
-    mutate( token = reorder_within(token, tf_idf, president)) %>%
-    ggplot(aes(token, tf_idf, fill = president)) +
-    geom_col(show.legend = FALSE) +
-    facet_wrap(~president, ncol = 2, scales = "free_y") +
-    coord_flip() +
-    scale_x_reordered() +
-    scale_y_continuous(expand = c(0,0)) +
-    labs(y = "Number of babies per decade",
-         x = NULL,
-         title = "What were the most common baby names in each decade?",
-         subtitle = "Via US Social Security Administration")
 ```
 
 What we can see below is that a pentagram is not exactly useful in distiguishing different presidents. We see that there are some commonly occuring phrases. But these happen a total of 3 to 5 times out of over 30 000 entries for some presidents. Therefore it is not necessary to go this far.
