@@ -382,21 +382,35 @@ wordcloud(train$token, max.words = 100, colors = c("grey80", "darkgoldenrod1", "
 ```{r}
 
 # Create a document term matrix
-test_dtm <- DocumentTermMatrix(Data_test_corpus_clean, 
-                               control = list(weighting =
-                                                function(x)
-                                                  weightTfIdf(x, normalize = F),
-                                              stopwords = TRUE))
+# test_dtm <- DocumentTermMatrix(Data_test_corpus_clean, 
+#                                control = list(weighting =
+#                                                 function(x)
+#                                                   weightTfIdf(x, normalize = T),
+#                                               stopwords = TRUE))
+# 
+# #train_dtm2 <- DocumentTermMatrix(Corpus(VectorSource(train$token)))
+# #tdformat <- TermDocumentMatrix()
+# #train_dtm <- DocumentTermMatrix(Data_train_corpus_clean, control = list(weightTfIdf(m, normalize = TRUE)))
+# 
+# train_dtm <- DocumentTermMatrix(Data_train_corpus_clean,
+#                                 control = list(weighting =
+#                                                  function(x)
+#                                                    weightTfIdf(x, normalize = T),
+#                                                stopwords = TRUE))
 
-#train_dtm2 <- DocumentTermMatrix(Corpus(VectorSource(train$token)))
-#tdformat <- TermDocumentMatrix()
-#train_dtm <- DocumentTermMatrix(Data_train_corpus_clean, control = list(weightTfIdf(m, normalize = TRUE)))
+cntrl=list(weighting = weightTfIdf,
+             #removeNumbers=TRUE,
+             #removeStopwords=TRUE,
+             #removePunctuation=TRUE,
+             stopwords = T)
 
 train_dtm <- DocumentTermMatrix(Data_train_corpus_clean,
-                                control = list(weighting =
-                                                 function(x)
-                                                   weightTfIdf(x, normalize = F),
-                                               stopwords = TRUE))
+                                control = cntrl)
+train_dtm <- removeSparseTerms(train_dtm,  0.95)
+
+test_dtm <- DocumentTermMatrix(Data_test_corpus_clean,
+                               control = cntrl)
+test_dtm <- removeSparseTerms(test_dtm, 0.97)
 
 inspect(test_dtm)
 inspect(train_dtm)
@@ -435,11 +449,11 @@ inspect(train_dtm)
 ```
 
 ```{r}
-# data_train <- as.matrix(train_dtm)
+data_train <- as.matrix(train_dtm)
 
 samp <- sample(1:nrow(data_train), size = 6000)
-# 
-# data_test <- as.matrix(test_dtm)
+ 
+data_test <- as.matrix(test_dtm)
 
 library(e1071)
 data_classifier <- naiveBayes(data_train[samp,], Data_train$president[samp], laplace = 0)
@@ -455,7 +469,7 @@ CrossTable(data_val_pred, Data_train$president[-samp],
 #           dnn = c('predicted', 'actual'))
 
 
-(tab1 <- table(Data_train$president[-samp], data_val_pred))
+(tab1 <- table(data_val_pred, Data_train$president[-samp]))
 ```
 
 ```{r}
