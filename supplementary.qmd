@@ -36,17 +36,23 @@ sona$president <- as.factor(sona$president)
 
 ```{r Cleaning Data}
 sentences <- sona %>%
-  unnest_sentences(speech, speech) %>%
-  mutate(ids = row_number())
+  unnest_sentences(speech, speech) #%>%
+  #mutate(ids = row_number())
+
+clean <- function(x){
+  x <- gsub("\\d+", "", x)
+  # remove contractions
+  x <- gsub("/'s", "", x)
+  # remove special characters
+  x <- gsub("[^[:alnum:] ]", "", x)
+  # lemmatization
+  x <- lemmatize_strings(x)
+  # remove single characters
+  x <- gsub("\\s.\\s", " ", x)
+}
 
 # remove numbers
-sentences$speech <- gsub('[0-9]+', '', sentences$speech)
-# remove contractions
-sentences$speech <- gsub("/'s", "", sentences$speech)
-# remove special characters
-sentences$speech <- gsub("[^[:alnum:] ]", "", sentences$speech)
-# lemmatization
-sentences$speech <- lemmatize_strings(sentences$speech)
+sentences$speech <- unlist(lapply(sentences$speech, clean))
 ```
 
 There are various ways in which one might go about selecting the training and test split for the models. One option considered was in having equal representation of each president in the training split.
@@ -136,11 +142,6 @@ Another option is to look into oversampling ([\@Imbalance]()). [\@Imbalance]() h
 Let's train the data on a sample of 1200 sentences for each president and see how it fairs. This would mean having to bootstrap for presidents like deKlerk and Mothlanthe. However, this should be done with the understanding that these two characters may have overestimated validation results as there could be instance of training examples in the validation.
 
 ```{r Oversample Split}
-# Need to keep some sentences separate.
-sentences <- sona %>%
-  unnest_sentences(speech, speech) %>%
-  mutate(ids = row_number())
-
 table(sentences$president)
 
 # Let's say each president has 70 sentences (that's close to 1000 words each.)
@@ -161,23 +162,37 @@ table(sentences$president)
 #   ungroup() %>%
 #   rename( token = speech )
 
-train <- as.data.frame(sentences) %>%
-  group_by(president) %>%
-  slice_sample( prop = 0.8 ) %>%
-  sample_n(size = 1200, replace = T) %>%
-  ungroup() %>%
-  rename( token = speech )
+# train <- as.data.frame(sentences) %>%
+#   group_by(president) %>%
+#   slice_sample( prop = 0.8 ) %>%
+#   sample_n(size = 1200, replace = T) %>%
+#   ungroup() %>%
+#   rename( token = speech )
 
 
 # train <- bind_rows(train1, train2) %>%
 #   mutate(ids = row_number())
 
-table(train$president)
+# table(train$president)
+# 
+# test <- sentences %>%
+#   unnest_sentences(token, speech) %>%
+#   anti_join(train, join_by(token)) %>%
+#   mutate(ids = row_number())
 
-test <- sentences %>%
-  unnest_sentences(token, speech) %>%
-  anti_join(train, join_by(token)) %>%
+over1 <- sentences %>%
+  filter(president %in% c("deKlerk", "Motlanthe")) %>%
+  group_by(president) %>%
+  sample_n(size = 1600, replace = T) %>%
+  ungroup()
+
+over2 <- sentences %>%
+  filter(!president %in% c("deKlerk", "Motlanthe"))
+
+over <- bind_rows(over1, over2) %>%
   mutate(ids = row_number())
+
+table(over$president)
 ```
 
 In the short exploration of the training samples below it would seem that oversampling is indeed a better strategy than undersampling. We can attempt to build off this. We may even be able to look into bigram and trigrams for this sized dataset.
@@ -185,8 +200,7 @@ In the short exploration of the training samples below it would seem that oversa
 
 ```{r Exploration of Over-Split}
 # Unigram
-uni <- train %>%
-  rename( speech = token) %>%
+uni <- over %>%
   unnest_tokens(token, speech) %>%
   #filter(!token %in% stop_words$word) %>%
   count(president, token)
@@ -232,8 +246,7 @@ uni_tf_idf %>%
 
 ```{r}
 # Bigram
-bigram <- train %>% 
-    rename( speech = token) %>%
+bigram <- over %>% 
   unnest_tokens(token, speech, token = 'ngrams', n = 2) %>%
   count(president, token)
 
@@ -268,8 +281,7 @@ Looking below, it would seem that anything more than a bigram for this oversampl
 
 ```{r}
 # Trigram
-trigram <- train %>% 
-    rename( speech = token) %>%
+trigram <- over %>% 
   unnest_tokens(token, speech, token = 'ngrams', n = 3) %>%
   count(president, token)
 
@@ -300,7 +312,7 @@ tri_tf_idf %>%
 
 
 ```{r}
-tt <- sentences %>%
+tt <- over %>%
   unnest_tokens(word, speech) %>%
   select(president, word, ids)
 
@@ -330,7 +342,7 @@ tfidf <- tweets_tdf %>%
   pivot_wider(names_from = word, values_from = tf_idf, values_fill = 0)# %>%  
 #  left_join(sentences %>% select(ids, president))
 
-tfidf <- sentences %>%
+tfidf <- over %>%
   select(ids, president) %>%
   rename (Response_President = president) %>%
   left_join(tfidf, by = "ids")%>%
@@ -349,6 +361,9 @@ train <- tfidf %>%
 table(train$president)
 
 model <- naive_bayes(Response_President ~., data = train, usekernal = T)
+
+p1 <- predict(model, train[,-1])
+(tab1 <- table(train$Response_President, p1))
 
 plot(model)
 ```
@@ -398,15 +413,20 @@ p1 <- predict(model, trainer[,-1])
 
 
 ```{r}
+
+train <- over %>%
+  slice_sample(prop = 0.8)
 Data_train <- train
+test <- over %>%
+  anti_join(train)
 Data_test <- test
 
 library(tm)
 
 #Creating Corpus
   # What this does is essentially save a list of lists of all the information
-suppressWarnings(Data_test_corpus <- Corpus(VectorSource(Data_test$token)))
-suppressWarnings(Data_train_corpus <- Corpus(VectorSource(Data_train$token)))
+suppressWarnings(Data_test_corpus <- Corpus(VectorSource(Data_test$speech)))
+suppressWarnings(Data_train_corpus <- Corpus(VectorSource(Data_train$speech)))
 
 #Corpus Cleaning
 suppressWarnings(Data_test_corpus_clean <- tm_map(Data_test_corpus, tolower))
@@ -435,7 +455,7 @@ suppressWarnings(inspect(Data_train_corpus_clean[1]))
 library(wordcloud)
   # Wordcloud does tokenization of corpus already.
   # It also removes stop words automatically
-wordcloud(train$token, max.words = 100, colors = c("grey80", "darkgoldenrod1", "tomato"), min.freq = 10, random.order = FALSE)
+wordcloud(train$speech, max.words = 100, colors = c("grey80", "darkgoldenrod1", "tomato"), min.freq = 10, random.order = FALSE)
 ```
 
 ```{r}
@@ -465,11 +485,11 @@ cntrl=list(weighting = weightTfIdf)#,
 
 train_dtm <- DocumentTermMatrix(Data_train_corpus_clean,
                                 control = cntrl)
-train_dtm <- removeSparseTerms(train_dtm,  0.95)
+#train_dtm <- removeSparseTerms(train_dtm,  0.95)
 
 test_dtm <- DocumentTermMatrix(Data_test_corpus_clean,
                                control = cntrl)
-test_dtm <- removeSparseTerms(test_dtm, 0.9)
+#test_dtm <- removeSparseTerms(test_dtm, 0.9)
 
 inspect(test_dtm)
 inspect(train_dtm)
@@ -508,11 +528,14 @@ data_test <- apply(data_test, MARGIN = 2, convert_counts)
 ```
 
 ```{r}
-#data_train <- as.matrix(train_dtm)
-
+data_train <- as.matrix(train_dtm)
+rowTotals <- slam::row_sums(data_train)
+data_train <- data_train[rowTotals > 0, ]
 samp <- sample(1:nrow(data_train), size = 6000)
 
-#data_test <- as.matrix(test_dtm)
+data_test <- as.matrix(test_dtm)
+rowTotals <- slam::row_sums(data_test)
+data_test <- data_test[rowTotals > 0, ]
 
 library(e1071)
 data_classifier <- naiveBayes(data_train[samp,], Data_train$president[samp], laplace = 0)

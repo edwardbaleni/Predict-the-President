@@ -1,0 +1,46 @@
+---
+title: "Supplementary 2"
+author: "Edward Baleni"
+format: html
+editor: visual
+---
+
+
+```{r Packages}
+require(dplyr)
+require(stringr)
+require(tidytext)
+require(ggplot2)
+require(tidyr)
+require(forcats)
+require(textstem)
+require(qdap)
+```
+
+```{r Data}
+set.seed(2023)
+sys.source("sona-first-steps.R" , envir = knitr::knit_global())
+sona <- as_tibble(sona)
+sona$president <- as.factor(sona$president)
+```
+
+```{r Cleaning Data}
+sentences <- sona %>%
+  unnest_sentences(speech, speech) #%>%
+  #mutate(ids = row_number())
+
+clean <- function(x){
+  x <- gsub("\\d+", "", x)
+  # remove contractions
+  x <- gsub("/'s", "", x)
+  # remove special characters
+  x <- gsub("[^[:alnum:] ]", "", x)
+  # lemmatization
+  x <- lemmatize_strings(x)
+  # remove single characters
+  x <- gsub("\\s.\\s", " ", x)
+}
+
+# remove numbers
+sentences$speech <- unlist(lapply(sentences$speech, clean))
+```
