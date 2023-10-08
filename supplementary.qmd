@@ -311,64 +311,6 @@ tri_tf_idf %>%
 ```
 
 
-```{r}
-tt <- over %>%
-  unnest_tokens(word, speech) %>%
-  select(president, word, ids)
-
-word_bag <- tt %>%
-  group_by(word) %>%
-  count() %>%
-  ungroup() %>%
-  #top_n(200, wt = n) %>%
-  select(-n)
-
-tweets_tdf <- tt %>%
-  #inner_join(word_bag) %>%
-  group_by(ids,word) %>%
-  count() %>%  
-  group_by(ids) %>%
-  mutate(total = sum(n)) %>%
-  ungroup()
-
-tweets_tdf <- tweets_tdf %>% #remove the old ones we worked out
-  bind_tf_idf(word, ids, n) %>%
-  group_by(word) %>%
-  top_n(200, tf_idf)
-
-
-tfidf <- tweets_tdf %>% 
-  select(ids, word, tf_idf) %>%  # note the change, using tf-idf
-  pivot_wider(names_from = word, values_from = tf_idf, values_fill = 0)# %>%  
-#  left_join(sentences %>% select(ids, president))
-
-tfidf <- over %>%
-  select(ids, president) %>%
-  rename (Response_President = president) %>%
-  left_join(tfidf, by = "ids")%>%
-  select(-ids)
-
-
-train <- tfidf %>%
-  group_by(Response_President) %>%
-  slice_sample( prop = 0.8 ) %>%
-  ungroup()
-
-
-# train <- bind_rows(train1, train2) %>%
-#   mutate(ids = row_number())
-
-table(train$president)
-
-model <- naive_bayes(Response_President ~., data = train, usekernal = T)
-
-p1 <- predict(model, train[,-1])
-(tab1 <- table(train$Response_President, p1))
-
-plot(model)
-```
-
-
 ```{r Quick analysis to compare uni and bi using random forests}
 require(naivebayes)
 tt <- sentences %>%
@@ -516,15 +458,15 @@ data_train <- DocumentTermMatrix(Data_train_corpus_clean, list(data_dict))
 data_test <- DocumentTermMatrix(Data_test_corpus_clean, list(data_dict))
 
 #Converting the frequency of word to count
-convert_counts <- function(x) {
-        x <- ifelse(x > 0, 1, 0)
-        x <- factor(x, levels = c(0, 1), labels = c("No", "Yes"))
-        return(x)
-}
-
-#Appending count function to Train and Test Dataset
-data_train <- apply(data_train, MARGIN = 2, convert_counts)
-data_test <- apply(data_test, MARGIN = 2, convert_counts)
+# convert_counts <- function(x) {
+#         x <- ifelse(x > 0, 1, 0)
+#         x <- factor(x, levels = c(0, 1), labels = c("No", "Yes"))
+#         return(x)
+# }
+# 
+# #Appending count function to Train and Test Dataset
+# data_train <- apply(data_train, MARGIN = 2, convert_counts)
+# data_test <- apply(data_test, MARGIN = 2, convert_counts)
 ```
 
 ```{r}
@@ -542,7 +484,7 @@ data_classifier <- naiveBayes(data_train[samp,], Data_train$president[samp], lap
 
 library(gmodels)
 data_val_pred <- predict(data_classifier, data_train[-samp,] )
-CrossTable(data_val_pred, Data_train$president[-samp],
+CrossTable(data_val_pred, unlist(Data_train$president[-samp]),
           prop.chisq = FALSE, prop.t = FALSE,
           dnn = c('predicted', 'actual'))
 #data_test_pred <- predict(data_classifier, data_test)
@@ -551,7 +493,8 @@ CrossTable(data_val_pred, Data_train$president[-samp],
 #           dnn = c('predicted', 'actual'))
 
 
-(tab1 <- table(data_val_pred, Data_train$president[-samp]))
+(tab1 <- table(data_val_pred, unlist(Data_train$president[-samp])))
+
 sum(diag(tab1))/1200  # When findFreqTerms(x) then this is 0.72
 ```
 
@@ -808,3 +751,62 @@ sum(diag(tab1))/1200  # When findFreqTerms(x) then this is 0.72
 ```
 
 
+
+
+######### Something extra
+```{r}
+tt <- over %>%
+  unnest_tokens(word, speech) %>%
+  select(president, word, ids)
+
+word_bag <- tt %>%
+  group_by(word) %>%
+  count() %>%
+  ungroup() %>%
+  #top_n(200, wt = n) %>%
+  select(-n)
+
+tweets_tdf <- tt %>%
+  #inner_join(word_bag) %>%
+  group_by(ids,word) %>%
+  count() %>%  
+  group_by(ids) %>%
+  mutate(total = sum(n)) %>%
+  ungroup()
+
+tweets_tdf <- tweets_tdf %>% #remove the old ones we worked out
+  bind_tf_idf(word, ids, n) %>%
+  group_by(word) %>%
+  top_n(200, tf_idf)
+
+
+tfidf <- tweets_tdf %>% 
+  select(ids, word, tf_idf) %>%  # note the change, using tf-idf
+  pivot_wider(names_from = word, values_from = tf_idf, values_fill = 0)# %>%  
+#  left_join(sentences %>% select(ids, president))
+
+tfidf <- over %>%
+  select(ids, president) %>%
+  rename (Response_President = president) %>%
+  left_join(tfidf, by = "ids")%>%
+  select(-ids)
+
+
+train <- tfidf %>%
+  group_by(Response_President) %>%
+  slice_sample( prop = 0.8 ) %>%
+  ungroup()
+
+
+# train <- bind_rows(train1, train2) %>%
+#   mutate(ids = row_number())
+
+table(train$president)
+
+model <- naive_bayes(Response_President ~., data = train, usekernal = T)
+
+p1 <- predict(model, train[,-1])
+(tab1 <- table(train$Response_President, p1))
+
+plot(model)
+```
