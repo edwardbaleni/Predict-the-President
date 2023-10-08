@@ -288,7 +288,46 @@ tt <- table((p1), (unlist(test_tweets[,1])))
 ```
 
 ```{r FFNN}
+y_train <- as.integer(unlist(training_tweets[,1]))
+x_train <- training_tweets[,-1]
 
+y_test <- as.integer(unlist(test_tweets[,1]))
+x_test <- test_tweets[,-1]
+
+
+y_train <- to_categorical(y_train)
+y_test_original <- y_test
+y_test <- to_categorical(y_test)
+
+
+model <- keras_model_sequential()
+
+
+model %>% 
+  layer_dense(units = 8, activation = 'relu', input_shape = c(4)) %>% 
+  layer_dropout(rate = 0.5) %>%
+  layer_dense(units = 3, activation = 'softmax')
+
+
+summary(model)
+
+
+
+model %>% compile(
+  loss = 'categorical_crossentropy',
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  metrics = c('accuracy'),
+)
+
+history <- model %>% fit(
+  x_train, y_train, 
+  epochs = 30, batch_size = 5, 
+  validation_split = 0.2, shuffle = TRUE
+)
+
+plot(history)
+
+model %>% evaluate(x_test, y_test)
 ```
 
 
