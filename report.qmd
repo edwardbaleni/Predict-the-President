@@ -246,20 +246,26 @@ tri_tf_idf %>%
   geom_col(show.legend = FALSE) +
   facet_wrap(~president, ncol = 2, scales = "free") +
   labs(x = "Count", y = NULL)
-
-
-
 ```
 
+
+## EDA
+<!-- a  great  variety  ofmeasures, including sentence length, word length, word fre-quencies,  character  frequencies,  and  vocabulary  richness -->
+
+<!-- vocabulary richnessfunctions are attempts to quan-tify the diversity of the vocabulary of a tex -->
 
 ## Naive Bayes Classifier
 
 ## Feed Forward Neural Networks
 
-## Convolutional Neural Networks or Tree-Based Method or (whatever the book suggests) or Logisitic Regression
+## Support Vector Machines
 
 # Results
 
 # Discussion
+
+# Limitations
+
+A limitation that arises in this study is a lack of candidate authors, as well as minimal data provided for some authors. This is an issue that has been detailed in research before ([\@Stylometry]()).
 
 # Conclusion
