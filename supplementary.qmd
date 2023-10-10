@@ -648,14 +648,12 @@ p1 <- predict(classifier, val.set[,-1])
 tt <- table((p1), (unlist(val.set[,1])))
 1 - sum(diag(tt))/ sum(tt)
 ```
+<!-- With spaces: naive = 0.463; svm = 0.418 -->
+<!-- Without spaces: naive = 0.47 svm = 0.42 -->
 
+We clearly see here that there is an improvement when punctuation is included.
 
-At this stage it is hard to say whether the inclusion of punctuation is adding or removing value from the analysis.
-
-
-
-
-
+Need to check if case matters too. But I don't think it will matter
 
 
 
