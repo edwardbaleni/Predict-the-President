@@ -94,7 +94,7 @@ uni_tf_idf %>%
 
 ```{r}
 data_count <- data_count %>%
-  mutate(ids_ = row_number())
+  mutate(ids = row_number())
 
 tidy_tweets <- data_count %>%
   unnest_character_shingles(token, speech, n = 4) #%>%         # Somehow, not removing tokens works in identifying st
@@ -266,6 +266,9 @@ tt <- table((p1), (unlist(test_tweets[,1])))
 
 
 <!-- 0.46 misscalssification achieved when nchars is 3, and all tokens are kept (No word bag) -->
+<!-- 0.44 with nchars is 4 and 2000 words kept -->
+<!-- 0.51 with nchars is 4 and all tokens kept -->
+<!-- 0.46 with nchars is 3, 2000 tokens and punctuation is included  -->
 
 ```{r Support Vector Machine}
 # This works for a a reasonably sized word bag

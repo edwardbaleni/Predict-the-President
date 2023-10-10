@@ -20,16 +20,20 @@ require(forcats)
 require(textstem)
 require(qdap)
 
+library(e1071)
+
 library(keras) 
 library(reticulate) 
 library(tensorflow)
+
+set.seed(321)
 ```
 
 ```{r Data}
 set.seed(2023)
 sys.source("sona-first-steps.R" , envir = knitr::knit_global())
 sona <- as_tibble(sona)
-sona$president <- as.factor(sona$president)
+#sona$president <- as.factor(sona$president)
 ```
 
 ```{r Cleaning Data}
@@ -53,16 +57,659 @@ clean <- function(x){
 sentences$speech <- unlist(lapply(sentences$speech, clean))
 ```
 
-```{r Remove first sentence}
-# Need to remove first sentence for each president, to analyse count well
-# Since first sentence is similar for each president
-hold <- c()
-for (i in unique(sentences$filename)){
-  hold <- c(hold, which( sentences$filename %in% i)[1])
-}
-data <- sentences[-hold,]
-sentences <- data
+# Supplementary
+
+This supplementary serves as grounds on which most of the final decisions were based. It includes finding preferred stylometic features and the handling of imbalanced classes.
+
+## Stylometric Features
+
+The first task is to select the stylometric features. This is deciding how one may choose to represent text. This can either be done by tokenizing by words (lexical features), a number of characters (character features), or in other more sophisticated ways like syntatic features or semantic features. In this study, only lexical features and character features are explored, while the other two require more domain knowledge to properly quantify ([\@Stylometry]()). 
+
+The goal of this assignment is that of author attribution, we are essentially trying to decide which president said what sentence. Although the some of the points addressed within the speech are slightly different, the main topic is that of a political address, therefore it may be worthwhile to view this research as a style-based text classification rather than a topic-based text classification. This will have significant effect on the study and the effect will be demonstrated here.
+
+One of the issues that still need to be addressed is the handling of imbalanced classes, at this stage, the imbalanced classes will be removed and will be looked at again later on.
+
+Another point to address is the useage of token count or TF-IDF weightings, as observations for the study. This initial exploration will be done with frequency, as this is a very stable way in conducting author attribution ([\@WordFreq]()). 
+
+For each experiment, a Naive Bayes classifier and a Support Vector Machine will be used to inform decisions.
+
+When looking into the count data, it sometimes does help to select a the most frequent words for the analysis. This will be examined later, at this stage, 150
+
+### Lexical Features
+
+```{r Remove Imabalances}
+data <- sentences %>%
+  filter(!president %in% c("deKlerk", "Motlanthe"))
+data$president <- as.factor(data$president)
+
+data_count <- data
+
+data_count <- data_count %>%
+  mutate(ids_ = row_number())
 ```
+
+When it comes to lexical features, these can be classed into N-grams. A collection of N contiguous words. The greater N is, the more complex the representation of the feature. It often doesn't show better results and the greater the N the higher the dimensionality of the problem, which will ultimately increase sparsity in the dataset, making it more difficult to classify ([\@Ngrams](), [\@WordFreq]()). To that extent, only unigrams and bigrams will be explored. 
+
+```{r Unigram}
+uni <- data_count %>%
+  unnest_tokens(token, speech, token = "words") %>%
+  filter(!token %in% stop_words$word)
+  
+word.bag.uni <- uni %>%
+  group_by(token) %>%
+  count() %>%
+  ungroup() %>%
+  top_n(200, wt = n) %>%
+  select(-n)
+
+uni.tdf <- uni %>%
+  inner_join(word.bag.uni) %>%
+  group_by(ids_,token) %>%
+  count() %>%  
+  group_by(ids_) %>%
+  mutate(total = sum(n)) %>%
+  ungroup()
+
+
+bag.of.words.uni <- uni.tdf %>% 
+  select(ids_, token, n) %>% 
+  pivot_wider(names_from = token, values_from = n, values_fill = 0) 
+
+
+bag.of.words.uni <- data_count %>%
+  select(ids_, president) %>%
+  rename (Response_President = president) %>%
+  right_join(bag.of.words.uni, join_by("ids_")) %>%
+  select(ids_, Response_President, everything()) 
+```
+
+
+```{r Bigram}
+bi <- data_count %>%
+  unnest_tokens(token, speech, token = "ngrams", n = 2) %>%
+  filter(!token %in% stop_words$word)
+  
+word.bag.bi <- bi %>%
+  group_by(token) %>%
+  count() %>%
+  ungroup() %>%
+  top_n(200, wt = n) %>%
+  select(-n)
+
+bi.tdf <- bi %>%
+  inner_join(word.bag.bi) %>%
+  group_by(ids_,token) %>%
+  count() %>%  
+  group_by(ids_) %>%
+  mutate(total = sum(n)) %>%
+  ungroup()
+
+
+bag.of.words.bi <- bi.tdf %>% 
+  select(ids_, token, n) %>% 
+  pivot_wider(names_from = token, values_from = n, values_fill = 0) 
+
+
+bag.of.words.bi <- data_count %>%
+  select(ids_, president) %>%
+  rename (Response_President = president) %>%
+  right_join(bag.of.words.bi, join_by("ids_")) %>%
+  select(ids_, Response_President, everything()) 
+```
+
+For the training, validation and test splits, it would be wise to select sample sizes by sentence and not by word, this will represent each row in the bag of words.
+```{r Splits}
+id           <- unique(data_count$ids_)
+N            <- length(id) 
+
+# Training set
+train <- sample(id, size = N * 0.6)
+
+# Validation set
+not_train    <- na.omit(ifelse(!id %in% train, id, NA))
+NN           <- length(not_train)
+val          <- sample(not_train, size = NN * 0.5 )
+
+# Test set
+test         <- na.omit(ifelse(!not_train %in% val, not_train, NA))
+
+length(test) + length(val) + length(train)
+```
+
+
+```{r Unigram Test}
+train.set    <- bag.of.words.uni[bag.of.words.uni$ids_ %in% train, -1]
+val.set      <- bag.of.words.uni[bag.of.words.uni$ids_ %in% val, -1]
+test.set     <- bag.of.words.uni[bag.of.words.uni$ids_ %in% test, -1]
+
+# Bayes classifier
+data_classifier <- naiveBayes(train.set[,-1], train.set[,1])
+p1 <- predict(data_classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+
+# SVM
+classifier = svm(train.set[,-1], train.set[,1], type = "C-classification", scale = T)
+p1 <- predict(classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+```
+
+```{r Bigram Test}
+train.set    <- bag.of.words.bi[bag.of.words.bi$ids_ %in% train, -1]
+val.set      <- bag.of.words.bi[bag.of.words.bi$ids_ %in% val, -1]
+test.set     <- bag.of.words.bi[bag.of.words.bi$ids_ %in% test, -1]
+
+
+# Bayes Classifier
+data_classifier <- naiveBayes(train.set[,-1], train.set[,1])
+p1 <- predict(data_classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+
+# SVM
+classifier = svm(train.set[,-1], train.set[,1], type = "C-classification", scale = T)
+p1 <- predict(classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+```
+
+What we see above is that for a word bag of 200 most frequent content words that the bigram does indeed perform worse. Content words are the opposite of functional words, where functional words are used to very abundandtly in style-based classification. These functional words are often removed in topic-based classification ([\@Stylometry]()) (there are more papers)..
+
+Although the missclassification error here is already quite poor, we can use this as a platform on which to launch the rest of the analysis. It is essential that we observe whether allowing functional words will improve the statement made earlier, that this is more directed towards style-based classification.
+
+It should also be noted that the unigram performining better than the bigram could be due to the size of the word bag.
+
+First let's look into whether using functional words will be useful to the analysis.
+
+
+
+```{r Unigram}
+data_count <- data
+
+data_count <- data_count %>%
+  mutate(ids_ = row_number())
+
+uni <- data_count %>%
+  unnest_tokens(token, speech, token = "words")
+  
+word.bag.uni <- uni %>%
+  group_by(token) %>%
+  count() %>%
+  ungroup() %>%
+  top_n(200, wt = n) %>%
+  select(-n)
+
+uni.tdf <- uni %>%
+  inner_join(word.bag.uni) %>%
+  group_by(ids_,token) %>%
+  count() %>%  
+  group_by(ids_) %>%
+  mutate(total = sum(n)) %>%
+  ungroup()
+
+
+bag.of.words.uni <- uni.tdf %>% 
+  select(ids_, token, n) %>% 
+  pivot_wider(names_from = token, values_from = n, values_fill = 0) 
+
+
+bag.of.words.uni <- data_count %>%
+  select(ids_, president) %>%
+  rename (Response_President = president) %>%
+  right_join(bag.of.words.uni, join_by("ids_")) %>%
+  select(ids_, Response_President, everything()) 
+```
+
+
+```{r Bigram}
+bi <- data_count %>%
+  unnest_tokens(token, speech, token = "ngrams", n = 2)
+  
+word.bag.bi <- bi %>%
+  group_by(token) %>%
+  count() %>%
+  ungroup() %>%
+  top_n(200, wt = n) %>%
+  select(-n)
+
+bi.tdf <- bi %>%
+  inner_join(word.bag.bi) %>%
+  group_by(ids_,token) %>%
+  count() %>%  
+  group_by(ids_) %>%
+  mutate(total = sum(n)) %>%
+  ungroup()
+
+
+bag.of.words.bi <- bi.tdf %>% 
+  select(ids_, token, n) %>% 
+  pivot_wider(names_from = token, values_from = n, values_fill = 0) 
+
+
+bag.of.words.bi <- data_count %>%
+  select(ids_, president) %>%
+  rename (Response_President = president) %>%
+  right_join(bag.of.words.bi, join_by("ids_")) %>%
+  select(ids_, Response_President, everything()) 
+```
+
+
+```{r Unigram Test}
+train.set    <- bag.of.words.uni[bag.of.words.uni$ids_ %in% train, -1]
+val.set      <- bag.of.words.uni[bag.of.words.uni$ids_ %in% val, -1]
+test.set     <- bag.of.words.uni[bag.of.words.uni$ids_ %in% test, -1]
+
+# Bayes classifier
+data_classifier <- naiveBayes(train.set[,-1], train.set[,1])
+p1 <- predict(data_classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+
+# SVM
+classifier = svm(train.set[,-1], train.set[,1], type = "C-classification", scale = T)
+p1 <- predict(classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+```
+
+```{r Bigram Test}
+train.set    <- bag.of.words.bi[bag.of.words.bi$ids_ %in% train, -1]
+val.set      <- bag.of.words.bi[bag.of.words.bi$ids_ %in% val, -1]
+test.set     <- bag.of.words.bi[bag.of.words.bi$ids_ %in% test, -1]
+
+
+# Bayes Classifier
+data_classifier <- naiveBayes(train.set[,-1], train.set[,1])
+p1 <- predict(data_classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+
+# SVM
+classifier = svm(train.set[,-1], train.set[,1], type = "C-classification", scale = T)
+p1 <- predict(classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+```
+
+Here we see that this is indeed more of style-based classification than a topic-based classification, this is shown in how the missclassification in general does decrease in both cases of of the bigram and unigram. As mentioned above, this is so as each of the SONA speeches, although done by different presidents, in general speaks on very similar topics and ideas, therefore, their styles are more important than their topics.
+
+In this second set of classifications we see that the unigram actually outperforms the bigram, whilst also having a missclassification that is lower than when stop words were removed.
+
+At this stage, I would suggest using unigrams and not using stop words for the analysis.
+
+However, since this is now a style-based classification task, using character features has in previous works been shown to capture style, lexical information and some contextual informatial. It is also able use punctuation and capitalization to infer stylistic approaches.
+
+
+
+
+```{r 3 Characters}
+uni <- data_count %>%
+  unnest_character_shingles(token, speech, n = 3) 
+  
+word.bag.uni <- uni %>%
+  group_by(token) %>%
+  count() %>%
+  ungroup() %>%
+  top_n(200, wt = n) %>%
+  select(-n)
+
+uni.tdf <- uni %>%
+  inner_join(word.bag.uni) %>%
+  group_by(ids_,token) %>%
+  count() %>%  
+  group_by(ids_) %>%
+  mutate(total = sum(n)) %>%
+  ungroup()
+
+
+bag.of.words.uni <- uni.tdf %>% 
+  select(ids_, token, n) %>% 
+  pivot_wider(names_from = token, values_from = n, values_fill = 0) 
+
+
+bag.of.words.uni <- data_count %>%
+  select(ids_, president) %>%
+  rename (Response_President = president) %>%
+  right_join(bag.of.words.uni, join_by("ids_")) %>%
+  select(ids_, Response_President, everything()) 
+```
+
+
+```{r 4 Characters}
+bi <- data_count %>%
+  unnest_character_shingles(token, speech, n = 4) 
+  
+word.bag.bi <- bi %>%
+  group_by(token) %>%
+  count() %>%
+  ungroup() %>%
+  top_n(200, wt = n) %>%
+  select(-n)
+
+bi.tdf <- bi %>%
+  inner_join(word.bag.bi) %>%
+  group_by(ids_,token) %>%
+  count() %>%  
+  group_by(ids_) %>%
+  mutate(total = sum(n)) %>%
+  ungroup()
+
+
+bag.of.words.bi <- bi.tdf %>% 
+  select(ids_, token, n) %>% 
+  pivot_wider(names_from = token, values_from = n, values_fill = 0) 
+
+
+bag.of.words.bi <- data_count %>%
+  select(ids_, president) %>%
+  rename (Response_President = president) %>%
+  right_join(bag.of.words.bi, join_by("ids_")) %>%
+  select(ids_, Response_President, everything()) 
+```
+
+
+```{r 3 Char Test}
+train.set    <- bag.of.words.uni[bag.of.words.uni$ids_ %in% train, -1]
+val.set      <- bag.of.words.uni[bag.of.words.uni$ids_ %in% val, -1]
+test.set     <- bag.of.words.uni[bag.of.words.uni$ids_ %in% test, -1]
+
+# Bayes classifier
+data_classifier <- naiveBayes(train.set[,-1], train.set[,1])
+p1 <- predict(data_classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+
+# SVM
+classifier = svm(train.set[,-1], train.set[,1], type = "C-classification", scale = T)
+p1 <- predict(classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+```
+
+```{r 4 Char Test}
+train.set    <- bag.of.words.bi[bag.of.words.bi$ids_ %in% train, -1]
+val.set      <- bag.of.words.bi[bag.of.words.bi$ids_ %in% val, -1]
+test.set     <- bag.of.words.bi[bag.of.words.bi$ids_ %in% test, -1]
+
+
+# Bayes Classifier
+data_classifier <- naiveBayes(train.set[,-1], train.set[,1])
+p1 <- predict(data_classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+
+# SVM
+classifier = svm(train.set[,-1], train.set[,1], type = "C-classification", scale = T)
+p1 <- predict(classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+```
+
+
+
+At this stage we can see that the classification is not that much different from a unigram, however, points of which to consider, is that when using character features certain items become necessary and deserve exploration: the number of characters, the size of the word bag, the inclusion of punctuation.
+
+The number of characters have been chosen to be either 3 or 4, which is consistent with the study ([\@Stylometry]()). The size of the bag and the inclusion of punctuation are two points which need to be further explored.
+
+
+
+
+```{r 3 Characters Bigger Bag}
+uni <- data_count %>%
+  unnest_character_shingles(token, speech, n = 3) 
+  
+word.bag.uni <- uni %>%
+  group_by(token) %>%
+  count() %>%
+  ungroup() %>%
+  top_n(2000, wt = n) %>%
+  select(-n)
+
+uni.tdf <- uni %>%
+  inner_join(word.bag.uni) %>%
+  group_by(ids_,token) %>%
+  count() %>%  
+  group_by(ids_) %>%
+  mutate(total = sum(n)) %>%
+  ungroup()
+
+
+bag.of.words.uni <- uni.tdf %>% 
+  select(ids_, token, n) %>% 
+  pivot_wider(names_from = token, values_from = n, values_fill = 0) 
+
+
+bag.of.words.uni <- data_count %>%
+  select(ids_, president) %>%
+  rename (Response_President = president) %>%
+  right_join(bag.of.words.uni, join_by("ids_")) %>%
+  select(ids_, Response_President, everything()) 
+```
+
+
+```{r 4 Characters Bigger Bag}
+bi <- data_count %>%
+  unnest_character_shingles(token, speech, n = 4) 
+  
+word.bag.bi <- bi %>%
+  group_by(token) %>%
+  count() %>%
+  ungroup() %>%
+  top_n(2000, wt = n) %>%
+  select(-n)
+
+bi.tdf <- bi %>%
+  inner_join(word.bag.bi) %>%
+  group_by(ids_,token) %>%
+  count() %>%  
+  group_by(ids_) %>%
+  mutate(total = sum(n)) %>%
+  ungroup()
+
+
+bag.of.words.bi <- bi.tdf %>% 
+  select(ids_, token, n) %>% 
+  pivot_wider(names_from = token, values_from = n, values_fill = 0) 
+
+
+bag.of.words.bi <- data_count %>%
+  select(ids_, president) %>%
+  rename (Response_President = president) %>%
+  right_join(bag.of.words.bi, join_by("ids_")) %>%
+  select(ids_, Response_President, everything()) 
+```
+
+
+```{r 3 Char Test Bigger Bag}
+train.set    <- bag.of.words.uni[bag.of.words.uni$ids_ %in% train, -1]
+val.set      <- bag.of.words.uni[bag.of.words.uni$ids_ %in% val, -1]
+test.set     <- bag.of.words.uni[bag.of.words.uni$ids_ %in% test, -1]
+
+# Bayes classifier
+data_classifier <- naiveBayes(train.set[,-1], train.set[,1])
+p1 <- predict(data_classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+
+# SVM
+classifier = svm(train.set[,-1], train.set[,1], type = "C-classification", scale = T)
+p1 <- predict(classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+```
+
+```{r 4 Char Test Bigger Bag}
+train.set    <- bag.of.words.bi[bag.of.words.bi$ids_ %in% train, -1]
+val.set      <- bag.of.words.bi[bag.of.words.bi$ids_ %in% val, -1]
+test.set     <- bag.of.words.bi[bag.of.words.bi$ids_ %in% test, -1]
+
+
+# Bayes Classifier
+data_classifier <- naiveBayes(train.set[,-1], train.set[,1])
+p1 <- predict(data_classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+
+# SVM
+classifier = svm(train.set[,-1], train.set[,1], type = "C-classification", scale = T)
+p1 <- predict(classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+```
+
+
+
+The missclassification has decreased tremendously from when the word bag contained 200 words.
+
+
+
+Now below we look at the inclusion of punctuation
+
+
+
+```{r Exluding Punctuation}
+sentences <- sona %>%
+  unnest_sentences(speech, speech) #%>%
+  #mutate(ids = row_number())
+
+clean <- function(x){
+  # remove numbers
+  x <- gsub("\\d+", "", x)
+  # remove contractions
+  #x <- gsub("/'s", "", x)
+  x <- gsub(" ", "", x)
+  # lemmatization
+  x <- lemmatize_strings(x)
+  # remove single characters
+  x <- gsub("\\s.\\s", " ", x)
+}
+
+sentences$speech <- unlist(lapply(sentences$speech, clean))
+
+data <- sentences %>%
+  filter(!president %in% c("deKlerk", "Motlanthe"))
+data$president <- as.factor(data$president)
+
+data_count <- data
+
+data_count <- data_count %>%
+  mutate(ids_ = row_number())
+```
+
+
+```{r 3 Characters Bigger Bag No Punc}
+uni <- data_count %>%
+  unnest_character_shingles(token, speech, n = 3, strip_non_alphanum = F) 
+  
+word.bag.uni <- uni %>%
+  group_by(token) %>%
+  count() %>%
+  ungroup() %>%
+  top_n(3000, wt = n) %>%
+  select(-n)
+
+uni.tdf <- uni %>%
+  inner_join(word.bag.uni) %>%
+  group_by(ids_,token) %>%
+  count() %>%  
+  group_by(ids_) %>%
+  mutate(total = sum(n)) %>%
+  ungroup()
+
+
+bag.of.words.uni <- uni.tdf %>% 
+  select(ids_, token, n) %>% 
+  pivot_wider(names_from = token, values_from = n, values_fill = 0) 
+
+
+bag.of.words.uni <- data_count %>%
+  select(ids_, president) %>%
+  rename (Response_President = president) %>%
+  right_join(bag.of.words.uni, join_by("ids_")) %>%
+  select(ids_, Response_President, everything()) 
+```
+
+
+```{r 4 Characters Bigger Bag No Punc}
+bi <- data_count %>%
+  unnest_character_shingles(token, speech, n = 4, strip_non_alphanum = F) 
+  
+word.bag.bi <- bi %>%
+  group_by(token) %>%
+  count() %>%
+  ungroup() %>%
+  top_n(3000, wt = n) %>%
+  select(-n)
+
+bi.tdf <- bi %>%
+  inner_join(word.bag.bi) %>%
+  group_by(ids_,token) %>%
+  count() %>%  
+  group_by(ids_) %>%
+  mutate(total = sum(n)) %>%
+  ungroup()
+
+
+bag.of.words.bi <- bi.tdf %>% 
+  select(ids_, token, n) %>% 
+  pivot_wider(names_from = token, values_from = n, values_fill = 0) 
+
+
+bag.of.words.bi <- data_count %>%
+  select(ids_, president) %>%
+  rename (Response_President = president) %>%
+  right_join(bag.of.words.bi, join_by("ids_")) %>%
+  select(ids_, Response_President, everything()) 
+```
+
+
+```{r 3 Char Test Bigger Bag No Punc}
+train.set    <- bag.of.words.uni[bag.of.words.uni$ids_ %in% train, -1]
+val.set      <- bag.of.words.uni[bag.of.words.uni$ids_ %in% val, -1]
+test.set     <- bag.of.words.uni[bag.of.words.uni$ids_ %in% test, -1]
+
+# Bayes classifier
+data_classifier <- naiveBayes(train.set[,-1], train.set[,1])
+p1 <- predict(data_classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+
+# SVM
+classifier = svm(train.set[,-1], train.set[,1], type = "C-classification", scale = T)
+p1 <- predict(classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+```
+<!-- For nchar = 4, when bag size = 3000, naive bayes = 0.47 and svm = 0.58 -->
+```{r 4 Char Test Bigger Bag No Punc}
+train.set    <- bag.of.words.bi[bag.of.words.bi$ids_ %in% train, -1]
+val.set      <- bag.of.words.bi[bag.of.words.bi$ids_ %in% val, -1]
+test.set     <- bag.of.words.bi[bag.of.words.bi$ids_ %in% test, -1]
+
+
+# Bayes Classifier
+data_classifier <- naiveBayes(train.set[,-1], train.set[,1])
+p1 <- predict(data_classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+
+# SVM
+classifier = svm(train.set[,-1], train.set[,1], type = "C-classification", scale = T)
+p1 <- predict(classifier, val.set[,-1])
+tt <- table((p1), (unlist(val.set[,1])))
+1 - sum(diag(tt))/ sum(tt)
+```
+
+
+At this stage it is hard to say whether the inclusion of punctuation is adding or removing value from the analysis.
+
+
+
+
+
+
+
 
 # Data Handling Options
 
