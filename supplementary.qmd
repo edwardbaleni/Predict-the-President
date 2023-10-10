@@ -26,7 +26,7 @@ library(keras)
 library(reticulate) 
 library(tensorflow)
 
-set.seed(321)
+#set.seed(321)
 ```
 
 ```{r Data}
@@ -463,7 +463,7 @@ word.bag.uni <- uni %>%
   group_by(token) %>%
   count() %>%
   ungroup() %>%
-  top_n(2000, wt = n) %>%
+  top_n(2500, wt = n) %>%
   select(-n)
 
 uni.tdf <- uni %>%
@@ -496,7 +496,7 @@ word.bag.bi <- bi %>%
   group_by(token) %>%
   count() %>%
   ungroup() %>%
-  top_n(2000, wt = n) %>%
+  top_n(2500, wt = n) %>%
   select(-n)
 
 bi.tdf <- bi %>%
@@ -576,13 +576,8 @@ sentences <- sona %>%
 clean <- function(x){
   # remove numbers
   x <- gsub("\\d+", "", x)
-  # remove contractions
-  #x <- gsub("/'s", "", x)
-  x <- gsub(" ", "", x)
   # lemmatization
   x <- lemmatize_strings(x)
-  # remove single characters
-  x <- gsub("\\s.\\s", " ", x)
 }
 
 sentences$speech <- unlist(lapply(sentences$speech, clean))
@@ -598,40 +593,9 @@ data_count <- data_count %>%
 ```
 
 
-```{r 3 Characters Bigger Bag No Punc}
-uni <- data_count %>%
-  unnest_character_shingles(token, speech, n = 3, strip_non_alphanum = F) 
-  
-word.bag.uni <- uni %>%
-  group_by(token) %>%
-  count() %>%
-  ungroup() %>%
-  top_n(3000, wt = n) %>%
-  select(-n)
-
-uni.tdf <- uni %>%
-  inner_join(word.bag.uni) %>%
-  group_by(ids_,token) %>%
-  count() %>%  
-  group_by(ids_) %>%
-  mutate(total = sum(n)) %>%
-  ungroup()
 
 
-bag.of.words.uni <- uni.tdf %>% 
-  select(ids_, token, n) %>% 
-  pivot_wider(names_from = token, values_from = n, values_fill = 0) 
-
-
-bag.of.words.uni <- data_count %>%
-  select(ids_, president) %>%
-  rename (Response_President = president) %>%
-  right_join(bag.of.words.uni, join_by("ids_")) %>%
-  select(ids_, Response_President, everything()) 
-```
-
-
-```{r 4 Characters Bigger Bag No Punc}
+```{r 4 Characters Bigger Bag Punc}
 bi <- data_count %>%
   unnest_character_shingles(token, speech, n = 4, strip_non_alphanum = F) 
   
@@ -639,7 +603,7 @@ word.bag.bi <- bi %>%
   group_by(token) %>%
   count() %>%
   ungroup() %>%
-  top_n(3000, wt = n) %>%
+  top_n(4500, wt = n) %>%
   select(-n)
 
 bi.tdf <- bi %>%
@@ -663,25 +627,9 @@ bag.of.words.bi <- data_count %>%
   select(ids_, Response_President, everything()) 
 ```
 
+<!-- For nchar = 4, when bag size = 4500, naive bayes = 0.47 and svm = 0.58 -->
+A word bag of 2000, 2500, 3000, 4000, 4500 and 5000 were looked at, these tests will not be shown, but can be replicated. The best performing model came out to be with a bag size of 4500 of the configurations tried. Unfortunately, character sequences such as: "..." and "..j" were created when looking at a number of characters of 3, this can not be run by these models. So for simplicity, only when the number of characters equal to 4 was observed here. 
 
-```{r 3 Char Test Bigger Bag No Punc}
-train.set    <- bag.of.words.uni[bag.of.words.uni$ids_ %in% train, -1]
-val.set      <- bag.of.words.uni[bag.of.words.uni$ids_ %in% val, -1]
-test.set     <- bag.of.words.uni[bag.of.words.uni$ids_ %in% test, -1]
-
-# Bayes classifier
-data_classifier <- naiveBayes(train.set[,-1], train.set[,1])
-p1 <- predict(data_classifier, val.set[,-1])
-tt <- table((p1), (unlist(val.set[,1])))
-1 - sum(diag(tt))/ sum(tt)
-
-# SVM
-classifier = svm(train.set[,-1], train.set[,1], type = "C-classification", scale = T)
-p1 <- predict(classifier, val.set[,-1])
-tt <- table((p1), (unlist(val.set[,1])))
-1 - sum(diag(tt))/ sum(tt)
-```
-<!-- For nchar = 4, when bag size = 3000, naive bayes = 0.47 and svm = 0.58 -->
 ```{r 4 Char Test Bigger Bag No Punc}
 train.set    <- bag.of.words.bi[bag.of.words.bi$ids_ %in% train, -1]
 val.set      <- bag.of.words.bi[bag.of.words.bi$ids_ %in% val, -1]
