@@ -290,16 +290,16 @@ tt <- table((p1), (unlist(test_tweets[,1])))
 ```
 
 ```{r FFNN}
-y_train <- as.integer(unlist(training_tweets[,1]))
-x_train <- as.matrix(training_tweets[,-1])
+y_train <- as.integer(unlist(train.set[,1])) - 1
+x_train <- as.matrix(train.set[,-1])
 
-y_test <- as.integer(unlist(test_tweets[,1]))
-x_test <- as.matrix(test_tweets[,-1])
+y_test <- as.integer(unlist(val.set[,1])) - 1
+x_test <- as.matrix(val.set[,-1])
 
 
-# y_train <- to_categorical(y_train)
+ y_train <- to_categorical(y_train)
 # y_test_original <- y_test
-# y_test <- to_categorical(y_test)
+ y_test <- to_categorical(y_test)
 
 
 # model <- keras_model_sequential()
@@ -332,24 +332,33 @@ x_test <- as.matrix(test_tweets[,-1])
 # model %>% evaluate(x_test, y_test)
 
 model <- keras_model_sequential() %>%
-   layer_dense(units = 8, activation = 'relu', input_shape = c(8166)) %>% 
+   layer_dense(units = 32, activation = 'relu', input_shape = c(4538)) %>% 
    layer_dropout(rate = 0.5) %>%
-   layer_dense(units = 1, activation = 'softmax')
+   layer_dense(units = 4, activation = 'softmax')
 
 summary(model)
 
 model %>% compile(
   loss = "categorical_crossentropy",
   optimizer = optimizer_adam(learning_rate = 0.01),
-  metrics = "accuracy"
+  metrics = "categorical_accuracy"
 )
 
 history <- model %>% fit(
   x_train, y_train, 
-  epochs = 50, batch_size = 100, verbose = 0) 
+  epochs = 50, batch_size = 100,verbose = 0) 
 
 plot(history)
 
-results <- model %>% evaluate(x_test, y_test, batch_size=1000, verbose = 2)
+results <- model %>% evaluate(x_test, y_test, batch_size=100, verbose = 2)
 results
 ```
+
+
+
+
+
+
+
+
+
