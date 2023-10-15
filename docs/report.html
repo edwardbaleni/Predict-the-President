@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.353">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Edward Baleni, BLNEDW003">
+
+<title>Predict the President</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Predict the President</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html" rel="" target="">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./report.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Predict the President</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./supplementary.html" rel="" target="">
+ <span class="menu-text">Supplementary</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools ms-auto">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#abstract" id="toc-abstract" class="nav-link active" data-scroll-target="#abstract">Abstract</a></li>
+  <li><a href="#introduction-and-literature-review" id="toc-introduction-and-literature-review" class="nav-link" data-scroll-target="#introduction-and-literature-review">Introduction and Literature review</a></li>
+  <li><a href="#data-and-methodology" id="toc-data-and-methodology" class="nav-link" data-scroll-target="#data-and-methodology">Data and Methodology</a>
+  <ul class="collapse">
+  <li><a href="#lemmatization" id="toc-lemmatization" class="nav-link" data-scroll-target="#lemmatization">Lemmatization</a></li>
+  <li><a href="#eda" id="toc-eda" class="nav-link" data-scroll-target="#eda">EDA</a></li>
+  <li><a href="#naive-bayes-classifier" id="toc-naive-bayes-classifier" class="nav-link" data-scroll-target="#naive-bayes-classifier">Naive Bayes Classifier</a></li>
+  <li><a href="#feed-forward-neural-networks" id="toc-feed-forward-neural-networks" class="nav-link" data-scroll-target="#feed-forward-neural-networks">Feed Forward Neural Networks</a></li>
+  <li><a href="#support-vector-machines" id="toc-support-vector-machines" class="nav-link" data-scroll-target="#support-vector-machines">Support Vector Machines</a></li>
+  </ul></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a></li>
+  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations">Limitations</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#bibliography" id="toc-bibliography" class="nav-link" data-scroll-target="#bibliography">Bibliography</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Predict the President</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Edward Baleni, BLNEDW003 </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="abstract" class="level1">
+<h1>Abstract</h1>
+</section>
+<section id="introduction-and-literature-review" class="level1">
+<h1>Introduction and Literature review</h1>
+<p>South Africa’s State of the Nation Address (SONA) is an annual event where the president of the country gives a report on the status of the nation. This purpose of this study is to create a classification task that identifies which president was the source of a given sentence.</p>
+<p>Look out for speaker disfluencies, such things may be able to aid in the identification of speech</p>
+</section>
+<section id="data-and-methodology" class="level1">
+<h1>Data and Methodology</h1>
+<p>The data used in this study was sourced from . The 1994 to 2023 SONA speeches are used within this study. The presidents who were present in this time span were FW De Klerk, Nelson Mandela, Thabo Mbeki, Kgalema Motlanthe, Jacob Zuma and Cyril Ramaphosa.</p>
+<p>Webscraping was used to collect this data. The speeches for each SONA was saved in a textfile.</p>
+<p>The idea here is that each president should be represented equally in their training and validation. It is not neccessary to concern oneself with the equality of representation in the test set. For this reason, it would make sense to extract a sample of the same size for each president, regardless of how many speeches they’ve done.</p>
+<p>Another thing to try is to simply remove the outliers Mothlale and deKlerk as they each only provided one speech. It is possible that looking into such characters may in fact skew the nature of this report in the predicting ability of the models.</p>
+<p>Another method is to look into inversely proportional. This is almost the same idea as having equal representations.</p>
+<p>Let’s train the data on a sample of 1000 for each president and see how it fairs. Howver, I do know that these 1000 samples cannot feature the opening statements because they all say the openning statements</p>
+<section id="lemmatization" class="level2">
+<h2 class="anchored" data-anchor-id="lemmatization">Lemmatization</h2>
+<p>It may be necessary to perform lemmatization as commonly appearing words may appear in different forms for each president. So changing something like running to run may be necessary in finding commonly occuring words for example.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 36 × 5
+   filename                        speech                  year  president date 
+   &lt;chr&gt;                           &lt;chr&gt;                   &lt;chr&gt; &lt;fct&gt;     &lt;chr&gt;
+ 1 1994_post_elections_Mandela.txt "Madame Speaker and De… 1994  Mandela   24-0…
+ 2 1994_pre_elections_deKlerk.txt  "Mr Speaker  This Parl… 1994  deKlerk   28-0…
+ 3 1995_Mandela.txt                "Honourable President … 1995  Mandela   17-0…
+ 4 1996_Mandela.txt                "Honourable President … 1996  Mandela   9-02…
+ 5 1997_Mandela.txt                "Madame Speaker and De… 1997  Mandela   7-02…
+ 6 1998_Mandela.txt                "Madame Speaker and De… 1998  Mandela   6-02…
+ 7 1999_post_elections_Mandela.txt "Madames Speaker and D… 1999  Mandela   25-0…
+ 8 1999_pre_elections_Mandela.txt  "Madame Speaker and De… 1999  Mandela   5-02…
+ 9 2000_Mbeki.txt                  "Madame Speaker and De… 2000  Mbeki     4-02…
+10 2001_Mbeki.txt                  "Madame Speaker and De… 2001  Mbeki     9-02…
+# ℹ 26 more rows</code></pre>
+</div>
+</div>
+<p>Unfortunately, for this data split, even for unigrams, we see very small frequencies even for words that are specific to one journal. This may mean that we will have to look at a different way to obtain an inverse weighted distribution of samples.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+  deKlerk   Mandela     Mbeki Motlanthe Ramaphosa      Zuma 
+       97      1665      2422       266      2288      2648 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+  deKlerk   Mandela     Mbeki Motlanthe Ramaphosa      Zuma 
+       70        70        70        70        70        70 </code></pre>
+</div>
+</div>
+<p>The word counts are helpful indicator of commonly occuring words, however, in this dataset, many of the presidents start their speeches similarly. They also have repetitive speech and points of order. It is therefore worthwhile to use the tf-idf weigthed counts instead of the frequencies of each word to find frequently occuring words. The TF-IDF finds the frequently occuring words for a particular document.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+  president total
+  &lt;fct&gt;     &lt;int&gt;
+1 deKlerk    1523
+2 Mandela    1904
+3 Mbeki      2394
+4 Motlanthe  1822
+5 Ramaphosa  1685
+6 Zuma       1275</code></pre>
+</div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="report_files/figure-html/Unigram 1-1.png" class="img-fluid figure-img" style="width:65.0%"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="report_files/figure-html/Unigram 1-2.png" class="img-fluid figure-img" style="width:65.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>For the bigrams below, we see very useless words come into play that could be used to characterise presidents, it may be useful to consider removing stop words to improve the goodness of this study. However, these minute differences may be just a manner of speaking for some of these presidents and as such are necessary to the text. Like it could be a personality trait specific to that president.</p>
+<p>We see below the usage of words that are not really useful to our analysis like, “last year”, this appears for 3 different presidents. Maybe remove this in a user-defined stop word dictionary.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+  president total
+  &lt;fct&gt;     &lt;int&gt;
+1 deKlerk    1453
+2 Mandela    1834
+3 Mbeki      2324
+4 Motlanthe  1752
+5 Ramaphosa  1615
+6 Zuma       1206</code></pre>
+</div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="report_files/figure-html/Bigram 1-1.png" class="img-fluid figure-img" style="width:65.0%"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="report_files/figure-html/Bigram 1-2.png" class="img-fluid figure-img" style="width:65.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>What we can see below is that a pentagram is not exactly useful in distiguishing different presidents. We see that there are some commonly occuring phrases. But these happen a total of 3 to 5 times out of over 30 000 entries for some presidents. Therefore it is not necessary to go this far.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="report_files/figure-html/Pentagram 1-1.png" class="img-fluid figure-img" style="width:65.0%"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="report_files/figure-html/Pentagram 1-2.png" class="img-fluid figure-img" style="width:65.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>A trigram in this instance is as far as I would recommend looking. Although, it is still not very stable.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="report_files/figure-html/Trigram-1.png" class="img-fluid figure-img" style="width:65.0%"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="report_files/figure-html/Trigram-2.png" class="img-fluid figure-img" style="width:65.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="eda" class="level2">
+<h2 class="anchored" data-anchor-id="eda">EDA</h2>
+<!-- a  great  variety  ofmeasures, including sentence length, word length, word fre-quencies,  character  frequencies,  and  vocabulary  richness -->
+<!-- vocabulary richnessfunctions are attempts to quan-tify the diversity of the vocabulary of a tex -->
+</section>
+<section id="naive-bayes-classifier" class="level2">
+<h2 class="anchored" data-anchor-id="naive-bayes-classifier">Naive Bayes Classifier</h2>
+</section>
+<section id="feed-forward-neural-networks" class="level2">
+<h2 class="anchored" data-anchor-id="feed-forward-neural-networks">Feed Forward Neural Networks</h2>
+</section>
+<section id="support-vector-machines" class="level2">
+<h2 class="anchored" data-anchor-id="support-vector-machines">Support Vector Machines</h2>
+</section>
+</section>
+<section id="results" class="level1">
+<h1>Results</h1>
+</section>
+<section id="discussion" class="level1">
+<h1>Discussion</h1>
+</section>
+<section id="limitations" class="level1">
+<h1>Limitations</h1>
+<p>A limitation that arises in this study is a lack of candidate authors, as well as minimal data provided for some authors. This is an issue that has been detailed in research before (<a href=""><span class="citation" data-cites="Stylometry">Stamatatos (<span>2009</span>)</span></a>).</p>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+</section>
+<section id="bibliography" class="level1">
+
+<!-- It will fill up automatically -->
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">Bibliography</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-Stylometry" class="csl-entry" role="listitem">
+Stamatatos, Efstathios. 2009. <span>“A Survey of Modern Authorship Attribution Methods.”</span> <em>Journal of the American Society for Information Science and Technology</em> 60 (3): 538–56. https://doi.org/<a href="https://doi.org/10.1002/asi.21001">https://doi.org/10.1002/asi.21001</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
