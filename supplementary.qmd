@@ -90,6 +90,11 @@ data_count <- data_count %>%
 
 When it comes to lexical features, these can be classed into N-grams. A collection of N contiguous words. The greater N is, the more complex the representation of the feature. It often doesn't show better results and the greater the N the higher the dimensionality of the problem, which will ultimately increase sparsity in the dataset, making it more difficult to classify ([\@Ngrams](), [\@WordFreq]()). To that extent, only unigrams and bigrams will be explored. 
 
+Often it would seem that unigrams are sufficient amongst the three. It is however, interesting to observe the behaviour of n-grams 
+<!-- https://shmpublisher.com/index.php/joscex/article/view/4/13
+     https://downloads.webis.de/pan/publications/papers/valencia_2019.pdf
+     -->
+
 ```{r Unigram}
 uni <- data_count %>%
   unnest_tokens(token, speech, token = "words") %>%
@@ -748,6 +753,7 @@ The next step we can look into to improve the the In-sample error, is to look at
 
 
 ```{r FFNN}
+# When training is done on all possible variables we get an accuracy of 62%
 y_train <- as.integer(unlist(train.set[,1])) # - 1
 x_train <- as.matrix(train.set[,-1])
 
@@ -760,7 +766,7 @@ x_test <- as.matrix(val.set[,-1])
  y_test <- to_categorical(y_test)
 
 model <- keras_model_sequential() %>%
-   layer_dense(units = 32, activation = 'relu', input_shape = c(4538)) %>% 
+   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x_train))) %>% 
    layer_dropout(rate = 0.5) %>%
    layer_dense(units = 5, activation = 'softmax')
 
@@ -781,13 +787,6 @@ plot(history)
 results <- model %>% evaluate(x_test, y_test, batch_size=100, verbose = 2)
 results
 ```
-
-
-
-
-
-
-### Feature Selection
 
 
 ## Topic-Based Classification
@@ -847,29 +846,6 @@ uni_tdf <-  uni_ %>%
 uni_tdf <- uni_tdf %>%
   bind_tf_idf(token, ids_, n)
 
-# # Calculate the mean TF-IDF score for each term across all presidents
-# term_mean_tfidf <- tweets_tdf %>%
-#   group_by(token) %>%
-#   summarize(mean_tfidf = mean(tf_idf, na.rm = TRUE)) %>%
-#   arrange(desc(mean_tfidf))
-# 
-# # Select the top 200 terms
-# top_terms <- term_mean_tfidf$token[1:200]
-# 
-# # Filter your dataframe to keep only these top terms
-# tweets_tdf_top200 <- tweets_tdf %>%
-#   filter(token %in% top_terms)
-
-# 
-# 
-# # Maybe pick out the top 200 on tf_idf alone
-# word_bag2 <- tweets_tdf %>%
-#   top_n(n = 200, wt = n)
-# #
-# 
-#tweets_tdf <- tweets_tdf %>%
-#  semi_join(word_bag)
-
 tfidf <- uni_tdf %>% 
   select(ids_, token, tf_idf) %>%  # note the change, using tf-idf
   pivot_wider(names_from = token, values_from = tf_idf, values_fill = 0)
@@ -880,22 +856,6 @@ tfidf <- data_count %>%
   rename (Response_President = president) %>%
   right_join(tfidf, join_by("ids_")) %>%
   select(ids_, Response_President, everything()) 
-
-
-# #Converting the frequency of word to count
-# convert_counts <- function(x) {
-#         x <- ifelse(x > 0, 1, 0)
-#         x <- factor(x, levels = c(0, 1), labels = c("No", "Yes"))
-#         return(x)
-# }
-# 
-# #Appending count function to Train and Test Dataset
-# data_train <- apply(tfidf[,-c(1,2)], MARGIN = 2, convert_counts)
-# 
-# data_train <- model.matrix(~. -1, data=data.frame(data_train))
-# 
-# 
-# tfidf <-  data.frame(tfidf[,c(1,2)], data_train)
 ```
 
 ```{r}
@@ -957,29 +917,6 @@ uni_tdf <-  uni_ %>%
 uni_tdf <- uni_tdf %>%
   bind_tf_idf(token, ids_, n)
 
-# # Calculate the mean TF-IDF score for each term across all presidents
-# term_mean_tfidf <- tweets_tdf %>%
-#   group_by(token) %>%
-#   summarize(mean_tfidf = mean(tf_idf, na.rm = TRUE)) %>%
-#   arrange(desc(mean_tfidf))
-# 
-# # Select the top 200 terms
-# top_terms <- term_mean_tfidf$token[1:200]
-# 
-# # Filter your dataframe to keep only these top terms
-# tweets_tdf_top200 <- tweets_tdf %>%
-#   filter(token %in% top_terms)
-
-# 
-# 
-# # Maybe pick out the top 200 on tf_idf alone
-# word_bag2 <- tweets_tdf %>%
-#   top_n(n = 200, wt = n)
-# #
-# 
-#tweets_tdf <- tweets_tdf %>%
-#  semi_join(word_bag)
-
 tfidf <- uni_tdf %>% 
   select(ids_, token, tf_idf) %>%  # note the change, using tf-idf
   pivot_wider(names_from = token, values_from = tf_idf, values_fill = 0)
@@ -1010,12 +947,11 @@ tt <- table((p1), (unlist(val.set[,1])))
 classifier = svm(train.set[,-1], train.set[,1], type = "C-classification", scale = F)
 p1 <- predict(classifier, val.set[,-1])
 tt <- table((p1), (unlist(val.set[,1])))
+
+tail(p1)
+str((unlist(val.set[,1])))
+
 1 - sum(diag(tt))/ sum(tt)
 ```
-
-
-
-
-
 
 
