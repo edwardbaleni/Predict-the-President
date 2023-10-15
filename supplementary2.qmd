@@ -5,7 +5,6 @@ format: html
 editor: visual
 ---
 
-
 ```{r Packages}
 require(dplyr)
 require(stringr)
@@ -57,13 +56,16 @@ data$president <- as.factor(data$president)
 ```{r Bag of Words}
 # Need to remove first sentence for each president, to analyse count well
 # Since first sentence is similar for each president
-hold <- c()
-for (i in unique(data$filename)){
-  hold <- c(hold, which( data$filename %in% i)[1])
-}
-data_count <- data[-hold,]
-```
 
+              # Removing the first sentence actually makes classification worse
+
+# hold <- c()
+# for (i in unique(data$filename)){
+#   hold <- c(hold, which( data$filename %in% i)[1])
+# }
+# data_count <- data[-hold,]
+data_count <- data
+```
 
 ```{r Bag of Words}
 uni <- data_count %>%
@@ -95,14 +97,14 @@ data_count <- data_count %>%
   mutate(ids = row_number())
 
 tidy_tweets <- data_count %>%
-  unnest_tokens(token, speech) %>%
-  filter(!token %in% stop_words$word)
+  unnest_character_shingles(token, speech, n = 4) #%>%         # Somehow, not removing tokens works in identifying st
+  #filter(!token %in% stop_words$word)
   
 word_bag <- tidy_tweets %>%
   group_by(token) %>%
   count() %>%
   ungroup() %>%
-  top_n(200, wt = n) %>%
+  top_n(2000, wt = n) %>%
   select(-n)
 
 tweets_tdf <- tidy_tweets %>%
@@ -120,12 +122,12 @@ bag_of_words <- tweets_tdf %>%
 
 
 
-words_tdf <- uni_tf_idf %>%
-  inner_join(word_bag)
-
-bag_of_words <- words_tdf %>% 
-  select(ids, token, n) %>% 
-  pivot_wider(names_from = token, values_from = n, values_fill = 0)
+# words_tdf <- uni_tf_idf %>%
+#   inner_join(word_bag)
+# 
+# bag_of_words <- words_tdf %>% 
+#   select(ids, token, n) %>% 
+#   pivot_wider(names_from = token, values_from = n, values_fill = 0)
 
 
 bag_of_words <- uni_tf_idf %>%
@@ -163,19 +165,6 @@ tt <- table((p1), (unlist(test_tweets[,1])))
 
 1 - sum(diag(tt))/ sum(tt)
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ```{r}
 data_count <- data %>%
@@ -246,7 +235,6 @@ tfidf <- uni_tf_idf %>%
 # tfidf <-  data.frame(tfidf[,c(1,2)], data_train)
 ```
 
-
 ```{r}
 set.seed(321) 
 training_ids <- tfidf %>% 
@@ -276,6 +264,12 @@ tt <- table((p1), (unlist(test_tweets[,1])))
 1 - sum(diag(tt))/ sum(tt)
 ```
 
+
+<!-- 0.46 misscalssification achieved when nchars is 3, and all tokens are kept (No word bag) -->
+<!-- 0.44 with nchars is 4 and 2000 words kept -->
+<!-- 0.51 with nchars is 4 and all tokens kept -->
+<!-- 0.46 with nchars is 3, 2000 tokens and punctuation is included  -->
+
 ```{r Support Vector Machine}
 # This works for a a reasonably sized word bag
 classifier = svm(training_tweets[,-1], training_tweets[,1], type = "C-classification", scale = F)
@@ -289,19 +283,23 @@ p1 <- predict(classifier, test_tweets[,-1])
 tt <- table((p1), (unlist(test_tweets[,1])))
 
 1 - sum(diag(tt))/ sum(tt)
+
+# library(rminer)
+# M <- fit(Response_President~., data=training_tweets, model="svm", kpar=list(sigma=0.10), C=4, scale = F)
+# svm.imp <- Importance(M, data=training_tweets)
 ```
 
 ```{r FFNN}
-y_train <- as.integer(unlist(training_tweets[,1]))
-x_train <- as.matrix(training_tweets[,-1])
+y_train <- as.integer(unlist(train.set[,1])) - 1
+x_train <- as.matrix(train.set[,-1])
 
-y_test <- as.integer(unlist(test_tweets[,1]))
-x_test <- as.matrix(test_tweets[,-1])
+y_test <- as.integer(unlist(val.set[,1])) - 1
+x_test <- as.matrix(val.set[,-1])
 
 
-# y_train <- to_categorical(y_train)
+ y_train <- to_categorical(y_train)
 # y_test_original <- y_test
-# y_test <- to_categorical(y_test)
+ y_test <- to_categorical(y_test)
 
 
 # model <- keras_model_sequential()
@@ -334,26 +332,33 @@ x_test <- as.matrix(test_tweets[,-1])
 # model %>% evaluate(x_test, y_test)
 
 model <- keras_model_sequential() %>%
-  layer_dense(units = 500, input_shape = c(8166), activation = "relu") %>%
-  layer_dense(units = 1, activation = "sigmoid")
+   layer_dense(units = 32, activation = 'relu', input_shape = c(4538)) %>% 
+   layer_dropout(rate = 0.5) %>%
+   layer_dense(units = 4, activation = 'softmax')
 
 summary(model)
 
 model %>% compile(
   loss = "categorical_crossentropy",
   optimizer = optimizer_adam(learning_rate = 0.01),
-  metrics = "accuracy"
+  metrics = "categorical_accuracy"
 )
 
 history <- model %>% fit(
   x_train, y_train, 
-  epochs = 50, batch_size = 1000, verbose = 0) 
+  epochs = 50, batch_size = 100,verbose = 0) 
 
 plot(history)
 
-results <- model %>% evaluate(x_test, y_test, batch_size=1000, verbose = 2)
+results <- model %>% evaluate(x_test, y_test, batch_size=100, verbose = 2)
 results
 ```
+
+
+
+
+
+
 
 
 

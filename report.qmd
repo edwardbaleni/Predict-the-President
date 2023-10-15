@@ -1,37 +1,40 @@
 ---
 title: "Predict the President"
 author: "Edward Baleni, BLNEDW003"
-format: html
-editor: visual
 bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, fig.align="center", out.width = "65%", fig.pos = "H")
+knitr::opts_chunk$set(echo = FALSE, fig.align="center", out.width = "65%", fig.pos = "H", message = F)
 ```
 
-```{r Packages}
+```{r Packages, include=FALSE, warning=FALSE,results='hide'}
 require(dplyr)
 require(stringr)
 require(tidytext)
 require(ggplot2)
 require(tidyr)
 require(forcats)
-
-# Lemmatization and Contraction decrementer
-  # https://www.rdocumentation.org/packages/qdap/versions/2.4.6/topics/replace_contraction
-  # https://github.com/trinker/textstem
+# # Lemmatization and Contraction decrementer
+#   # https://www.rdocumentation.org/packages/qdap/versions/2.4.6/topics/replace_contraction
+#   # https://github.com/trinker/textstem
 require(textstem)
-require(qdap)
+# require(qdap)
 ```
 
 # Abstract
 
-# Introduction and Literature review
+# Introduction and Literature Review
+
+South Africa's State of the Nation Address (SONA) is an annual event where the president of the country gives a report on the status of the nation. This purpose of this study is to create a classification task that identifies which president was the source of a given sentence. 
 
 Look out for speaker disfluencies, such things may be able to aid in the identification of speech
 
-# Data
+# Data and Methodology
+
+The data used in this study was sourced from \url{https://www.gov.za/state-nation-address}. The 1994 to 2023 SONA speeches are used within this study. The presidents who were present in this time span were FW De Klerk, Nelson Mandela, Thabo Mbeki, Kgalema Motlanthe, Jacob Zuma and Cyril Ramaphosa.
+
+Webscraping was used to collect this data. The speeches for each SONA was saved in a textfile. 
 
 ```{r Data}
 sys.source("sona-first-steps.R" , envir = knitr::knit_global())
@@ -39,9 +42,8 @@ sona <- as_tibble(sona)
 sona$president <- as.factor(sona$president)
 ```
 
-# Methodology
 
-The idea here is that each president should be represented equally in their training and validation. It is not neccessary to concern oneself with the equality of representation in the test set. For this reason, it would make sense to extract a sample of the same size for each president, regardless of how many speeches they've done. 
+The idea here is that each president should be represented equally in their training and validation. It is not neccessary to concern oneself with the equality of representation in the test set. For this reason, it would make sense to extract a sample of the same size for each president, regardless of how many speeches they've done.
 
 Another thing to try is to simply remove the outliers Mothlale and deKlerk as they each only provided one speech. It is possible that looking into such characters may in fact skew the nature of this report in the predicting ability of the models.
 
@@ -51,18 +53,18 @@ Let's train the data on a sample of 1000 for each president and see how it fairs
 
 ## Lemmatization
 
-It may be necessary to perform lemmatization as commonly appearing words may appear in different forms for each president. So changing something like running to run may be necessary in finding commonly occuring words for example. 
+It may be necessary to perform lemmatization as commonly appearing words may appear in different forms for each president. So changing something like running to run may be necessary in finding commonly occuring words for example.
 
 ```{r Cleaning Data}
 # Remove numbers
 sona$speech = gsub('[0-9]+', '', sona$speech)
 sona
-sona$speech <- lemmatize_strings(sona$speech)
-sona$speech <- replace_contraction(sona$speech)
+#sona$speech <- lemmatize_strings(sona$speech)
+#sona$speech <- replace_contraction(sona$speech)
 ```
 
-
 Unfortunately, for this data split, even for unigrams, we see very small frequencies even for words that are specific to one journal. This may mean that we will have to look at a different way to obtain an inverse weighted distribution of samples.
+
 ```{r Split Data}
 # Need to keep some sentences separate.
 sentences <- sona %>%
@@ -85,7 +87,6 @@ test <- sentences %>%
   unnest_sentences(token, speech) %>%
   anti_join(train)
 ```
-
 
 ```{r Tokenization}
 # Unigram
@@ -114,10 +115,9 @@ pentagram <- train%>%
   count(president, token)
 ```
 
-
 The word counts are helpful indicator of commonly occuring words, however, in this dataset, many of the presidents start their speeches similarly. They also have repetitive speech and points of order. It is therefore worthwhile to use the tf-idf weigthed counts instead of the frequencies of each word to find frequently occuring words. The TF-IDF finds the frequently occuring words for a particular document.
 
-```{r Unigram}
+```{r Unigram 1}
 uni %>%
   group_by(president) %>%
   summarise(total = sum(n))
@@ -147,9 +147,9 @@ uni_tf_idf %>%
 
 For the bigrams below, we see very useless words come into play that could be used to characterise presidents, it may be useful to consider removing stop words to improve the goodness of this study. However, these minute differences may be just a manner of speaking for some of these presidents and as such are necessary to the text. Like it could be a personality trait specific to that president.
 
-
 We see below the usage of words that are not really useful to our analysis like, "last year", this appears for 3 different presidents. Maybe remove this in a user-defined stop word dictionary.
-```{r Bigram}
+
+```{r Bigram 1}
 
 bigram_tf_idf <- bigram %>%
   bind_tf_idf(token, president, n)
@@ -179,7 +179,8 @@ bigram_tf_idf %>%
 ```
 
 What we can see below is that a pentagram is not exactly useful in distiguishing different presidents. We see that there are some commonly occuring phrases. But these happen a total of 3 to 5 times out of over 30 000 entries for some presidents. Therefore it is not necessary to go this far.
-```{r Pentagram}
+
+```{r Pentagram 1}
 # Note that this may be useless, should maybe only go as high as a trigram
   # These Pentagrams may not be useful in categorizing much as it will not allow us much data to work with, since every phrase of 5 words will probably not repeat itself.
 # Also notice that the first 20 sentences or something is repeated in every speech, so it may not be helpful to look to this extent unless we look at tf-idf
@@ -216,6 +217,7 @@ pent_tf_idf %>%
 ```
 
 A trigram in this instance is as far as I would recommend looking. Although, it is still not very stable.
+
 ```{r Trigram}
 # Note that this may be useless, should maybe only go as high as a trigram
   # These Pentagrams may not be useful in categorizing much as it will not allow us much data to work with, since every phrase of 5 words will probably not repeat itself.
@@ -246,20 +248,29 @@ tri_tf_idf %>%
   geom_col(show.legend = FALSE) +
   facet_wrap(~president, ncol = 2, scales = "free") +
   labs(x = "Count", y = NULL)
-
-
-
 ```
 
+## EDA
+
+<!-- a  great  variety  ofmeasures, including sentence length, word length, word fre-quencies,  character  frequencies,  and  vocabulary  richness -->
+
+<!-- vocabulary richnessfunctions are attempts to quan-tify the diversity of the vocabulary of a tex -->
 
 ## Naive Bayes Classifier
 
 ## Feed Forward Neural Networks
 
-## Convolutional Neural Networks or Tree-Based Method or (whatever the book suggests) or Logisitic Regression
+## Support Vector Machines
 
 # Results
 
 # Discussion
 
+# Limitations
+
+A limitation that arises in this study is a lack of candidate authors, as well as minimal data provided for some authors. This is an issue that has been detailed in research before ([@Stylometry]()).
+
 # Conclusion
+
+# Bibliography
+<!-- It will fill up automatically -->
