@@ -3,3 +3,9 @@ __MACOSX
 
 # Do not want RHistory either
 .Rhistory
+
+/.quarto/
+<<<<<<< HEAD
+=======
+.Rproj.user
+>>>>>>> d0112bed1db269baf04ab921953b7429de72c797
