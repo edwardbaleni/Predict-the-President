@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.353">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Edward Baleni, BLNEDW003">
+
+<title>Predict the President</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Predict the President</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html" rel="" target="">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./report.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Predict the President</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./supplementary.html" rel="" target="">
+ <span class="menu-text">Supplementary</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools ms-auto">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#abstract" id="toc-abstract" class="nav-link active" data-scroll-target="#abstract">Abstract</a></li>
+  <li><a href="#introduction-and-literature-review" id="toc-introduction-and-literature-review" class="nav-link" data-scroll-target="#introduction-and-literature-review">Introduction and Literature Review</a></li>
+  <li><a href="#data-and-methodology" id="toc-data-and-methodology" class="nav-link" data-scroll-target="#data-and-methodology">Data and Methodology</a>
+  <ul class="collapse">
+  <li><a href="#eda" id="toc-eda" class="nav-link" data-scroll-target="#eda">EDA</a></li>
+  <li><a href="#pre-processing" id="toc-pre-processing" class="nav-link" data-scroll-target="#pre-processing">Pre-Processing</a>
+  <ul class="collapse">
+  <li><a href="#lexical-features" id="toc-lexical-features" class="nav-link" data-scroll-target="#lexical-features">Lexical Features</a></li>
+  <li><a href="#character-features" id="toc-character-features" class="nav-link" data-scroll-target="#character-features">Character Features</a></li>
+  <li><a href="#imbalanced-classes" id="toc-imbalanced-classes" class="nav-link" data-scroll-target="#imbalanced-classes">Imbalanced Classes</a></li>
+  </ul></li>
+  <li><a href="#bag-of-words" id="toc-bag-of-words" class="nav-link" data-scroll-target="#bag-of-words">Bag of Words</a></li>
+  <li><a href="#term-frequency---inverse-document-frequency-tf-idf" id="toc-term-frequency---inverse-document-frequency-tf-idf" class="nav-link" data-scroll-target="#term-frequency---inverse-document-frequency-tf-idf">Term Frequency - Inverse Document Frequency (TF-IDF)</a></li>
+  <li><a href="#train-validation-and-testing-splits" id="toc-train-validation-and-testing-splits" class="nav-link" data-scroll-target="#train-validation-and-testing-splits">Train, Validation and Testing Splits</a></li>
+  <li><a href="#naive-bayes-classifier" id="toc-naive-bayes-classifier" class="nav-link" data-scroll-target="#naive-bayes-classifier">Naive Bayes Classifier</a></li>
+  <li><a href="#support-vector-machines" id="toc-support-vector-machines" class="nav-link" data-scroll-target="#support-vector-machines">Support Vector Machines</a></li>
+  <li><a href="#feed-forward-neural-networks" id="toc-feed-forward-neural-networks" class="nav-link" data-scroll-target="#feed-forward-neural-networks">Feed Forward Neural Networks</a></li>
+  </ul></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a></li>
+  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations">Limitations</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#bibliography" id="toc-bibliography" class="nav-link" data-scroll-target="#bibliography">Bibliography</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Predict the President</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Edward Baleni, BLNEDW003 </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="abstract" class="level1">
+<h1>Abstract</h1>
+</section>
+<section id="introduction-and-literature-review" class="level1">
+<h1>Introduction and Literature Review</h1>
+<p>South Africa’s State of the Nation Address (SONA) is an annual event where the president of the country gives a report on the status of the nation. This status entails a highlighting the key challenges and achievements witnessed in the past year as well as a mentioning of the government’s goals and objectives for the foreseable future. A number of presidents have taken office between the years of 1994 and 2023. These presidents being FW De Klerk, Nelson Mandela, Thabo Mbeki, Kgalema Motlanthe, Jacob Zuma and Cyril Ramaphosa. The purpose of this study is to create a text classification task that identifies which president was the source of a given sentence. Such a task is often called authorship attribution (<a href=""><span class="citation" data-cites="Ngrams">Coyotl-Morales et al. (<span>2006</span>)</span></a>). In such a task is important that one is able to characterize each author, or speaker, in some way that is able to capture the style or ideas of each president.</p>
+<p>Author attribution is a natural language processing (NLP) task ….(<a href=""><span class="citation" data-cites="WordFreq">Škorić et al. (<span>2022</span>)</span></a>)….</p>
+<p>There are are a number of ways to characterise authors. In this study a comparison between a topic-based text classification and a style-based text classification will be explored. Text-based text classification, attempts to not use functional words in the classification of texts, this is be used to find the general ideas or meaining of texts, as well as being able to identify topics associated with a given text; this provides semantic information. Style-based classification, Stylometry, makes strong use of the function words in classification (<a href=""><span class="citation" data-cites="Stylometry">Stamatatos (<span>2009</span>)</span></a>). Function words are used to aid in the syntax of a sentence rather than the meaning. These features that are not consciously used within a text and as such vary between different authors, this lack of control over function words have made them ideal for modelling function word frequencies to create an effective attribution technique (<a href=""><span class="citation" data-cites="FunctionWords">Argamon and Shlomo (<span>2005</span>)</span></a>). Although, the points addressed within each speech is slightly different, the main topic is that of a political address, therefore it is worthwhile to view this research in the context of a style-based text classification as well as a topic-based text classification.</p>
+<p>In this study the classic word bag approach with token frequencies to TF-IDF</p>
+<p>Naive Bayes SVM FFNN</p>
+</section>
+<section id="data-and-methodology" class="level1">
+<h1>Data and Methodology</h1>
+<p>The data used in this study was sourced from <a href="https://www.gov.za/state-nation-address">gov.za</a>. As mentioned adresses from 1994 to 2023 are used within this study. The speakers present in this time span were FW De Klerk, Nelson Mandela, Thabo Mbeki, Kgalema Motlanthe, Jacob Zuma and Cyril Ramaphosa. Some webscraping techniques, courtesy of Ian Durbach, were used to collect this data.</p>
+<section id="eda" class="level2">
+<h2 class="anchored" data-anchor-id="eda">EDA</h2>
+<!-- a  great  variety  ofmeasures, including sentence length, word length, word fre-quencies,  character  frequencies,  and  vocabulary  richness -->
+<!-- vocabulary richnessfunctions are attempts to quan-tify the diversity of the vocabulary of a tex -->
+<!-- Perform a quick EDA to explain the data and a quick rationale for removing the outliers -->
+</section>
+<section id="pre-processing" class="level2">
+<h2 class="anchored" data-anchor-id="pre-processing">Pre-Processing</h2>
+<p>After obtaining the data, the first line of each speech is removed. This first line is the date the address is held. The data is then tokenized by sentence. Only sentences with over two words remained for the rest of the analysis. The reason this is done is because the sentences with less than 3 words seemed to either just be digits or to be unfinished words, most of the time.</p>
+<p>Following this many different considerations have been made in the <a href="./supplementary.html">Supplementary</a> to find the best representation of the data for classification. Both lexical and character features are considered; the inclusion and exclusion of function words (stop words include function words); using token frequencies and TF-IDF are considered; different sized word bags are considered; the inclusion of case and punctuation are are also considered. Lexical features regard tokens as a sequence of words, where a unigram is a single word, a bigram are two contiguous words, a trigram is three and so forth. Character features are a sequence of contiguous characters also using n-grams to characterise how many characters are present in each feature. These two types of features qualify as two of the most basic markers used for identifying an author’s style, where lexical features are slighttly more complex than character features (<a href=""><span class="citation" data-cites="Stylometry">Stamatatos (<span>2009</span>)</span></a>). Of the many options explored in the <a href="./supplementary.html">Supplementary</a>, only two of the models will be represented here. How data is cleaned and shaped is different between these two approaches. The first approach uses lexical features, while the second uses character features, this is how we will distinguish between the two going forward.</p>
+<p>These are important distinctions at this stage as they determine how the data is organised.</p>
+<p>In the <a href="./supplementary.html">Supplementary</a>, both a topic-based approach and style-based approaches were looked into. It was found that the style-based approach performed better than topic-based approach. This was illustrated in how the model performance improved with the inclusion of function words…….</p>
+<section id="lexical-features" class="level3">
+<h3 class="anchored" data-anchor-id="lexical-features">Lexical Features</h3>
+<p>There is complexity that comes with using lexical features, and the sparsity within the bag-of-words that such features introduce, allowing features with capitalization was not appropriate (<a href=""><span class="citation" data-cites="LexVsChar">Stamatatos (<span>2008</span>)</span></a>), capitalization within the transcription of a speech, indicate the beginning of an idea, or the beginning of a sentence, sentiment cannot be captured by such. Whereas, in the context of a book, capitalization can be use to convey a strong meaning in a character’s words.</p>
+<p>Here the sentences were cleaned quite strictly in order to obtain a dataset. All digits are removed using a regex operation. Contractions are replaced with their long form also via the aid of regex pattern matching (<a href=""><span class="citation" data-cites="textclean">Rinker (<span>2018</span>)</span></a>). Here punctuation is maintained as punctuation is able to characterise syntatic information (<a href=""><span class="citation" data-cites="punc">(<span><strong>punc?</strong></span>)</span></a>). Punctuation is maintained, however, special unicode characters, astrixes, and other punctuation that is not commonly seen in text are removed, only full stops, question marks, commas, exclamation marks, brackets, apostrophes and curly brackets are maintained. Lemmatization is done as commonly appearing words appear in different forms for each president. A lemma is a set of words that have the same stem, where each variation of the word is called a word form. Lemmatization is a process that is able to determine that two words have the same root, to lemmatize is to change all these wordforms into their root. This process of lemmatization is done by morphological parsing, where this separates the morphenes into parts. A morphene, is the smaller building blocks of a word. Lemmatization was done by using a dictionary of common word forms, if a word is a part of a lemma, then it will be matched to the dictionary and replaced by the morphenes that make it up. After performing this lemmatization, the affixes, additional morphenes that aren’t the stem, are still present in the data, these are generally quite random letters that will appear (<a href=""><span class="citation" data-cites="Jurafsky2000SpeechAL">Jurafsky and Martin (<span>2023</span>)</span></a>). The final step in cleaning is to remove these affixes</p>
+</section>
+<section id="character-features" class="level3">
+<h3 class="anchored" data-anchor-id="character-features">Character Features</h3>
+<p>Character features are more simplistic than lexical features and are able to capture stylistic nuances. They are able to capture some lexical and contextual information. They do however carry a lot of redundancies resulting in high dimensionality.</p>
+<p>The data here is cleaned differently. In the <a href="./supplementary.html">Supplementary</a>, it is shown that the feature space that includes both punctuation and capitalization performs the best of all the character spaces. A character n-gram of both 3 and 4 features were assessed, and both are decently sized n-grams. Here the character n-gram of 4 contiguous characters will be used.</p>
+<p>First the speeches are tokenized into sentences, where previously, the text would have been set to lower case and the punctuation was included, here both the text maintains it’s capitalization and the punctuation shall remain. To clean these sentences, all digits were removed, followed by the lemmatization of wordforms to stems.</p>
+</section>
+<section id="imbalanced-classes" class="level3">
+<h3 class="anchored" data-anchor-id="imbalanced-classes">Imbalanced Classes</h3>
+<p>Both Motlanthe and deKlerk are outliers… To balance the classes</p>
+</section>
+</section>
+<section id="bag-of-words" class="level2">
+<h2 class="anchored" data-anchor-id="bag-of-words">Bag of Words</h2>
+<p>It is important that we get the data into a format that can be used by the classifiers to classify a sentence. A bag of words in one such way we can do this. What happens here is that the entirety of text is put into something called a bag of words. This is an unordered set of words which contain the frequency of each word in the document (<a href=""><span class="citation" data-cites="Jurafsky2000SpeechAL">Jurafsky and Martin (<span>2023</span>)</span></a>). For both cases of lexoical features and character features, the pre-processed sentences need to be tokenized down to their desired level. The lexical features are tokenized as unigrams of words, while including punctuation of individual words; the character features are tokenized as n-grams with 4 characters, with the inclusion of punctuation and capitalization. Both types of features included function words, as this was decided to be a stylometric exercise as per the <a href="./supplementary.html">Supplementary</a>.</p>
+<p>In both the cases of the lexical and character features, the most important features are the most frequent. With this understanding, a crude feature selection, can be conducted for both the lexical and the character features.</p>
+<p>After tokenizing, most frequent features were selected. This was tried as 200, 1000, 2000, 4000, 4500 and all the tokens for both the lexical features and the character features. After making these selections, a word bag was created for each selection of top features.</p>
+</section>
+<section id="term-frequency---inverse-document-frequency-tf-idf" class="level2">
+<h2 class="anchored" data-anchor-id="term-frequency---inverse-document-frequency-tf-idf">Term Frequency - Inverse Document Frequency (TF-IDF)</h2>
+<p>For comparison, TF-IDF was also considered. Term frequency, TF, is a measure of how frequently a term occurs in a document. TF can be found as,</p>
+<p><span class="math display">\[\text{tf(term t in document i)} = \frac{\text{Number of times term t appears in document i}}{\text{Number of terms in document i}}.\]</span></p>
+<p>Inverse document term frequency downweights terms that are frequent in a collection of documents and upweights terms that are not frequent within a collection of documents. It is calculated as,</p>
+<p><span class="math display">\[\text{idf(term t)} = \text{ln}\left(\frac{\text{Number of documents in corpus}}{\text{Number of documents containing term t}}\right).\]</span></p>
+<p>TF-IDF is the multiplication of the two metrics (<a href=""><span class="citation" data-cites="TextMining">Silge and Robinson (<span>2017</span>)</span></a>). TF-IDF measures the importance of a word to a document in a collection. In this analysis this has been done by considering one document to be a sentence. Following this intuition, the quantities above can be calculated.</p>
+<p>In the <a href="./supplementary.html">Supplementary</a>, both the lexical feature approach and the character features were looked into to find which would be better performing for TF-IDF. The character features seemed to show a better result and so will be used in this report.</p>
+<p>Since TF-IDF determines what features are important to which document, this can be seen as a topic-based classification, as function words and commonly occurring tokens amongst the documents will be downweighted resulting in semantic features being strongly weighted. For TF-IDF, all tokens were kept, because some of the highly weighted scores may only appear once in a document and as a result may act as quite a poor classifier out-of-sample, and so it is necessary to leave all possible tokens.</p>
+</section>
+<section id="train-validation-and-testing-splits" class="level2">
+<h2 class="anchored" data-anchor-id="train-validation-and-testing-splits">Train, Validation and Testing Splits</h2>
+<p>For the training, validation and test splits, it would be wise to select sample sizes by sentence and not by word, this will represent each row in the bag of words.</p>
+<p>The data will have a 60:20:20 split of training, validation and test data. The training set will represent 60% of the total number of sentences available, the validation set will represent 20% and the test set will be the remaining 20%.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 8983</code></pre>
+</div>
+</div>
+</section>
+<section id="naive-bayes-classifier" class="level2">
+<h2 class="anchored" data-anchor-id="naive-bayes-classifier">Naive Bayes Classifier</h2>
+<p>A multinomial naive Bayes classifier was to classify this text. This is a probabilistic classifier, given the document <span class="math inline">\(d\)</span> and classes <span class="math inline">\(c \in C\)</span>, the classifier will predict the class, <span class="math inline">\(\hat{c}\)</span>, with the maximum posterior probabiliity,</p>
+<p><span class="math display">\[\hat{c} = \underset{c\in C}{\arg\max} P(c|d)\]</span></p>
+<p>Using Bayes rule, the above prediction can be further broken down into,</p>
+<p><span class="math display">\[\hat{c} = \underset{c\in C}{\arg\max} P(c|d) = \underset{c\in C}{\arg\max} \frac{P(d|c)P(c)}{P(d)}\]</span></p>
+<p>This can be further simplified by to,</p>
+<p><span class="math display">\[\hat{c} = \underset{c\in C}{\arg\max} P(d|c)P(c) \]</span></p>
+<p>as <span class="math inline">\(P(d)\)</span> stays constant for all classes, which allows us to cancel this out. This equation above is made up of the likehood of the document and te prior probability of the class. The documents can subsequently be divided up into features, be it our lexical or character features above. Following this great number of features, <span class="math inline">\(\{f_i : i = 1,2,...,n\}\)</span>, this classifier makes two simplifying assumptions that would infer it’s naivety, that the tokens are position independent and that the joint likelihood of the features also maintain independence,</p>
+<p><span class="math display">\[P(d|c) = P(f_1, f_2, ..., f_n|c) = P(f_1|c)P(f_2|c)...P(f_n|c)\]</span> The final equation of the naive Bayes classifier then becomes,</p>
+<p><span class="math display">\[c_{NB} = \underset{c\in C}{\arg\max} P(c) \prod_{f\in F} P(f|c).\]</span></p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5829621</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.4727171</code></pre>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.4808013</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.4190317</code></pre>
+</div>
+</div>
+</section>
+<section id="support-vector-machines" class="level2">
+<h2 class="anchored" data-anchor-id="support-vector-machines">Support Vector Machines</h2>
+</section>
+<section id="feed-forward-neural-networks" class="level2">
+<h2 class="anchored" data-anchor-id="feed-forward-neural-networks">Feed Forward Neural Networks</h2>
+</section>
+</section>
+<section id="results" class="level1">
+<h1>Results</h1>
+</section>
+<section id="discussion" class="level1">
+<h1>Discussion</h1>
+</section>
+<section id="limitations" class="level1">
+<h1>Limitations</h1>
+<p>A limitation that arises in this study is a lack of candidate authors, as well as minimal data provided for some authors. This is an issue that has been detailed in research before (<a href=""><span class="citation" data-cites="Stylometry">Stamatatos (<span>2009</span>)</span></a>).</p>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+</section>
+<section id="bibliography" class="level1">
+
+<!-- It will fill up automatically -->
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">Bibliography</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-FunctionWords" class="csl-entry" role="listitem">
+Argamon, Shlomo, and Levitan Shlomo. 2005. <span>“Measuring the Usefulness of Function Words for Authorship Attribution.”</span> In <em>Proceeding of the Joint Conference on Association for Literary and Linguistic Computing/Association Computer Humanities</em>.
+</div>
+<div id="ref-Ngrams" class="csl-entry" role="listitem">
+Coyotl-Morales, Rosa, Luis Villaseñor-Pineda, Manuel Montes, and Paolo Rosso. 2006. <span>“Authorship Attribution Using Word Sequences.”</span> In, 4225:844–53. <a href="https://doi.org/10.1007/11892755_87">https://doi.org/10.1007/11892755_87</a>.
+</div>
+<div id="ref-Jurafsky2000SpeechAL" class="csl-entry" role="listitem">
+Jurafsky, Dan, and James H. Martin. 2023. <span>“Speech and Language Processing - an Introduction to Natural Language Processing, Computational Linguistics, and Speech Recognition.”</span> In <em>Prentice Hall Series in Artificial Intelligence</em>. <a href="https://web.stanford.edu/~jurafsky/slp3/ed3book.pdf">https://web.stanford.edu/~jurafsky/slp3/ed3book.pdf</a>.
+</div>
+<div id="ref-textclean" class="csl-entry" role="listitem">
+Rinker, Tyler W. 2018. <em>Textclean: Text Cleaning Tools</em>. Buffalo, New York. <a href="https://github.com/trinker/textclean">https://github.com/trinker/textclean</a>.
+</div>
+<div id="ref-TextMining" class="csl-entry" role="listitem">
+Silge, Julia, and David Robinson. 2017. <em>Text Mining with r: A Tidy Approach</em>. 1st ed. O’Reilly Media, Inc.
+</div>
+<div id="ref-WordFreq" class="csl-entry" role="listitem">
+Škorić, Mihailo, Ranka Stanković, Milica Ikonić Nešić, Joanna Byszuk, and Maciej Eder. 2022. <span>“Parallel Stylometric Document Embeddings with Deep Learning Based Language Models in Literary Authorship Attribution.”</span> <em>Mathematics</em> 10 (5). <a href="https://doi.org/10.3390/math10050838">https://doi.org/10.3390/math10050838</a>.
+</div>
+<div id="ref-LexVsChar" class="csl-entry" role="listitem">
+Stamatatos, Efstathios. 2008. <span>“Author Identification: Using Text Sampling to Handle the Class Imbalance Problem.”</span> <em>Information Processing &amp; Management</em> 44 (March): 790–99. <a href="https://doi.org/10.1016/j.ipm.2007.05.012">https://doi.org/10.1016/j.ipm.2007.05.012</a>.
+</div>
+<div id="ref-Stylometry" class="csl-entry" role="listitem">
+———. 2009. <span>“A Survey of Modern Authorship Attribution Methods.”</span> <em>Journal of the American Society for Information Science and Technology</em> 60 (3): 538–56. https://doi.org/<a href="https://doi.org/10.1002/asi.21001">https://doi.org/10.1002/asi.21001</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
