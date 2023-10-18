@@ -4,6 +4,8 @@ author: "Edward Baleni"
 format: html
 editor: visual
 bibliography: references.bib
+Rendering:
+  embed-resources: true
 ---
 
 ```{r setup, include=FALSE}
@@ -954,6 +956,14 @@ str((unlist(val.set[,1])))
 
 1 - sum(diag(tt))/ sum(tt)
 ```
+
+
+
+
+
+# Results
+
+<!-- Create one big table to show results -->
 
 # Class Imbalance
 
