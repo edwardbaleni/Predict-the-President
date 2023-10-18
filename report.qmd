@@ -553,6 +553,10 @@ test.set.uni.all     <- bag.of.words.uni.all[bag.of.words.uni.all$ids_ %in% test
 train.set.char.all    <- bag.of.words.char.all[bag.of.words.char.all$ids_ %in% train, -1]
 val.set.char.all      <- bag.of.words.char.all[bag.of.words.char.all$ids_ %in% val, -1]
 test.set.char.all     <- bag.of.words.char.all[bag.of.words.char.all$ids_ %in% test, -1]
+
+train.set.tfidf     <- tfidf[tfidf$ids_ %in% train, -1]
+val.set.tfidf     <- tfidf[tfidf$ids_ %in% val, -1]
+test.set.tfidf     <- tfidf[tfidf$ids_ %in% test, -1]
 ```
 
 ## Naive Bayes Classifier
@@ -657,6 +661,17 @@ load("naiveLexical.RData")
 load("naiveCharacter.RData")
 ```
 
+```{r Naive Bayes Classifier TFIDF}
+# tfidf.classifier  <- naiveBayes(train.set.tfidf[,-1], train.set.tfidf[,1])
+# tfidf.p           <- predict(tfidf.classifier, val.set.tfidf[,-1])
+# tfidf.t           <- table((tfidf.p), (unlist(val.set.tfidf[,1])))
+# 
+# save(tfidf.classifier, tfidf.p, tfidf.t, file = "naiveTFIDF.RData")
+
+load("naiveTFIDF.RData")
+```
+
+
 ## Support Vector Machines
 
 Support vector machines, SVM, are widely used in the space of text classification ([\@Stylometry]()). SVMs perform linear operations in a higher-dimensional manifold.
@@ -748,6 +763,17 @@ load("svmCharacter.RData")
 
 ```
 
+```{r SVM Classifier TFIDF}
+svm.tfidf.classifier  <- svm(train.set.tfidf[,-1], train.set.tfidf[,1], type = "C-classification", scale = F)
+svm.tfidf.p           <- predict(svm.tfidf.classifier, val.set.tfidf[,-1])
+svm.tfidf.t           <- table((svm.tfidf.p), (unlist(val.set.tfidf[,1])))
+
+save(svm.tfidf.classifier, svm.tfidf.p, svm.tfidf.t, file = "svmTFIDF.RData")
+
+load("svmTFIDF.RData")
+```
+
+
 ## Feed Forward Neural Networks
 
 A neural network is a series of non-linear basis functions, this is handled via interconnected nodes over a number of layers. Each layer has a number of nodes and is connected to every other node in the layer before (if any) and after it (if any). The case where there are no layers before the current layer is for the input layer, which is a layer that takes in data. The number of nodes present at the input layer are equal to the number of features in the bag of words. Similarly, the case where there are no layers after the current layer is for the output layer, in this text classification task. Since the task is that of multinomial classification, the number of nodes on this output layer is equivalent to the number of classes available. The layers between the input layer and the output layer are called hidden layers. The output of each layer is passed on as the input to the next layer. The hidden layers are capable of taking a weighted sum of their inputs and applying a non-linear activation function to this to obtain its output ([\@Jurafsky2000SpeechAL](), [\@Hastie]()).
@@ -806,6 +832,10 @@ y.train.2.4 <- to_categorical(y.train.2.4)             ; y.val.2.4   <- to_categ
 y.train.2.all <- as.integer(unlist(train.set.char.all[,1])) ; x.train.2.all <- as.matrix(train.set.char.all[,-1])
 y.val.2.all   <- as.integer(unlist(val.set.char.all[,1]))   ; x.val.2.all   <- as.matrix(val.set.char.all[,-1]);  
 y.train.2.all <- to_categorical(y.train.2.all)             ; y.val.2.all   <- to_categorical(y.val.2.all)
+
+y.train.tfidf <- as.integer(unlist(train.set.tfidf[,1])) ; x.train.tfidf <- as.matrix(train.set.tfidf[,-1])
+y.val.tfidf   <- as.integer(unlist(val.set.tfidf[,1]))   ; x.val.tfidf   <- as.matrix(val.set.tfidf[,-1]);  
+y.train.tfidf <- to_categorical(y.train.tfidf)             ; y.val.tfidf   <- to_categorical(y.val.tfidf)
 
 ```
 
@@ -925,34 +955,48 @@ model.2.all %>% compile(
 
 ```
 
+```{r FFNN TFIDF}
+model.tfidf <- keras_model_sequential() %>%
+   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x.train.tfidf))) %>% 
+   layer_dropout(rate = 0.5) %>%
+   layer_dense(units = 5, activation = 'softmax')
+
+model.tfidf %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  metrics = "accuracy"
+)
+```
+
+
 # Results
 
 ## Validation Results
 
 ```{r FFNN Lexical Fit}
-history.1.1 <- model.1.1 %>% fit(
-  x.train.1.1, y.train.1.1,
-  epochs = 50, batch_size = 100,verbose = 0)
+# history.1.1 <- model.1.1 %>% fit(
+#   x.train.1.1, y.train.1.1,
+#   epochs = 50, batch_size = 100,verbose = 0)
+# 
+# history.1.2 <- model.1.2 %>% fit(
+#   x.train.1.2, y.train.1.2,
+#   epochs = 50, batch_size = 100,verbose = 0)
+# 
+# history.1.3 <- model.1.3 %>% fit(
+#   x.train.1.3, y.train.1.3,
+#   epochs = 50, batch_size = 100,verbose = 0)
+# 
+# history.1.4 <- model.1.4 %>% fit(
+#   x.train.1.4, y.train.1.4,
+#   epochs = 50, batch_size = 100,verbose = 0)
+# 
+# history.1.all <- model.1.all %>% fit(
+#   x.train.1.all, y.train.1.all,
+#   epochs = 50, batch_size = 100,verbose = 0)
+# 
+# save(history.1.1, history.1.2, history.1.3, history.1.4, history.1.all, file = "FFLexical.RData")
 
-history.1.2 <- model.1.2 %>% fit(
-  x.train.1.2, y.train.1.2,
-  epochs = 50, batch_size = 100,verbose = 0)
-
-history.1.3 <- model.1.3 %>% fit(
-  x.train.1.3, y.train.1.3,
-  epochs = 50, batch_size = 100,verbose = 0)
-
-history.1.4 <- model.1.4 %>% fit(
-  x.train.1.4, y.train.1.4,
-  epochs = 50, batch_size = 100,verbose = 0)
-
-history.1.all <- model.1.all %>% fit(
-  x.train.1.all, y.train.1.all,
-  epochs = 50, batch_size = 100,verbose = 0)
-
-save(history.1.1, history.1.2, history.1.3, history.1.4, history.1.all, file = "FFLexical.RData")
-
-laod("FFLexical.RData")
+load("FFLexical.RData")
 
 par(mfrow = c(2,3))
 plot(history.1.1)
@@ -964,27 +1008,27 @@ plot(history.1.all)
 
 
 ```{r FFNN Character Fit}
-history.2.1 <- model.2.1 %>% fit(
-  x.train.2.1, y.train.2.1,
-  epochs = 50, batch_size = 100,verbose = 0)
-
-history.2.2 <- model.2.2 %>% fit(
-  x.train.2.2, y.train.2.2,
-  epochs = 50, batch_size = 100,verbose = 0)
-
-history.2.3 <- model.2.3 %>% fit(
-  x.train.2.3, y.train.2.3,
-  epochs = 50, batch_size = 100,verbose = 0)
-
-history.2.4 <- model.2.4 %>% fit(
-  x.train.2.4, y.train.2.4,
-  epochs = 50, batch_size = 100,verbose = 0)
-
-history.2.all <- model.2.all %>% fit(
-  x.train.2.all, y.train.2.all,
-  epochs = 50, batch_size = 100,verbose = 0)
-
-save(history.2.1, history.2.2, history.2.3, history.2.4, history.2.all, file = "FFChar.RData")
+# history.2.1 <- model.2.1 %>% fit(
+#   x.train.2.1, y.train.2.1,
+#   epochs = 50, batch_size = 100,verbose = 0)
+# 
+# history.2.2 <- model.2.2 %>% fit(
+#   x.train.2.2, y.train.2.2,
+#   epochs = 50, batch_size = 100,verbose = 0)
+# 
+# history.2.3 <- model.2.3 %>% fit(
+#   x.train.2.3, y.train.2.3,
+#   epochs = 50, batch_size = 100,verbose = 0)
+# 
+# history.2.4 <- model.2.4 %>% fit(
+#   x.train.2.4, y.train.2.4,
+#   epochs = 50, batch_size = 100,verbose = 0)
+# 
+# history.2.all <- model.2.all %>% fit(
+#   x.train.2.all, y.train.2.all,
+#   epochs = 50, batch_size = 100,verbose = 0)
+# 
+# save(history.2.1, history.2.2, history.2.3, history.2.4, history.2.all, file = "FFChar.RData")
 
 load("FFChar.RData")
 
@@ -994,6 +1038,19 @@ plot(history.2.2)
 plot(history.2.3)
 plot(history.2.4)
 plot(history.2.all)
+```
+
+
+```{r FFNN TFIDF Fit}
+# history.tfidf <- model.tfidf %>% fit(
+#   x.train.tfidf, y.train.tfidf,
+#   epochs = 50, batch_size = 100,verbose = 0)
+# 
+# save(history.tfidf, file = "FFtfidf.RData")
+
+load("FFTFIDF.RData")
+
+plot(history.tfidf)
 ```
 
 
@@ -1012,6 +1069,9 @@ plot(history.2.all)
 1 - sum(diag(t.4.2))/ sum(t.4.2)
 1 - sum(diag(t.all.2))/ sum(t.all.2)
 
+# TFIDF naive bayes
+1 - sum(diag(tfidf.t))/ sum(tfidf.t)
+
 # Lexical SVM
 1 - sum(diag(svm.t.1.1))/ sum(svm.t.1.1)
 1 - sum(diag(svm.t.2.1))/ sum(svm.t.2.1)
@@ -1026,6 +1086,9 @@ plot(history.2.all)
 1 - sum(diag(svm.t.4.2))/ sum(svm.t.4.2)
 1 - sum(diag(svm.t.all.2))/ sum(svm.t.all.2)
 
+# TFIDF SVM
+1 - sum(diag(svm.tfidf.t))/ sum(svm.tfidf.t)
+
 # Lexical FFNN
 1 - model.1.1 %>% evaluate(x.val.1.1, y.val.1.1, batch_size=100, verbose = 2)
 1 - model.1.2 %>% evaluate(x.val.1.2, y.val.1.2, batch_size=100, verbose = 2)
@@ -1039,6 +1102,10 @@ plot(history.2.all)
 1 - model.2.3 %>% evaluate(x.val.2.3, y.val.2.3, batch_size=100, verbose = 2)
 1 - model.2.4 %>% evaluate(x.val.2.4, y.val.2.4, batch_size=100, verbose = 2)
 1 - model.2.all %>% evaluate(x.val.2.all, y.val.2.all, batch_size=100, verbose = 2)
+
+# TFIDF FFNN
+  # Best model is TFIDF with characters
+1 - model.tfidf %>% evaluate(x.val.tfidf, y.val.tfidf, batch_size=100, verbose = 2)
 ```
 
 ## Final Model
