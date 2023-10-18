@@ -744,7 +744,7 @@ load("svmLexical.RData")
 #      svm.classifier.4.2, 
 #      svm.classifier.all.2, file = "svmCharacter.RData")
 
-load(svmCharacter.RData)
+load("svmCharacter.RData")
 
 ```
 
@@ -760,9 +760,242 @@ where $l$ represents the number of layers, $d_l$ the number of nodes in layer $l
 
 The activation for the hidden layers has been chosen as the reLu activation function and the output layer uses a soft-max activation function. The classification task uses accuracy rate to evaluate model performance. Like the other models this is just a measure of correctly classified predicitons.
 
+<!-- Talk about forward and backward passes -->
+
+To find the best model in terms of feed forwards neural networks, the bag of words at different word bags was assessed against a default model with 32 nodes in the input layer with a relu activation function, a dropout rate of 0.5 at this layer, and an output layer with a softmax activation function to evaluate a categorical classification. Later on, hyperparameter tuning to find a better model will happen and used to test the final data.
+```{r Data for FFNN}
+
+# Lexical
+y.train.1.1 <- as.integer(unlist(train.set.uni.1[,1])) ; x.train.1.1 <- as.matrix(train.set.uni.1[,-1])
+y.val.1.1   <- as.integer(unlist(val.set.uni.1[,1]))   ; x.val.1.1   <- as.matrix(val.set.uni.1[,-1]);  
+y.train.1.1 <- to_categorical(y.train.1.1)             ; y.val.1.1   <- to_categorical(y.val.1.1)
+
+y.train.1.2 <- as.integer(unlist(train.set.uni.2[,1])) ; x.train.1.2 <- as.matrix(train.set.uni.2[,-1])
+y.val.1.2   <- as.integer(unlist(val.set.uni.2[,1]))   ; x.val.1.2   <- as.matrix(val.set.uni.2[,-1]);  
+y.train.1.2 <- to_categorical(y.train.1.2)             ; y.val.1.2   <- to_categorical(y.val.1.2)
+
+y.train.1.3 <- as.integer(unlist(train.set.uni.3[,1])) ; x.train.1.3 <- as.matrix(train.set.uni.3[,-1])
+y.val.1.3   <- as.integer(unlist(val.set.uni.3[,1]))   ; x.val.1.3   <- as.matrix(val.set.uni.3[,-1]);  
+y.train.1.3 <- to_categorical(y.train.1.3)             ; y.val.1.3   <- to_categorical(y.val.1.3)
+
+y.train.1.4 <- as.integer(unlist(train.set.uni.4[,1])) ; x.train.1.4 <- as.matrix(train.set.uni.4[,-1])
+y.val.1.4   <- as.integer(unlist(val.set.uni.4[,1]))   ; x.val.1.4   <- as.matrix(val.set.uni.4[,-1]);  
+y.train.1.4 <- to_categorical(y.train.1.4)             ; y.val.1.4   <- to_categorical(y.val.1.4)
+
+y.train.1.all <- as.integer(unlist(train.set.uni.all[,1])) ; x.train.1.all <- as.matrix(train.set.uni.all[,-1])
+y.val.1.all   <- as.integer(unlist(val.set.uni.all[,1]))   ; x.val.1.all   <- as.matrix(val.set.uni.all[,-1]);  
+y.train.1.all <- to_categorical(y.train.1.all)             ; y.val.1.all   <- to_categorical(y.val.1.all)
+
+# Character
+y.train.2.1 <- as.integer(unlist(train.set.char.1[,1])) ; x.train.2.1 <- as.matrix(train.set.char.1[,-1])
+y.val.2.1   <- as.integer(unlist(val.set.char.1[,1]))   ; x.val.2.1   <- as.matrix(val.set.char.1[,-1]);  
+y.train.2.1 <- to_categorical(y.train.2.1)             ; y.val.2.1   <- to_categorical(y.val.2.1)
+
+y.train.2.2 <- as.integer(unlist(train.set.char.2[,1])) ; x.train.2.2 <- as.matrix(train.set.char.2[,-1])
+y.val.2.2   <- as.integer(unlist(val.set.char.2[,1]))   ; x.val.2.2   <- as.matrix(val.set.char.2[,-1]);  
+y.train.2.2 <- to_categorical(y.train.2.2)             ; y.val.2.2   <- to_categorical(y.val.2.2)
+
+y.train.2.3 <- as.integer(unlist(train.set.char.3[,1])) ; x.train.2.3 <- as.matrix(train.set.char.3[,-1])
+y.val.2.3   <- as.integer(unlist(val.set.char.3[,1]))   ; x.val.2.3   <- as.matrix(val.set.char.3[,-1]);  
+y.train.2.3 <- to_categorical(y.train.2.3)             ; y.val.2.3   <- to_categorical(y.val.2.3)
+
+y.train.2.4 <- as.integer(unlist(train.set.char.4[,1])) ; x.train.2.4 <- as.matrix(train.set.char.4[,-1])
+y.val.2.4   <- as.integer(unlist(val.set.char.4[,1]))   ; x.val.2.4   <- as.matrix(val.set.char.4[,-1]);  
+y.train.2.4 <- to_categorical(y.train.2.4)             ; y.val.2.4   <- to_categorical(y.val.2.4)
+
+y.train.2.all <- as.integer(unlist(train.set.char.all[,1])) ; x.train.2.all <- as.matrix(train.set.char.all[,-1])
+y.val.2.all   <- as.integer(unlist(val.set.char.all[,1]))   ; x.val.2.all   <- as.matrix(val.set.char.all[,-1]);  
+y.train.2.all <- to_categorical(y.train.2.all)             ; y.val.2.all   <- to_categorical(y.val.2.all)
+
+```
+
+
+```{r FFNN Lexical}
+model.1.1 <- keras_model_sequential() %>%
+   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x.train.1.1))) %>% 
+   layer_dropout(rate = 0.5) %>%
+   layer_dense(units = 5, activation = 'softmax')
+
+model.1.1 %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  metrics = "accuracy"
+)
+model.1.2 <- keras_model_sequential() %>%
+   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x.train.1.2))) %>% 
+   layer_dropout(rate = 0.5) %>%
+   layer_dense(units = 5, activation = 'softmax')
+
+model.1.2 %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  metrics = "accuracy"
+)
+
+model.1.3 <- keras_model_sequential() %>%
+   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x.train.1.3))) %>% 
+   layer_dropout(rate = 0.5) %>%
+   layer_dense(units = 5, activation = 'softmax')
+
+model.1.3 %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  metrics = "accuracy"
+)
+
+model.1.4 <- keras_model_sequential() %>%
+   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x.train.1.4))) %>% 
+   layer_dropout(rate = 0.5) %>%
+   layer_dense(units = 5, activation = 'softmax')
+
+model.1.4 %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  metrics = "accuracy"
+)
+
+model.1.all <- keras_model_sequential() %>%
+   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x.train.1.all))) %>% 
+   layer_dropout(rate = 0.5) %>%
+   layer_dense(units = 5, activation = 'softmax')
+
+model.1.all %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  metrics = "accuracy"
+)
+
+```
+
+```{r FFNN Character}
+model.2.1 <- keras_model_sequential() %>%
+   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x.train.2.1))) %>% 
+   layer_dropout(rate = 0.5) %>%
+   layer_dense(units = 5, activation = 'softmax')
+
+model.2.1 %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  metrics = "accuracy"
+)
+model.2.2 <- keras_model_sequential() %>%
+   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x.train.2.2))) %>% 
+   layer_dropout(rate = 0.5) %>%
+   layer_dense(units = 5, activation = 'softmax')
+
+model.2.2 %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  metrics = "accuracy"
+)
+
+model.2.3 <- keras_model_sequential() %>%
+   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x.train.2.3))) %>% 
+   layer_dropout(rate = 0.5) %>%
+   layer_dense(units = 5, activation = 'softmax')
+
+model.2.3 %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  metrics = "accuracy"
+)
+
+model.2.4 <- keras_model_sequential() %>%
+   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x.train.2.4))) %>% 
+   layer_dropout(rate = 0.5) %>%
+   layer_dense(units = 5, activation = 'softmax')
+
+model.2.4 %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  metrics = "accuracy"
+)
+
+model.2.all <- keras_model_sequential() %>%
+   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x.train.2.all))) %>% 
+   layer_dropout(rate = 0.5) %>%
+   layer_dense(units = 5, activation = 'softmax')
+
+model.2.all %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  metrics = "accuracy"
+)
+
+
+```
+
 # Results
 
 ## Validation Results
+
+```{r FFNN Lexical Fit}
+history.1.1 <- model.1.1 %>% fit(
+  x.train.1.1, y.train.1.1,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+history.1.2 <- model.1.2 %>% fit(
+  x.train.1.2, y.train.1.2,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+history.1.3 <- model.1.3 %>% fit(
+  x.train.1.3, y.train.1.3,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+history.1.4 <- model.1.4 %>% fit(
+  x.train.1.4, y.train.1.4,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+history.1.all <- model.1.all %>% fit(
+  x.train.1.all, y.train.1.all,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+save(history.1.1, history.1.2, history.1.3, history.1.4, history.1.all, file = "FFLexical.RData")
+
+laod("FFLexical.RData")
+
+par(mfrow = c(2,3))
+plot(history.1.1)
+plot(history.1.2)
+plot(history.1.3)
+plot(history.1.4)
+plot(history.1.all)
+```
+
+
+```{r FFNN Character Fit}
+history.2.1 <- model.2.1 %>% fit(
+  x.train.2.1, y.train.2.1,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+history.2.2 <- model.2.2 %>% fit(
+  x.train.2.2, y.train.2.2,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+history.2.3 <- model.2.3 %>% fit(
+  x.train.2.3, y.train.2.3,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+history.2.4 <- model.2.4 %>% fit(
+  x.train.2.4, y.train.2.4,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+history.2.all <- model.2.all %>% fit(
+  x.train.2.all, y.train.2.all,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+save(history.2.1, history.2.2, history.2.3, history.2.4, history.2.all, file = "FFChar.RData")
+
+load("FFChar.RData")
+
+par(mfrow = c(2,3))
+plot(history.2.1)
+plot(history.2.2)
+plot(history.2.3)
+plot(history.2.4)
+plot(history.2.all)
+```
+
 
 ```{r Validation Results}
 # Lexical naive bayes
@@ -794,11 +1027,23 @@ The activation for the hidden layers has been chosen as the reLu activation func
 1 - sum(diag(svm.t.all.2))/ sum(svm.t.all.2)
 
 # Lexical FFNN
+1 - model.1.1 %>% evaluate(x.val.1.1, y.val.1.1, batch_size=100, verbose = 2)
+1 - model.1.2 %>% evaluate(x.val.1.2, y.val.1.2, batch_size=100, verbose = 2)
+1 - model.1.3 %>% evaluate(x.val.1.3, y.val.1.3, batch_size=100, verbose = 2)
+1 - model.1.4 %>% evaluate(x.val.1.4, y.val.1.4, batch_size=100, verbose = 2)
+1 - model.1.all %>% evaluate(x.val.1.all, y.val.1.all, batch_size=100, verbose = 2)
 
 # Character FFNN
+1 - model.2.1 %>% evaluate(x.val.2.1, y.val.2.1, batch_size=100, verbose = 2)
+1 - model.2.2 %>% evaluate(x.val.2.2, y.val.2.2, batch_size=100, verbose = 2)
+1 - model.2.3 %>% evaluate(x.val.2.3, y.val.2.3, batch_size=100, verbose = 2)
+1 - model.2.4 %>% evaluate(x.val.2.4, y.val.2.4, batch_size=100, verbose = 2)
+1 - model.2.all %>% evaluate(x.val.2.all, y.val.2.all, batch_size=100, verbose = 2)
 ```
 
 ## Final Model
+
+<!-- Use test set on final model -->
 
 # Discussion
 
