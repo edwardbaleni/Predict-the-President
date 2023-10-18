@@ -39,9 +39,11 @@ In this study the classic word bag approach with token frequencies to TF-IDF
 
 Naive Bayes SVM FFNN
 
+In the topics to follow, the data and methodology will be defined. Following this, various models will be used and validated to select the best type of data for the analysis using base models. After this, hyperparameter tuning will be done on the top 3 models to obtain their best performances...
+
 # Data and Methodology
 
-The data used in this study was sourced from [gov.za](https://www.gov.za/state-nation-address). As mentioned adresses from 1994 to 2023 are used within this study. The speakers present in this time span were FW De Klerk, Nelson Mandela, Thabo Mbeki, Kgalema Motlanthe, Jacob Zuma and Cyril Ramaphosa. Some webscraping techniques, courtesy of Ian Durbach, were used to collect this data.
+The data used in this study was sourced from [gov.za](https://www.gov.za/state-nation-address). It is a collection of 36 addresses from 6 different presidents within the years 1994 to 2023. The speakers present in this time span were FW De Klerk, Nelson Mandela, Thabo Mbeki, Kgalema Motlanthe, Jacob Zuma and Cyril Ramaphosa. Web-scraping techniques were used to collect this data, courtesy of Ian Durbach.
 
 ```{r Data}
 set.seed(2023)
@@ -59,7 +61,7 @@ sona <- as_tibble(sona)
 
 ## Pre-Processing
 
-After obtaining the data, the first line of each speech is removed. This first line is the date the address is held. The data is then tokenized by sentence. Only sentences with over two words remained for the rest of the analysis. The reason this is done is because the sentences with less than 3 words seemed to either just be digits or to be unfinished words, most of the time.
+After obtaining the data, the first line of each speech is removed. This first line is the date the address is held. The data is then tokenized by sentence. Only sentences with over two words remained for the rest of the analysis. The reason this is done is because the sentences with less than 3 words seemed to either either be made up of digits or unfinished words, most of the time.
 
 ```{r Pre-Process Lex}
 sentences <- sona %>%
@@ -74,17 +76,15 @@ sentences$StringCount <- unlist(lapply(sentences$speech, str.ct))
 sentences <- sentences[sentences$StringCount > 2,]
 ```
 
-Following this many different considerations have been made in the [Supplementary](supplementary.qmd) to find the best representation of the data for classification. Both lexical and character features are considered; the inclusion and exclusion of function words (stop words include function words); using token frequencies and TF-IDF are considered; different sized word bags are considered; the inclusion of case and punctuation are are also considered. Lexical features regard tokens as a sequence of words, where a unigram is a single word, a bigram are two contiguous words, a trigram is three and so forth. Character features are a sequence of contiguous characters also using n-grams to characterise how many characters are present in each feature. These two types of features qualify as two of the most basic markers used for identifying an author's style, where lexical features are slighttly more complex than character features ([\@Stylometry]()). Of the many options explored in the [Supplementary](supplementary.qmd), only two of the models will be represented here. How data is cleaned and shaped is different between these two approaches. The first approach uses lexical features, while the second uses character features, this is how we will distinguish between the two going forward.
+Following this many different considerations have been made in the [Supplementary](supplementary.qmd) to find the best representation of the data for classification. Both lexical and character features are considered; the inclusion and exclusion of function words (stop words include function words); using token frequencies and TF-IDF are considered; different sized word bags are considered; the inclusion of case and punctuation are are also considered. Lexical features regard tokens as a sequence of words, where a unigram is a single word, a bigram are two contiguous words, a trigram is three and so forth. Character features are a sequence of contiguous characters also using n-grams to characterise how many characters are present in each feature. These two types of features qualify as two of the most basic markers used for identifying an author's style, where lexical features are slightly more complex than character features ([\@Stylometry]()). Of the many options explored in the [Supplementary](supplementary.qmd), only two of the models will be represented here. The first approach will use unigrams of words to represent lexical features, while the second uses character features with a 4 character n-gram, this is how we will distinguish between the two going forward. These are important distinctions at this stage as they determine how the data is organised.
 
-These are important distinctions at this stage as they determine how the data is organised.
-
-In the [Supplementary](supplementary.qmd), both a topic-based approach and style-based approaches were looked into. It was found that the style-based approach performed better than topic-based approach. This was illustrated in how the model performance improved with the inclusion of function words.......
+In the [Supplementary](supplementary.qmd), both a topic-based approach and style-based approach were looked into. It was found that the style-based approach performed better than topic-based approach, in most scenarios. This was illustrated in the improvement of model performance of the models with the inclusion of function words. This idea will be furthered explored below.
 
 ### Lexical Features
 
-There is complexity that comes with using lexical features, and the sparsity within the bag-of-words that such features introduce, allowing features with capitalization was not appropriate ([\@LexVsChar]()), capitalization within the transcription of a speech, indicate the beginning of an idea, or the beginning of a sentence, sentiment cannot be captured by such. Whereas, in the context of a book, capitalization can be use to convey a strong meaning in a character's words.
+There is complexity that comes with using lexical features; the sparsity within the bag-of-words of such features was a the reason why capitalization was not deemed appropriate in conjunction with lexical features ([\@LexVsChar]()). Capitalization within the transcription of a speech can only indicate the beginning of an idea, sentiment cannot be captured by such. Whereas, in the context of a book, capitalization can be use to convey a strong meaning in a character's words.
 
-Here the sentences were cleaned quite strictly in order to obtain a dataset. All digits are removed using a regex operation. Contractions are replaced with their long form also via the aid of regex pattern matching ([\@textclean]()). Here punctuation is maintained as punctuation is able to characterise syntatic information ([\@Punc]()). Punctuation is maintained, however, special unicode characters, astrixes, and other punctuation that is not commonly seen in text are removed, only full stops, question marks, commas, exclamation marks, brackets, apostrophes and curly brackets are maintained. Lemmatization is done as commonly appearing words appear in different forms for each president. A lemma is a set of words that have the same stem, where each variation of the word is called a word form. Lemmatization is a process that is able to determine that two words have the same root, to lemmatize is to change all these wordforms into their root. This process of lemmatization is done by morphological parsing, where this separates the morphenes into parts. A morphene, is the smaller building blocks of a word. Lemmatization was done by using a dictionary of common word forms, if a word is a part of a lemma, then it will be matched to the dictionary and replaced by the morphenes that make it up. After performing this lemmatization, the affixes, additional morphenes that aren't the stem, are still present in the data, these are generally quite random letters that will appear ([\@Jurafsky2000SpeechAL]()). The final step in cleaning is to remove these affixes
+First the speeches are tokenized into sentences and are given sentence ids. Thereafter sentences were cleaned quite strictly. All digits are removed using a regex operation. Contractions are replaced with their long form via regex pattern matching ([\@textclean]()). Punctuation is maintained as punctuation is able to characterise syntatic information ([\@Punc]()). Punctuation is maintained, however, special unicode characters, astrixes, and other punctuation that is not commonly seen in text are removed, only full stops, question marks, commas, exclamation marks, brackets, apostrophes and curly brackets are maintained. Lemmatization is performed as commonly appearing words appear in different forms for each president. A lemma is a set of words that have the same stem, where each variation of the word is called a word form. Lemmatization is a process that is able to determine that two words have the same root. To lemmatize is to change wordforms into their root. This process of lemmatization is done by morphological parsing, where this separates the morphenes into parts. A morphene is a smaller building block of a word. Lemmatization was done by using a dictionary of common wordforms, if a word is a part of a lemma, then it will be matched to the dictionary and replaced by the morphenes that make it up. After performing this lemmatization, the affixes, additional morphenes that aren't the stem, are still present in the data. Affixes are often random letters that will appear ([\@Jurafsky2000SpeechAL]()). The final step in cleaning is to remove these affixes
 
 ```{r Lex Clean}
 clean1 <- function(x){
@@ -92,7 +92,7 @@ clean1 <- function(x){
   x <- textclean::replace_contraction(x)
   # lemmatization
   x <- lemmatize_strings(x)
-  # remove single characters
+  # remove single characters and Affixes
   x <- gsub("\\s.\\s", " ", x)
   # remove numbers
   x <- gsub("[0-9]", "", x)
@@ -108,7 +108,7 @@ Character features are more simplistic than lexical features and are able to cap
 
 The data here is cleaned differently. In the [Supplementary](supplementary.qmd), it is shown that the feature space that includes both punctuation and capitalization performs the best of all the character spaces. A character n-gram of both 3 and 4 features were assessed, and both are decently sized n-grams. Here the character n-gram of 4 contiguous characters will be used.
 
-First the speeches are tokenized into sentences, where previously, the text would have been set to lower case and the punctuation was included, here both the text maintains it's capitalization and the punctuation shall remain. To clean these sentences, all digits were removed, followed by the lemmatization of wordforms to stems.
+First the speeches are tokenized into sentences, and given an id. Where previously the text would have been set to lower case and the punctuation was included, here both the text maintains it's capitalization and the punctuation remain. To clean these sentences, all digits were removed, followed by the lemmatization of wordforms to stems.
 
 ```{r Pre-Process Chars}
 sentences.cap.punc             <- sona %>%
@@ -131,7 +131,9 @@ sentences.cap.punc$speech <- unlist(lapply(sentences.cap.punc$speech, clean2))
 
 ### Imbalanced Classes
 
-Both Motlanthe and deKlerk are outliers... To balance the classes
+The data has imbalanced classes present. This means that the distribution of the data across classes is skewed. Motlanthe and de Klerk both only gave one speech. This was Motlanthe's and de Klerk's outgoing speeches; every other presidents managed to give more than one speech.
+
+There are a number of ways to deal with imbalanced classes, for future work one might look into @LexVsChar to get an idea of what strategies do actually work on text classification tasks. In this report, these outlying classes were removed from the remainder of the analysis.
 
 ```{r Remove Imabalances Lex}
 data_count <- cleaned.sentences %>%
@@ -153,9 +155,9 @@ data_count2 <- data_count2 %>%
 
 ## Bag of Words
 
-It is important that we get the data into a format that can be used by the classifiers to classify a sentence. A bag of words in one such way we can do this. What happens here is that the entirety of text is put into something called a bag of words. This is an unordered set of words which contain the frequency of each word in the document ([\@Jurafsky2000SpeechAL]()). For both cases of lexoical features and character features, the pre-processed sentences need to be tokenized down to their desired level. The lexical features are tokenized as unigrams of words, while including punctuation of individual words; the character features are tokenized as n-grams with 4 characters, with the inclusion of punctuation and capitalization. Both types of features included function words, as this was decided to be a stylometric exercise as per the [Supplementary](supplementary.qmd).
+It is important that we get the data into a format that can be used by the classifiers. A bag of words is one such way to do this. The text is placed into something called a bag of words. This is an unordered set of words that contain the frequency of each word in the document ([\@Jurafsky2000SpeechAL]()). For both lexical and character features, the pre-processed sentences need to be tokenized down to their desired level. The lexical features are tokenized as unigrams of words, while including punctuation as individual words; the character features are tokenized as n-grams with 4 characters, with the inclusion of punctuation and capitalization. Both types of features included function words, as this was decided to be a stylometric exercise as per the [Supplementary](supplementary.qmd). In both cases, the sentence id was maintained over each word to allocate which sentence it belongs to.
 
-In both the cases of the lexical and character features, the most important features are the most frequent. With this understanding, a crude feature selection, can be conducted for both the lexical and the character features.
+In both cases, lexical and character features, the most important features are the most frequent. With this understanding, a crude feature selection, can be conducted for both.
 
 After tokenizing, most frequent features were selected. This was tried as 200, 500, 2000, 4500 and all the tokens for both the lexical features and the character features. After making these selections, a word bag was created for each selection of top features.
 
@@ -451,11 +453,9 @@ Inverse document term frequency downweights terms that are frequent in a collect
 
 $$\text{idf(term t)} = \text{ln}\left(\frac{\text{Number of documents in corpus}}{\text{Number of documents containing term t}}\right).$$
 
-TF-IDF is the multiplication of the two metrics ([\@TextMining]()). TF-IDF measures the importance of a word to a document in a collection. In this analysis this has been done by considering one document to be a sentence. Following this intuition, the quantities above can be calculated.
+TF-IDF is the multiplication of the two metrics ([\@TextMining](), @Durbach2023 ). TF-IDF measures the importance of a word to a document in a collection. In this analysis this has been done by considering one document to be a sentence. Following this intuition, the quantities above can be calculated.
 
-In the [Supplementary](supplementary.qmd), both the lexical feature approach and the character features were looked into to find which would be better performing for TF-IDF. The character features seemed to show a better result and so will be used in this report.
-
-Since TF-IDF determines what features are important to which document, this can be seen as a topic-based classification, as function words and commonly occurring tokens amongst the documents will be downweighted resulting in semantic features being strongly weighted. For TF-IDF, all tokens were kept, because some of the highly weighted scores may only appear once in a document and as a result may act as quite a poor classifier out-of-sample, and so it is necessary to leave all possible tokens.
+Since TF-IDF determines what features are important to which document, this can be seen as a topic-based classification, as function words and commonly occurring tokens among the documents will be downweighted resulting in semantic features being strongly weighted. For TF-IDF, all tokens were kept, because some of the highly weighted scores may only appear once in a document and as a result may act as quite a poor classifier out-of-sample, and so it is necessary to leave all possible tokens.
 
 ```{r TFIDF}
 uni_ <- data_count2 %>%
@@ -487,7 +487,7 @@ tfidf <- data_count %>%
 
 For the training, validation and test splits, it would be wise to select sample sizes by sentence and not by word, this will represent each row in the bag of words.
 
-The data will have a 60:20:20 split of training, validation and test data. The training set will represent 60% of the total number of sentences available, the validation set will represent 20% and the test set will be the remaining 20%.
+The data will have a 60:20:20 split of training, validation and test data. The training set will represent 60% of the total number of sentences available, the validation set will represent 20% and the test set will be the remaining 20%. These splits are done for each word bag and for tf-idf.
 
 ```{r Splits}
 id           <- unique(data_count$ids_)
@@ -561,7 +561,7 @@ test.set.tfidf     <- tfidf[tfidf$ids_ %in% test, -1]
 
 ## Naive Bayes Classifier
 
-A multinomial naive Bayes classifier was use to classify text. This is a probabilistic classifier, given the document $d$ and classes $c \in C$, the classifier will predict the class, $\hat{c}$, with the maximum posterior probabiliity,
+A multinomial naive Bayes classifier was used to classify text. This is a probabilistic classifier, given the document $d$ and classes $c \in C$, the classifier will predict the class, $\hat{c}$, with the maximum posterior probability,
 
 $$\hat{c} = \underset{c\in C}{\arg\max} P(c|d)$$
 
@@ -573,13 +573,15 @@ This can be further simplified by to,
 
 $$\hat{c} = \underset{c\in C}{\arg\max} P(d|c)P(c) $$
 
-as $P(d)$ stays constant for all classes, which allows us to cancel this out. This equation above is made up of the likehood of the document and te prior probability of the class. The documents can subsequently be divided up into features, be it our lexical or character features above. Following this great number of features, $\{f_i : i = 1,2,...,n\}$, this classifier makes two simplifying assumptions that would infer it's naivety, that the tokens are position independent and that the joint likelihood of the features also maintain independence,
+as $P(d)$ stays constant for all classes, which allows us to cancel this out. This equation above is made up of the likelihood of the document and prior probability of the class. The documents can subsequently be divided up into features, be it our lexical or character features above. Following this great number of features, $\{f_i : i = 1,2,...,n\}$, this classifier makes two simplifying assumptions that would infer it's naivety, that the tokens are position independent and that the joint likelihood of the features also maintain independence,
 
 $$P(d|c) = P(f_1, f_2, ..., f_n|c) = P(f_1|c)P(f_2|c)...P(f_n|c)$$ The final equation of the naive Bayes classifier then becomes,
 
-$$c_{NB} = \underset{c\in C}{\arg\max} P(c) \prod_{f\in F} P(f|c)$$
+$$\hat{c}_{NB} = \underset{c\in C}{\arg\max} P(c) \prod_{f\in F} P(f|c)$$
 
 ([\@Jurafsky2000SpeechAL]()).
+
+This classifier was made with no Laplace smoothing. Laplace smoothing, will be looked into for the final models. This is a simple smoothing algorithm that can be easily implemented in this classifier. It simply adds to the count the number specified before finding probabilities ([\@Jurafsky2000SpeechAL]()).
 
 ```{r Naive Bayes Classifier Lexical}
 
@@ -670,7 +672,6 @@ load("naiveCharacter.RData")
 
 load("naiveTFIDF.RData")
 ```
-
 
 ## Support Vector Machines
 
@@ -773,10 +774,9 @@ save(svm.tfidf.classifier, svm.tfidf.p, svm.tfidf.t, file = "svmTFIDF.RData")
 load("svmTFIDF.RData")
 ```
 
-
 ## Feed Forward Neural Networks
 
-A neural network is a series of non-linear basis functions, this is handled via interconnected nodes over a number of layers. Each layer has a number of nodes and is connected to every other node in the layer before (if any) and after it (if any). The case where there are no layers before the current layer is for the input layer, which is a layer that takes in data. The number of nodes present at the input layer are equal to the number of features in the bag of words. Similarly, the case where there are no layers after the current layer is for the output layer, in this text classification task. Since the task is that of multinomial classification, the number of nodes on this output layer is equivalent to the number of classes available. The layers between the input layer and the output layer are called hidden layers. The output of each layer is passed on as the input to the next layer. The hidden layers are capable of taking a weighted sum of their inputs and applying a non-linear activation function to this to obtain its output ([\@Jurafsky2000SpeechAL](), [\@Hastie]()).
+A neural network is a series of non-linear basis functions, this is handled via interconnected nodes over a number of layers. Each layer has a number of nodes and is connected to every other node in the layer before (if any) and after it (if any). The case where there are no layers before the current layer is for the input layer, which is a layer that takes in data. The number of nodes present at the input layer are equal to the number of features in the bag of words. Similarly, the case where there are no layers after the current layer is for the output layer, in this text classification task. Since the task is that of multinomial classification, the number of nodes on this output layer is equivalent to the number of classes available. The layers between the input layer and the output layer are called hidden layers. The output of each layer is passed on as the input to the next layer. The hidden layers are capable of taking a weighted sum of their inputs and applying a non-linear activation function to this to obtain its output ([\@Jurafsky2000SpeechAL](), [\@Hastie]()). Forward and backward passes of the data are used to change the parameters in order to optimize an objective function.
 
 A general way in which to represent this operation is the following,
 
@@ -784,11 +784,10 @@ $$a^l_j(i) = \sigma_l\left( \sum_{k = 1}^{d_l - 1} a_k^{l-1}(i)w_{kj}^l + b_j^l 
 
 where $l$ represents the number of layers, $d_l$ the number of nodes in layer $l$, $\sigma_l(.)$ denotes the activation function, $w_{kj}^l$ denotes the weight linking the $k^{th}$ node in layer $l-1$ to the $j^{th}$ node in layer $l$, $b_j^l$ denotes the $j^{th}$ bias in layer $l$ ([\@Et]()).
 
-The activation for the hidden layers has been chosen as the reLu activation function and the output layer uses a soft-max activation function. The classification task uses accuracy rate to evaluate model performance. Like the other models this is just a measure of correctly classified predicitons.
+The activation for the hidden layers has been chosen as the reLu activation function and the output layer uses a soft-max activation function. The classification task uses accuracy rate to evaluate model performance. Like the other models this is just a measure of correctly classified predictions.
 
-<!-- Talk about forward and backward passes -->
+To find the best data in terms of FFNN, the bag of words at different word bags was assessed against a default model with 32 nodes, an input layer with relu activation function, a dropout rate of 0.5, an output layer with a softmax activation function and performacne calculated via accuracy. Later on, hyperparameter tuning to find a better model will happen and used to test the final data.
 
-To find the best model in terms of feed forwards neural networks, the bag of words at different word bags was assessed against a default model with 32 nodes in the input layer with a relu activation function, a dropout rate of 0.5 at this layer, and an output layer with a softmax activation function to evaluate a categorical classification. Later on, hyperparameter tuning to find a better model will happen and used to test the final data.
 ```{r Data for FFNN}
 
 # Lexical
@@ -838,7 +837,6 @@ y.val.tfidf   <- as.integer(unlist(val.set.tfidf[,1]))   ; x.val.tfidf   <- as.m
 y.train.tfidf <- to_categorical(y.train.tfidf)             ; y.val.tfidf   <- to_categorical(y.val.tfidf)
 
 ```
-
 
 ```{r FFNN Lexical}
 model.1.1 <- keras_model_sequential() %>%
@@ -968,7 +966,6 @@ model.tfidf %>% compile(
 )
 ```
 
-
 # Results
 
 ## Validation Results
@@ -1006,7 +1003,6 @@ plot(history.1.4)
 plot(history.1.all)
 ```
 
-
 ```{r FFNN Character Fit}
 # history.2.1 <- model.2.1 %>% fit(
 #   x.train.2.1, y.train.2.1,
@@ -1040,7 +1036,6 @@ plot(history.2.4)
 plot(history.2.all)
 ```
 
-
 ```{r FFNN TFIDF Fit}
 # history.tfidf <- model.tfidf %>% fit(
 #   x.train.tfidf, y.train.tfidf,
@@ -1052,7 +1047,6 @@ load("FFTFIDF.RData")
 
 plot(history.tfidf)
 ```
-
 
 ```{r Validation Results}
 # Lexical naive bayes
@@ -1108,15 +1102,23 @@ plot(history.tfidf)
 1 - model.tfidf %>% evaluate(x.val.tfidf, y.val.tfidf, batch_size=100, verbose = 2)
 ```
 
+<!-- Add a table of all the results -->
+
+## Hyperparameter Tuning Results
+
+<!-- Perform hyperparameter tuning for svm and ffnn on final model -->
+
 ## Final Model
 
-<!-- Use test set on final model -->
+<!-- Use test set on final models -->
 
 # Discussion
 
 # Limitations
 
 A limitation that arises in this study is a lack of candidate authors, as well as minimal data provided for some authors. This is an issue that has been detailed in research before ([\@Stylometry]()).
+
+Perform a recuesive feature elimination (@WordFreq) using the rfe function in the package provided by, @Caret .
 
 # Conclusion
 
