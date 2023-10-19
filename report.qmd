@@ -1237,7 +1237,7 @@ as_hux(runs1.1) %>%
   set_header_rows(1, T) %>%
   set_top_border(row = 2) %>%
   style_headers(bold = T) %>% 
-  set_caption("Table 3: Cross validated results depicting the best hyperparameters for the character feature set in a single layer FFNN")
+  set_caption("Table 2: Cross validated results depicting the best hyperparameters for the character feature set in a single layer FFNN")
 ```
 In Table 4 we see that the best hyperparameters for the model built off the TFIDF feature set are in fact the same as the default model described at the beginning of the paper, but with a dropout rate of 0.01 instead of 0.5.
 
@@ -1252,7 +1252,7 @@ From here on the NB, SVM, and the FFNN can be described under the same constrain
 
 ## Final Model
 
-For each model, we can begin by combining the training and validation data, then we can go ahead and train this new and final model.
+For each model, we began by combining the training and validation data, then we can go ahead and train this new and final model. The 
 
 ```{r Combine data}
 # Combine data
@@ -1348,23 +1348,28 @@ test.s.2                   <- 1 - sum(diag(svm.tfidf.test.t))/ sum(svm.tfidf.tes
 # test.f.2 <- 1 - (model2 %>% evaluate(x.test.tfidf, y.test.tfidf, batch_size=100, verbose = 0))[2]
 ```
 
+Table 4 holds the out-of-sample missclassification rates of the final models. The results demonstrate that of the three classifiers observed, the FFNN performed the best over both feature sets. The FFNN obtained a missclassification rate of 0.401 (accuracy of 0.599) when 4500 of the most important character features were considered. It obtained a missclassification of 0.328 (accuracy of 0.672) when using a full feature set of TFIDF. 
+
+Although, the TFIDF feature set trained in a neural network had the best result, it is still necessary to consider the character feature set. The character feaature set did not perform as well but was a lot more consistent over all classifiers. It's shown to perform massively better under the NB and SVM classifiers over the TFIDF feature set.
 
 ```{r Test Results}
-chars <- c(test.n.1, test.s.1, test.f.1)
-ff <- c(test.n.2, test.s.2, test.f.2)
-tests <- data.frame(Feature = c("Character 4500", "TFIDF"), rbind(chars, ff))
-colnames(tests) <- c("NB", "SVM", "FFNN")
+# chars <- c(test.n.1, test.s.1, test.f.1)
+# ff <- c(test.n.2, test.s.2, test.f.2)
+# tests <- data.frame(Feature = c("Character 4500", "TFIDF"), rbind(chars, ff))
+# colnames(tests) <- c("","NB", "SVM", "FFNN")
+# 
+# save(tests,file= "testResults.RData")
+
+load("testResults.RData")
 
 as_hux(tests) %>%
   set_header_rows(1, T) %>%
-  set_header_cols(1, T)
+  set_header_cols(1, T)%>%
   set_top_border(row = 2) %>%
   style_headers(bold = T) %>% 
-  set_right_border(everywhere, 1, brdr(3, "double", "grey"))
-  set_caption("Table 3: Cross validated results depicting the best hyperparameters for the TFIDF feature set in a single layer FFNN")
+  set_right_border(everywhere, 1, brdr(3, "double", "grey")) %>%
+  set_caption("Table 4: Test set missclassification rate over each model and feature set")
 ```
-
-# Discussion
 
 # Limitations
 
@@ -1372,7 +1377,7 @@ A limitation that arises in this study is a lack of candidate authors, as well a
 
 Perform a recuesive feature elimination ([\@WordFreq]()) using the rfe function in the package provided by, ([\@Caret]()) .
 
-# Conclusion
+# Discussion and Conclusion
 
 # Bibliography
 
