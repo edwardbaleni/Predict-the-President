@@ -1163,6 +1163,8 @@ The Laplace smoothing produced no significant results. Laplace smoothing at para
 
 ```
 
+The figure below depicts the validation missclassification across different levels of cost complexity in the SVM. Below we see that for the character features that the best model came about when the cost was 100. The final model for the SVM will have a cost of 100. The cost complexity of the TFIDF features did not change. This may indicate that this data set does not work with a radial kernal. However, for simplicity the two sets of features will have a dataset
+
 ```{r Cost Complexity, fig.cap="Validation missclassification for both the character features and TFIDF features"}
 cost <- c(0.1, 1, 10, 50, 100, 1000)
 # tune.n.3 <- list()
@@ -1197,33 +1199,170 @@ plot(cost, tune.n.4, type = "b", lwd = 1.5, ylab = "Validation Missclassificatio
 Earlier when looking for a good feature set, it was clear that 50 epochs was too many, so this will be set to 20 epochs.
 
 ```{r FFNN Hyperparameter tuning}
-x.train.2.4 <- rbind(x.train.2.4, x.val.2.4)
-y.train.2.4 <- rbind(y.train.2.4, y.val.2.4)
-
-x.train.tfidf <- rbind(x.train.tfidf, x.val.tfidf)
-y.train.tfidf <- rbind(y.train.tfidf, y.val.tfidf)
-
-runs1 <- tfruns::tuning_run("Tuning1.R", 
-                            flags = list(dense_units = c(10, 32, 64, 128), 
-                                         rate = c(0.01, 0.5),
-                                         batch = c(50, 100)))
-
-runs2 <- tfruns::tuning_run("Tuning2.R", 
-                            flags = list(dense_units = c(10, 32, 64, 128), 
-                                         rate = c(0.01, 0.5),
-                                         batch = c(50, 100)))
-
-head(runs)
-runs[,c(3,4,5,6,11,12)]
-
-save(runs1, runs2, "FF_Hyper.RData")
+# x.train.2.4 <- rbind(x.train.2.4, x.val.2.4)
+# y.train.2.4 <- rbind(y.train.2.4, y.val.2.4)
+# 
+# x.train.tfidf <- rbind(x.train.tfidf, x.val.tfidf)
+# y.train.tfidf <- rbind(y.train.tfidf, y.val.tfidf)
+# 
+# runs1 <- tfruns::tuning_run("Tuning1.R", 
+#                             flags = list(dense_units = c(10, 32, 64, 128), 
+#                                          rate = c(0.01, 0.5),
+#                                          batch = c(50, 100)))
+# 
+# runs2 <- tfruns::tuning_run("Tuning2.R", 
+#                             flags = list(dense_units = c(10, 32, 64, 128), 
+#                                          rate = c(0.01, 0.5),
+#                                          batch = c(50, 100)))
+# 
+# save(runs1, runs2, file = "FF_Hyper.RData")
 
 load("FF_Hyper.RData")
+
+# make a table of the top 5
+runs1 <- runs1 %>% arrange(desc(metric_accuracy))
+runs2 <- runs2 %>% arrange(desc(metric_accuracy))
+
+runs1.1 <- runs1[1:5,c(2,3,4, 6, 13)] 
+runs1.2 <- runs2[1:5,c(2,3,4, 6, 13)]
+colnames(runs1.2) <- colnames(runs1.1) <- c("Loss", "Accuracy", "Nodes", "BatchSize", "Learning Rate")
 ```
+
+In Table 3 we see that the best hyperparameters for the model built off the character feature set are in fact the same as the default model described at the beginning of the paper. This table depicts the accuracy of the model, which is,
+$$\text{accuracy} = 1 - \text{missclassification}.$$
+So a high accuracy is good.
+
+```{r FFNN Hyper Results 1}
+as_hux(runs1.1) %>%
+  set_header_rows(1, T) %>%
+  set_top_border(row = 2) %>%
+  style_headers(bold = T) %>% 
+  set_caption("Table 3: Cross validated results depicting the best hyperparameters for the character feature set in a single layer FFNN")
+```
+In Table 4 we see that the best hyperparameters for the model built off the TFIDF feature set are in fact the same as the default model described at the beginning of the paper, but with a dropout rate of 0.01 instead of 0.5.
+
+```{r FFNN Hyper Results 2}
+as_hux(runs1.2) %>%
+  set_header_rows(1, T) %>%
+  set_top_border(row = 2) %>%
+  style_headers(bold = T) %>% 
+  set_caption("Table 3: Cross validated results depicting the best hyperparameters for the TFIDF feature set in a single layer FFNN")
+```
+From here on the NB, SVM, and the FFNN can be described under the same constraint for both feature sets. 
 
 ## Final Model
 
-<!-- Use test set on final models -->
+For each model, we can begin by combining the training and validation data, then we can go ahead and train this new and final model.
+
+```{r Combine data}
+# Combine data
+train.set.char.4 <- rbind(train.set.char.4, val.set.char.4)
+train.set.tfidf  <- rbind(train.set.tfidf, val.set.tfidf)
+```
+
+
+```{r Naive Test}
+# naive.char.test.classifier <- naiveBayes(train.set.char.4[,-1], train.set.char.4[,1])
+# naive.char.test.p          <- predict(naive.char.test.classifier, test.set.char.4[,-1])
+# naive.char.test.t          <- table((naive.char.test.p), (unlist(test.set.char.4[,1])))
+# test.n.1                   <- 1 - sum(diag(naive.char.test.t))/ sum(naive.char.test.t)
+# 
+# naive.tfidf.test.classifier <- naiveBayes(train.set.tfidf[,-1], train.set.tfidf[,1])
+# naive.tfidf.test.p         <- predict(naive.tfidf.test.classifier, test.set.tfidf[,-1])
+# naive.tfidf.test.t         <- table((naive.tfidf.test.p), (unlist(test.set.tfidf[,1])))
+# test.n.2                   <- 1 - sum(diag(naive.tfidf.test.t))/ sum(naive.tfidf.test.t)
+```
+
+```{r SVM Test}
+svm.char.test.classifier <- svm(train.set.char.4[,-1], train.set.char.4[,1], type = "C-classification", scale = T, cost = 100)
+svm.char.test.p          <- predict(svm.char.test.classifier, test.set.char.4[,-1])
+svm.char.test.t          <- table((svm.char.test.p), (unlist(test.set.char.4[,1])))
+test.s.1                   <- 1 - sum(diag(svm.char.test.t))/ sum(svm.char.test.t)
+
+svm.tfidf.test.classifier <- svm(train.set.tfidf[,-1], train.set.tfidf[,1], type = "C-classification", scale = F, cost = 100)
+svm.tfidf.test.p         <- predict(svm.tfidf.test.classifier, test.set.tfidf[,-1])
+svm.tfidf.test.t         <- table((svm.tfidf.test.p), (unlist(test.set.tfidf[,1])))
+test.s.2                   <- 1 - sum(diag(svm.tfidf.test.t))/ sum(svm.tfidf.test.t)
+```
+
+```{r FFNN Tet}
+# This was already changed earlier
+#x.train.2.4
+#y.train.2.4
+# 
+#x.train.tfidf
+#y.train.tfidf
+
+# y.test.2.4   <- as.integer(unlist(test.set.char.4[,1])) 
+# x.test.2.4   <- as.matrix(test.set.char.4[,-1])
+# 
+# y.test.2.4   <- to_categorical(y.test.2.4)
+# 
+# 
+# y.test.tfidf   <- as.integer(unlist(test.set.tfidf[,1]))   
+# x.test.tfidf   <- as.matrix(test.set.tfidf[,-1]);  
+# 
+# y.test.tfidf   <- to_categorical(y.test.tfidf)
+# 
+# # Character
+# model1 <- keras_model_sequential() %>%
+#   layer_dense(units = 32, 
+#               activation = "relu", 
+#               input_shape = c(ncol(x.train.2.4))) %>% 
+#   layer_dropout(rate = 0.01) %>%
+#   layer_dense(units = 5, 
+#               activation = 'softmax')
+# 
+# model1 %>% compile(
+#   loss = "categorical_crossentropy",
+#   optimizer = optimizer_adam(learning_rate = 0.01),
+#   metrics = "accuracy"
+# )
+# 
+# hist1 <- model1 %>% fit(
+#   x.train.2.4, y.train.2.4,
+#   epochs = 20, batch_size = 100,
+#   verbose = 0)
+# 
+# # TFIDF
+# 
+# model2 <- keras_model_sequential() %>%
+#   layer_dense(units = 32, 
+#               activation = "relu", 
+#               input_shape = c(ncol(x.train.tfidf))) %>% 
+#   layer_dropout(rate = 0.01) %>%
+#   layer_dense(units = 5, 
+#               activation = 'softmax')
+# 
+# model2 %>% compile(
+#   loss = "categorical_crossentropy",
+#   optimizer = optimizer_adam(learning_rate = 0.01),
+#   metrics = "accuracy"
+# )
+# 
+# hist2 <- model2 %>% fit(
+#     x.train.tfidf, y.train.tfidf,
+#     epochs = 20, batch_size = 100,verbose = 0)
+# 
+# test.f.1 <- 1 - (model1 %>% evaluate(x.test.2.4, y.test.2.4, batch_size=100, verbose = 0))[2]
+# test.f.2 <- 1 - (model2 %>% evaluate(x.test.tfidf, y.test.tfidf, batch_size=100, verbose = 0))[2]
+```
+
+
+```{r Test Results}
+chars <- c(test.n.1, test.s.1, test.f.1)
+ff <- c(test.n.2, test.s.2, test.f.2)
+tests <- data.frame(Feature = c("Character 4500", "TFIDF"), rbind(chars, ff))
+colnames(tests) <- c("NB", "SVM", "FFNN")
+
+as_hux(tests) %>%
+  set_header_rows(1, T) %>%
+  set_header_cols(1, T)
+  set_top_border(row = 2) %>%
+  style_headers(bold = T) %>% 
+  set_right_border(everywhere, 1, brdr(3, "double", "grey"))
+  set_caption("Table 3: Cross validated results depicting the best hyperparameters for the TFIDF feature set in a single layer FFNN")
+```
 
 # Discussion
 

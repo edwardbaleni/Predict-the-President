@@ -69,9 +69,9 @@ cleaned.sentences$speech <- unlist(lapply(cleaned.sentences$speech, clean1))
 
 The first task is to select the stylometric features. This is deciding how one may choose to represent text. This can either be done by tokenizing by words (lexical features), a number of characters (character features), or in other more sophisticated ways like syntatic features or semantic features. In this study, only lexical features and character features are explored, while the other two require more domain knowledge to properly quantify ([\@Stylometry]()).
 
-Another point to address is the useage of token count or TF-IDF weightings, as observations for the study. This initial exploration will be done with frequency, as this is a very stable way in conducting author attribution ([\@WordFreq]()).
+Another point to address is the usage of token count or TF-IDF weightings, as observations for the study. This initial exploration will be done with frequency, as this is a very stable way in conducting author attribution ([\@WordFreq]()).
 
-For each experiment, a Naive Bayes classifier and a Support Vector Machine will be used to inform decisions.
+For each experiment, a Naive Bayes classifier and a Support Vector Machine will be used to inform decisions, and at the end a Feed-forward neural network will be explored.
 
 ### Lexical Features
 
@@ -84,11 +84,7 @@ data_count <- data_count %>%
   mutate(ids_ = row_number())
 ```
 
-When it comes to lexical features, these can be classed into N-grams. A collection of N contiguous words. The greater N is, the more complex the representation of the feature. It often doesn't show better results and the greater the N the higher the dimensionality of the problem, which will ultimately increase sparsity in the dataset, making it more difficult to classify ([\@Ngrams](), [\@WordFreq]()). To that extent, only unigrams and bigrams will be explored.
-
-Often it would seem that unigrams are sufficient amongst the three. It is however, interesting to observe the behaviour of n-grams <!-- https://shmpublisher.com/index.php/joscex/article/view/4/13
-     https://downloads.webis.de/pan/publications/papers/valencia_2019.pdf
-     -->
+When it comes to lexical features, these can be classed into N-grams. A collection of N contiguous words. The greater N is, the more complex the representation of the feature. It often doesn't show better results and the greater the N the higher the dimensionality of the problem, which will ultimately increase sparsity in the dataset, making it more difficult to classify ([\@Ngrams](), [\@WordFreq]()). To that extent, only unigrams and bigrams will be explored. Often it would seem that unigrams are sufficient amongst the three. It is however, interesting to observe the behaviour of n-grams @Tiffani2020OptimizationON.
 
 ```{r Unigram 1}
 uni.1 <- data_count %>%
@@ -186,15 +182,15 @@ length(test) + length(val) + length(train)
 ```
 
 ```{r Unigram Test 1}
-train.set    <- bag.of.words.uni.1[bag.of.words.uni.1$ids_ %in% train, -1]
-val.set      <- bag.of.words.uni.1[bag.of.words.uni.1$ids_ %in% val, -1]
-test.set     <- bag.of.words.uni.1[bag.of.words.uni.1$ids_ %in% test, -1]
+train.set.1    <- bag.of.words.uni.1[bag.of.words.uni.1$ids_ %in% train, -1]
+val.set.1      <- bag.of.words.uni.1[bag.of.words.uni.1$ids_ %in% val, -1]
+test.set.1     <- bag.of.words.uni.1[bag.of.words.uni.1$ids_ %in% test, -1]
 
 # Bayes classifier
-data_classifier <- naiveBayes(train.set[,-1], train.set[,1])
-p1 <- predict(data_classifier, val.set[,-1])
-tt <- table((p1), (unlist(val.set[,1])))
-1 - sum(diag(tt))/ sum(tt)
+data_classifier.1 <- naiveBayes(train.set.1[,-1], train.set.1[,1])
+p1.1 <- predict(data_classifier.1, val.set.1[,-1])
+tt.1 <- table((p1.1), (unlist(val.set.1[,1])))
+1 - sum(diag(tt.1))/ sum(tt.1)
 
 # SVM
 classifier = svm(train.set[,-1], train.set[,1], type = "C-classification", scale = T)
@@ -221,7 +217,7 @@ p1 <- predict(classifier, val.set[,-1])
 tt <- table((p1), (unlist(val.set[,1])))
 1 - sum(diag(tt))/ sum(tt)
 
-save(classifier, file = "supp_cleanedLexical.RData)
+save(classifier, file = "Test1.RData")
 
 ```
 
