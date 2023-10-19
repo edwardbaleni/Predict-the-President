@@ -2,8 +2,6 @@
 title: "Predict the President"
 author: "Edward Baleni, BLNEDW003"
 bibliography: references.bib
-Rendering:
-  embed-resources: true
 ---
 
 ```{r setup, include=FALSE}
@@ -19,12 +17,15 @@ require(tidyr)
 require(forcats)
 require(textstem)
 require(textclean)
+require(cowplot)
+require(huxtable)
+require(dplyr)
+require(e1071)
 
-library(e1071)
-
-library(keras) 
-library(reticulate) 
-library(tensorflow)
+require(keras) 
+require(reticulate) 
+require(tensorflow)
+require(kerastuneR)
 ```
 
 # Abstract
@@ -505,8 +506,6 @@ val          <- sample(not_train, size = NN * 0.5 )
 
 # Test set
 test         <- na.omit(ifelse(!not_train %in% val, not_train, NA))
-
-length(test) + length(val) + length(train)
 ```
 
 ```{r Train Val Test}
@@ -794,11 +793,11 @@ load("svmCharacter.RData")
 ```
 
 ```{r SVM Classifier TFIDF}
-svm.tfidf.classifier  <- svm(train.set.tfidf[,-1], train.set.tfidf[,1], type = "C-classification", scale = F)
-svm.tfidf.p           <- predict(svm.tfidf.classifier, val.set.tfidf[,-1])
-svm.tfidf.t           <- table((svm.tfidf.p), (unlist(val.set.tfidf[,1])))
-
-save(svm.tfidf.classifier, svm.tfidf.p, svm.tfidf.t, file = "svmTFIDF.RData")
+# svm.tfidf.classifier  <- svm(train.set.tfidf[,-1], train.set.tfidf[,1], type = "C-classification", scale = F)
+# svm.tfidf.p           <- predict(svm.tfidf.classifier, val.set.tfidf[,-1])
+# svm.tfidf.t           <- table((svm.tfidf.p), (unlist(val.set.tfidf[,1])))
+# 
+# save(svm.tfidf.classifier, svm.tfidf.p, svm.tfidf.t, file = "svmTFIDF.RData")
 
 load("svmTFIDF.RData")
 ```
@@ -999,141 +998,236 @@ model.tfidf %>% compile(
 
 ## Validation Results
 
-```{r FFNN Lexical Fit}
-# history.1.1 <- model.1.1 %>% fit(
-#   x.train.1.1, y.train.1.1,
-#   epochs = 50, batch_size = 100,verbose = 0)
-# 
-# history.1.2 <- model.1.2 %>% fit(
-#   x.train.1.2, y.train.1.2,
-#   epochs = 50, batch_size = 100,verbose = 0)
-# 
-# history.1.3 <- model.1.3 %>% fit(
-#   x.train.1.3, y.train.1.3,
-#   epochs = 50, batch_size = 100,verbose = 0)
-# 
-# history.1.4 <- model.1.4 %>% fit(
-#   x.train.1.4, y.train.1.4,
-#   epochs = 50, batch_size = 100,verbose = 0)
-# 
-# history.1.all <- model.1.all %>% fit(
-#   x.train.1.all, y.train.1.all,
-#   epochs = 50, batch_size = 100,verbose = 0)
-# 
+For the FFNN, in general we see that loss increase and accuracy increases, which indicates that the model is learning. The in-sample, IS, model accuracy looks to improve as the data set increases for all different types of dataset. With the model built off TFIDF holding the best IS accuracy.
+
+```{r FFNN Lexical Fit, fig.cap=""}
+history.1.1 <- model.1.1 %>% fit(
+  x.train.1.1, y.train.1.1,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+history.1.2 <- model.1.2 %>% fit(
+  x.train.1.2, y.train.1.2,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+history.1.3 <- model.1.3 %>% fit(
+  x.train.1.3, y.train.1.3,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+history.1.4 <- model.1.4 %>% fit(
+  x.train.1.4, y.train.1.4,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+history.1.all <- model.1.all %>% fit(
+  x.train.1.all, y.train.1.all,
+  epochs = 50, batch_size = 100,verbose = 0)
+
 # save(history.1.1, history.1.2, history.1.3, history.1.4, history.1.all, file = "FFLexical.RData")
+# 
+# load("FFLexical.RData")
 
-load("FFLexical.RData")
-
-par(mfrow = c(2,3))
-plot(history.1.1)
-plot(history.1.2)
-plot(history.1.3)
-plot(history.1.4)
-plot(history.1.all)
+plot_grid(plot(history.1.1), plot(history.1.2), plot(history.1.3), plot(history.1.4), plot(history.1.all), labels = c("200", "500", "2000", "4500", "All"), label_size = 7, label_colour = "red")
 ```
+A similar observation can be made in the below figure. 
 
-```{r FFNN Character Fit}
-# history.2.1 <- model.2.1 %>% fit(
-#   x.train.2.1, y.train.2.1,
-#   epochs = 50, batch_size = 100,verbose = 0)
-# 
-# history.2.2 <- model.2.2 %>% fit(
-#   x.train.2.2, y.train.2.2,
-#   epochs = 50, batch_size = 100,verbose = 0)
-# 
-# history.2.3 <- model.2.3 %>% fit(
-#   x.train.2.3, y.train.2.3,
-#   epochs = 50, batch_size = 100,verbose = 0)
-# 
-# history.2.4 <- model.2.4 %>% fit(
-#   x.train.2.4, y.train.2.4,
-#   epochs = 50, batch_size = 100,verbose = 0)
-# 
-# history.2.all <- model.2.all %>% fit(
-#   x.train.2.all, y.train.2.all,
-#   epochs = 50, batch_size = 100,verbose = 0)
-# 
+```{r FFNN Character Fit, fig.cap=""}
+history.2.1 <- model.2.1 %>% fit(
+  x.train.2.1, y.train.2.1,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+history.2.2 <- model.2.2 %>% fit(
+  x.train.2.2, y.train.2.2,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+history.2.3 <- model.2.3 %>% fit(
+  x.train.2.3, y.train.2.3,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+history.2.4 <- model.2.4 %>% fit(
+  x.train.2.4, y.train.2.4,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+history.2.all <- model.2.all %>% fit(
+  x.train.2.all, y.train.2.all,
+  epochs = 50, batch_size = 100,verbose = 0)
+
 # save(history.2.1, history.2.2, history.2.3, history.2.4, history.2.all, file = "FFChar.RData")
-
-load("FFChar.RData")
-
-par(mfrow = c(2,3))
-plot(history.2.1)
-plot(history.2.2)
-plot(history.2.3)
-plot(history.2.4)
-plot(history.2.all)
-```
-
-```{r FFNN TFIDF Fit}
-# history.tfidf <- model.tfidf %>% fit(
-#   x.train.tfidf, y.train.tfidf,
-#   epochs = 50, batch_size = 100,verbose = 0)
 # 
-# save(history.tfidf, file = "FFtfidf.RData")
+# load("FFChar.RData")
 
-load("FFTFIDF.RData")
+plot_grid(plot(history.2.1), plot(history.2.2), plot(history.2.3), plot(history.2.4), plot(history.2.all), labels = c("200", "500", "2000", "4500", "All"), label_size = 7, label_colour = "red")
+```
+This figure as mentioned above seems to have the best IS accuracy.
+
+```{r FFNN TFIDF Fit, fig.cap="", out.width="50%"}
+history.tfidf <- model.tfidf %>% fit(
+  x.train.tfidf, y.train.tfidf,
+  epochs = 50, batch_size = 100,verbose = 0)
+
+# save(history.tfidf, file = "FFtfidf.RData")
+# 
+# load("FFTFIDF.RData")
 
 plot(history.tfidf)
 ```
+Table 1 depicts the results of our analysis of different features over differently sized word bags. It is an analysis, that is capable of depicting how many words are necessary for our models and which models we can look to take forward with which data. We see that for both the naive Bayes classifier and the SVM the missclassification is lowest when using character features at a bag size of 4500 features. The FFNN that the best classification comes when tfidf is considered above all else. In order to find the model that performs best, both these two well performing feature sets will undergo hyperparameter tuning for NB, SVM and FFNN.
 
 ```{r Validation Results}
 # Lexical naive bayes
-1 - sum(diag(t.1.1))/ sum(t.1.1)
-1 - sum(diag(t.2.1))/ sum(t.2.1)
-1 - sum(diag(t.3.1))/ sum(t.3.1)
-1 - sum(diag(t.4.1))/ sum(t.4.1)
-1 - sum(diag(t.all.1))/ sum(t.all.1)
+nL <- c(1 - sum(diag(t.1.1))/ sum(t.1.1),
+       1 - sum(diag(t.2.1))/ sum(t.2.1),
+       1 - sum(diag(t.3.1))/ sum(t.3.1),
+       1 - sum(diag(t.4.1))/ sum(t.4.1),
+       1 - sum(diag(t.all.1))/ sum(t.all.1))
 
 # Character Naive Bayes
-1 - sum(diag(t.1.2))/ sum(t.1.2)
-1 - sum(diag(t.2.2))/ sum(t.2.2)
-1 - sum(diag(t.3.2))/ sum(t.3.2)
-1 - sum(diag(t.4.2))/ sum(t.4.2)
-1 - sum(diag(t.all.2))/ sum(t.all.2)
+nC <- c(1 - sum(diag(t.1.2))/ sum(t.1.2),
+        1 - sum(diag(t.2.2))/ sum(t.2.2),
+        1 - sum(diag(t.3.2))/ sum(t.3.2),
+        1 - sum(diag(t.4.2))/ sum(t.4.2),
+        1 - sum(diag(t.all.2))/ sum(t.all.2))
 
 # TFIDF naive bayes
-1 - sum(diag(tfidf.t))/ sum(tfidf.t)
+nT <- c(NA,NA, NA, NA,1 - sum(diag(tfidf.t))/ sum(tfidf.t))
 
 # Lexical SVM
-1 - sum(diag(svm.t.1.1))/ sum(svm.t.1.1)
-1 - sum(diag(svm.t.2.1))/ sum(svm.t.2.1)
-1 - sum(diag(svm.t.3.1))/ sum(svm.t.3.1)
-1 - sum(diag(svm.t.4.1))/ sum(svm.t.4.1)
-1 - sum(diag(svm.t.all.1))/ sum(svm.t.all.1)
+sL <- c(1 - sum(diag(svm.t.1.1))/ sum(svm.t.1.1),
+        1 - sum(diag(svm.t.2.1))/ sum(svm.t.2.1),
+        1 - sum(diag(svm.t.3.1))/ sum(svm.t.3.1),
+        1 - sum(diag(svm.t.4.1))/ sum(svm.t.4.1),
+        1 - sum(diag(svm.t.all.1))/ sum(svm.t.all.1))
 
 # Character SVM
-1 - sum(diag(svm.t.1.2))/ sum(svm.t.1.2)
-1 - sum(diag(svm.t.2.2))/ sum(svm.t.2.2)
-1 - sum(diag(svm.t.3.2))/ sum(svm.t.3.2)
-1 - sum(diag(svm.t.4.2))/ sum(svm.t.4.2)
-1 - sum(diag(svm.t.all.2))/ sum(svm.t.all.2)
+sC <- c(1 - sum(diag(svm.t.1.2))/ sum(svm.t.1.2),
+        1 - sum(diag(svm.t.2.2))/ sum(svm.t.2.2),
+        1 - sum(diag(svm.t.3.2))/ sum(svm.t.3.2),
+        1 - sum(diag(svm.t.4.2))/ sum(svm.t.4.2),
+        1 - sum(diag(svm.t.all.2))/ sum(svm.t.all.2))
 
 # TFIDF SVM
-1 - sum(diag(svm.tfidf.t))/ sum(svm.tfidf.t)
+sT <- c(NA,NA,NA,NA,1 - sum(diag(svm.tfidf.t))/ sum(svm.tfidf.t))
 
 # Lexical FFNN
-1 - model.1.1 %>% evaluate(x.val.1.1, y.val.1.1, batch_size=100, verbose = 2)
-1 - model.1.2 %>% evaluate(x.val.1.2, y.val.1.2, batch_size=100, verbose = 2)
-1 - model.1.3 %>% evaluate(x.val.1.3, y.val.1.3, batch_size=100, verbose = 2)
-1 - model.1.4 %>% evaluate(x.val.1.4, y.val.1.4, batch_size=100, verbose = 2)
-1 - model.1.all %>% evaluate(x.val.1.all, y.val.1.all, batch_size=100, verbose = 2)
+fL <- c(1 - (model.1.1 %>% evaluate(x.val.1.1, y.val.1.1, batch_size=100, verbose = 0))[2],
+        1 - (model.1.2 %>% evaluate(x.val.1.2, y.val.1.2, batch_size=100, verbose = 0))[2],
+        1 - (model.1.3 %>% evaluate(x.val.1.3, y.val.1.3, batch_size=100, verbose = 0))[2],
+        1 - (model.1.4 %>% evaluate(x.val.1.4, y.val.1.4, batch_size=100, verbose = 0))[2],
+        1 - (model.1.all %>% evaluate(x.val.1.all, y.val.1.all, batch_size=100, verbose = 2))[2])
 
 # Character FFNN
-1 - model.2.1 %>% evaluate(x.val.2.1, y.val.2.1, batch_size=100, verbose = 2)
-1 - model.2.2 %>% evaluate(x.val.2.2, y.val.2.2, batch_size=100, verbose = 2)
-1 - model.2.3 %>% evaluate(x.val.2.3, y.val.2.3, batch_size=100, verbose = 2)
-1 - model.2.4 %>% evaluate(x.val.2.4, y.val.2.4, batch_size=100, verbose = 2)
-1 - model.2.all %>% evaluate(x.val.2.all, y.val.2.all, batch_size=100, verbose = 2)
+fC <- c(1 - (model.2.1 %>% evaluate(x.val.2.1, y.val.2.1, batch_size=100, verbose = 0))[2],
+        1 - (model.2.2 %>% evaluate(x.val.2.2, y.val.2.2, batch_size=100, verbose = 0))[2],
+        1 - (model.2.3 %>% evaluate(x.val.2.3, y.val.2.3, batch_size=100, verbose = 0))[2],
+        1 - (model.2.4 %>% evaluate(x.val.2.4, y.val.2.4, batch_size=100, verbose = 0))[2],
+        1 - (model.2.all %>% evaluate(x.val.2.all, y.val.2.all, batch_size=100, verbose = 0))[2])
 
 # TFIDF FFNN
   # Best model is TFIDF with characters
-1 - model.tfidf %>% evaluate(x.val.tfidf, y.val.tfidf, batch_size=100, verbose = 2)
+fT <- c(NA,NA,NA,NA, 1 - (model.tfidf %>% evaluate(x.val.tfidf, y.val.tfidf, batch_size=100, verbose = 0))[2])
+
+validatedResults <- data.frame(Count = c(200, 500, 2000, 4500, "All"), Lex.n = nL, Char.n = nC, TFIDF.n = nT, Lex.s = sL, Char.s = sC, TFIDF.s = sT, Lex.f = fL, Char.f = fC, TFIDF.f = fT)
+
+#save(validatedResults, file = "validatedResults.RData")
+
+as_hux(validatedResults) %>% 
+  insert_row("","NB", "", "", "SVM", "", "", "FFNN", fill = "") %>% 
+  merge_cells(1, 2:4) %>% 
+  merge_cells(1, 5:7) %>%
+  merge_cells(1, 8:10) %>%
+  set_header_rows(1:2, TRUE) %>% 
+  set_header_cols(1, TRUE) %>% 
+  style_headers(bold = TRUE) %>%
+  set_all_borders()%>% set_caption("Table 1: Validation results depicting performance of differently specified data in each model for different word bags and TFIDF")
+```
+## Hyperparameter Tuning Results
+
+```{r Laplace Smoothing}
+n_hyper <- 0:4
+tune.n.1 <- list()
+tune.n.2 <- list()
+for (i in 1:5) {
+  char.classifier <- naiveBayes(train.set.char.4[,-1], train.set.char.4[,1], laplace = n_hyper[i])
+  char.p          <- predict(char.classifier, val.set.char.4[,-1])
+  char.t          <- table((char.p), (unlist(val.set.char.4[,1]))) 
+  tune.n.1[[i]]   <- 1 - sum(diag(char.t))/ sum(char.t)
+  
+  classifier      <- naiveBayes(train.set.tfidf[,-1], train.set.tfidf[,1], laplace = n_hyper[i])
+  p               <- predict(classifier, val.set.tfidf[,-1])
+  t               <- table((p), (unlist(val.set.tfidf[,1])))
+  tune.n.2[[i]]   <- 1 - sum(diag(t))/ sum(t)
+}
+
+
 ```
 
-<!-- Add a table of all the results -->
+```{r Cost Complexity}
+svm.classifier.4.2       <- svm(train.set.char.4[,-1], train.set.char.4[,1], type = "C-classification", scale = T)
+svm.p.4.2                <- predict(svm.classifier.4.2, val.set.char.4[,-1])
+svm.t.4.2                <- table((svm.p.4.2), (unlist(val.set.char.4[,1])))
 
-## Hyperparameter Tuning Results
+# svm.tfidf.classifier  <- svm(train.set.tfidf[,-1], train.set.tfidf[,1], type = "C-classification", scale = F)
+# svm.tfidf.p           <- predict(svm.tfidf.classifier, val.set.tfidf[,-1])
+# svm.tfidf.t           <- table((svm.tfidf.p), (unlist(val.set.tfidf[,1])))
+```
+
+```{r}
+# https://cran.r-project.org/web/packages/kerastuneR/vignettes/Introduction.html
+build_model = function(hp) {
+  model = keras_model_sequential()
+  model %>% layer_dense(units=hp$Int('units',
+                                      min_value=32,
+                                      max_value=512,
+                                      step=32),
+                                      input_shape = ncol(x.train.1.4),
+                                      activation='relu') %>% 
+  layer_dense(units=5, activation='softmax') %>% 
+  compile(
+    optimizer= tf$keras$optimizers$Adam(
+      hp$Choice('learning_rate',
+                values=c(1e-2, 1e-3, 1e-4))),
+    loss='binary_crossentropy',
+    metrics='accuracy') 
+  return(model)
+}
+```
+
+
+```{r FFNN Hyperparameter tuning}
+model.2.4 <- keras_model_sequential() %>%
+   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x.train.2.4))) %>% 
+   layer_dropout(rate = 0.5) %>%
+   layer_dense(units = 5, activation = 'softmax')
+
+model.2.4 %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  metrics = "accuracy"
+)
+
+model.tfidf <- keras_model_sequential() %>%
+   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x.train.tfidf))) %>% 
+   layer_dropout(rate = 0.5) %>%
+   layer_dense(units = 5, activation = 'softmax')
+
+model.tfidf %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  metrics = "accuracy"
+)
+```
+
+
+```{r FFNN Hyperparameter tuning}
+tf_tuner <-  import("keras")
+
+tuner <- kerastuneR::Hyperband(
+    build_model,
+    objective = 'accuracy',
+    max_trials = 5,
+    executions_per_trial = 3,
+    project_name = 'helloworld')
+```
+
+
 
 <!-- Perform hyperparameter tuning for svm and ffnn on final model -->
 

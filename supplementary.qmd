@@ -4,8 +4,6 @@ author: "Edward Baleni"
 format: html
 editor: visual
 bibliography: references.bib
-Rendering:
-  embed-resources: true
 ---
 
 ```{r setup, include=FALSE}
@@ -222,6 +220,9 @@ classifier = svm(train.set[,-1], train.set[,1], type = "C-classification", scale
 p1 <- predict(classifier, val.set[,-1])
 tt <- table((p1), (unlist(val.set[,1])))
 1 - sum(diag(tt))/ sum(tt)
+
+save(classifier, file = "supp_cleanedLexical.RData)
+
 ```
 
 What we see above is that for a word bag of 200 most frequent content words that the bigram does indeed perform worse. Content words are the opposite of functional words, where functional words are used to very abundandtly in style-based classification. These functional words are often removed in topic-based classification ([\@Stylometry]()) (there are more papers)..

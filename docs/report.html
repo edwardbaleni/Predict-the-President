@@ -148,7 +148,12 @@ div.csl-indent {
   <li><a href="#support-vector-machines" id="toc-support-vector-machines" class="nav-link" data-scroll-target="#support-vector-machines">Support Vector Machines</a></li>
   <li><a href="#feed-forward-neural-networks" id="toc-feed-forward-neural-networks" class="nav-link" data-scroll-target="#feed-forward-neural-networks">Feed Forward Neural Networks</a></li>
   </ul></li>
-  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
+  <ul class="collapse">
+  <li><a href="#validation-results" id="toc-validation-results" class="nav-link" data-scroll-target="#validation-results">Validation Results</a></li>
+  <li><a href="#hyperparameter-tuning-results" id="toc-hyperparameter-tuning-results" class="nav-link" data-scroll-target="#hyperparameter-tuning-results">Hyperparameter Tuning Results</a></li>
+  <li><a href="#final-model" id="toc-final-model" class="nav-link" data-scroll-target="#final-model">Final Model</a></li>
+  </ul></li>
   <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a></li>
   <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations">Limitations</a></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
@@ -187,15 +192,16 @@ div.csl-indent {
 </section>
 <section id="introduction-and-literature-review" class="level1">
 <h1>Introduction and Literature Review</h1>
-<p>South Africa’s State of the Nation Address (SONA) is an annual event where the president of the country gives a report on the status of the nation. This status entails a highlighting the key challenges and achievements witnessed in the past year as well as a mentioning of the government’s goals and objectives for the foreseable future. A number of presidents have taken office between the years of 1994 and 2023. These presidents being FW De Klerk, Nelson Mandela, Thabo Mbeki, Kgalema Motlanthe, Jacob Zuma and Cyril Ramaphosa. The purpose of this study is to create a text classification task that identifies which president was the source of a given sentence. Such a task is often called authorship attribution (<a href=""><span class="citation" data-cites="Ngrams">Coyotl-Morales et al. (<span>2006</span>)</span></a>). In such a task is important that one is able to characterize each author, or speaker, in some way that is able to capture the style or ideas of each president.</p>
-<p>Author attribution is a natural language processing (NLP) task ….(<a href=""><span class="citation" data-cites="WordFreq">Škorić et al. (<span>2022</span>)</span></a>)….</p>
-<p>There are are a number of ways to characterise authors. In this study a comparison between a topic-based text classification and a style-based text classification will be explored. Text-based text classification, attempts to not use functional words in the classification of texts, this is be used to find the general ideas or meaining of texts, as well as being able to identify topics associated with a given text; this provides semantic information. Style-based classification, Stylometry, makes strong use of the function words in classification (<a href=""><span class="citation" data-cites="Stylometry">Stamatatos (<span>2009</span>)</span></a>). Function words are used to aid in the syntax of a sentence rather than the meaning. These features that are not consciously used within a text and as such vary between different authors, this lack of control over function words have made them ideal for modelling function word frequencies to create an effective attribution technique (<a href=""><span class="citation" data-cites="FunctionWords">Argamon and Shlomo (<span>2005</span>)</span></a>). Although, the points addressed within each speech is slightly different, the main topic is that of a political address, therefore it is worthwhile to view this research in the context of a style-based text classification as well as a topic-based text classification.</p>
+<p>South Africa’s State of the Nation Address (SONA) is an annual event where the president of the country gives a report on the status of the nation. This status entails a highlighting the key challenges and achievements witnessed in the past year as well as a mentioning of the government’s goals and objectives for the foreseable future. A number of presidents have taken office between the years of 1994 and 2023. These presidents being FW De Klerk, Nelson Mandela, Thabo Mbeki, Kgalema Motlanthe, Jacob Zuma and Cyril Ramaphosa. The purpose of this study is to create a text classification task that identifies which president was the source of a given sentence. Such a task is often called authorship attribution (<a href="">@Ngrams</a>). In such a task is important that one is able to characterize each author, or speaker, in some way that is able to capture the style or ideas of each president.</p>
+<p>Author attribution is a natural language processing (NLP) task ….(<a href="">@WordFreq</a>)….</p>
+<p>There are are a number of ways to characterise authors. In this study a comparison between a topic-based text classification and a style-based text classification will be explored. Text-based text classification, attempts to not use functional words in the classification of texts, this is be used to find the general ideas or meaining of texts, as well as being able to identify topics associated with a given text; this provides semantic information. Style-based classification, Stylometry, makes strong use of the function words in classification (<a href="">@Stylometry</a>). Function words are used to aid in the syntax of a sentence rather than the meaning. These features that are not consciously used within a text and as such vary between different authors, this lack of control over function words have made them ideal for modelling function word frequencies to create an effective attribution technique (<a href="">@FunctionWords</a>). Although, the points addressed within each speech is slightly different, the main topic is that of a political address, therefore it is worthwhile to view this research in the context of a style-based text classification as well as a topic-based text classification.</p>
 <p>In this study the classic word bag approach with token frequencies to TF-IDF</p>
 <p>Naive Bayes SVM FFNN</p>
+<p>In the topics to follow, the data and methodology will be defined. Following this, various models will be used and validated to select the best type of data for the analysis using base models. After this, hyperparameter tuning will be done on the top 3 models to obtain their best performances…</p>
 </section>
 <section id="data-and-methodology" class="level1">
 <h1>Data and Methodology</h1>
-<p>The data used in this study was sourced from <a href="https://www.gov.za/state-nation-address">gov.za</a>. As mentioned adresses from 1994 to 2023 are used within this study. The speakers present in this time span were FW De Klerk, Nelson Mandela, Thabo Mbeki, Kgalema Motlanthe, Jacob Zuma and Cyril Ramaphosa. Some webscraping techniques, courtesy of Ian Durbach, were used to collect this data.</p>
+<p>The data used in this study was sourced from <a href="https://www.gov.za/state-nation-address">gov.za</a>. It is a collection of 36 addresses from 6 different presidents within the years 1994 to 2023. The speakers present in this time span were FW De Klerk, Nelson Mandela, Thabo Mbeki, Kgalema Motlanthe, Jacob Zuma and Cyril Ramaphosa. Web-scraping techniques were used to collect this data, courtesy of Ian Durbach.</p>
 <section id="eda" class="level2">
 <h2 class="anchored" data-anchor-id="eda">EDA</h2>
 <!-- a  great  variety  ofmeasures, including sentence length, word length, word fre-quencies,  character  frequencies,  and  vocabulary  richness -->
@@ -204,31 +210,31 @@ div.csl-indent {
 </section>
 <section id="pre-processing" class="level2">
 <h2 class="anchored" data-anchor-id="pre-processing">Pre-Processing</h2>
-<p>After obtaining the data, the first line of each speech is removed. This first line is the date the address is held. The data is then tokenized by sentence. Only sentences with over two words remained for the rest of the analysis. The reason this is done is because the sentences with less than 3 words seemed to either just be digits or to be unfinished words, most of the time.</p>
-<p>Following this many different considerations have been made in the <a href="./supplementary.html">Supplementary</a> to find the best representation of the data for classification. Both lexical and character features are considered; the inclusion and exclusion of function words (stop words include function words); using token frequencies and TF-IDF are considered; different sized word bags are considered; the inclusion of case and punctuation are are also considered. Lexical features regard tokens as a sequence of words, where a unigram is a single word, a bigram are two contiguous words, a trigram is three and so forth. Character features are a sequence of contiguous characters also using n-grams to characterise how many characters are present in each feature. These two types of features qualify as two of the most basic markers used for identifying an author’s style, where lexical features are slighttly more complex than character features (<a href=""><span class="citation" data-cites="Stylometry">Stamatatos (<span>2009</span>)</span></a>). Of the many options explored in the <a href="./supplementary.html">Supplementary</a>, only two of the models will be represented here. How data is cleaned and shaped is different between these two approaches. The first approach uses lexical features, while the second uses character features, this is how we will distinguish between the two going forward.</p>
-<p>These are important distinctions at this stage as they determine how the data is organised.</p>
-<p>In the <a href="./supplementary.html">Supplementary</a>, both a topic-based approach and style-based approaches were looked into. It was found that the style-based approach performed better than topic-based approach. This was illustrated in how the model performance improved with the inclusion of function words…….</p>
+<p>After obtaining the data, the first line of each speech is removed. This first line is the date the address is held. The data is then tokenized by sentence. Only sentences with over two words remained for the rest of the analysis. The reason this is done is because the sentences with less than 3 words seemed to either either be made up of digits or unfinished words, most of the time.</p>
+<p>Following this many different considerations have been made in the <a href="./supplementary.html">Supplementary</a> to find the best representation of the data for classification. Both lexical and character features are considered; the inclusion and exclusion of function words (stop words include function words); using token frequencies and TF-IDF are considered; different sized word bags are considered; the inclusion of case and punctuation are are also considered. Lexical features regard tokens as a sequence of words, where a unigram is a single word, a bigram are two contiguous words, a trigram is three and so forth. Character features are a sequence of contiguous characters also using n-grams to characterise how many characters are present in each feature. These two types of features qualify as two of the most basic markers used for identifying an author’s style, where lexical features are slightly more complex than character features (<a href="">@Stylometry</a>). Of the many options explored in the <a href="./supplementary.html">Supplementary</a>, only two of the models will be represented here. The first approach will use unigrams of words to represent lexical features, while the second uses character features with a 4 character n-gram, this is how we will distinguish between the two going forward. These are important distinctions at this stage as they determine how the data is organised.</p>
+<p>In the <a href="./supplementary.html">Supplementary</a>, both a topic-based approach and style-based approach were looked into. It was found that the style-based approach performed better than topic-based approach, in most scenarios. This was illustrated in the improvement of model performance of the models with the inclusion of function words. This idea will be furthered explored below.</p>
 <section id="lexical-features" class="level3">
 <h3 class="anchored" data-anchor-id="lexical-features">Lexical Features</h3>
-<p>There is complexity that comes with using lexical features, and the sparsity within the bag-of-words that such features introduce, allowing features with capitalization was not appropriate (<a href=""><span class="citation" data-cites="LexVsChar">Stamatatos (<span>2008</span>)</span></a>), capitalization within the transcription of a speech, indicate the beginning of an idea, or the beginning of a sentence, sentiment cannot be captured by such. Whereas, in the context of a book, capitalization can be use to convey a strong meaning in a character’s words.</p>
-<p>Here the sentences were cleaned quite strictly in order to obtain a dataset. All digits are removed using a regex operation. Contractions are replaced with their long form also via the aid of regex pattern matching (<a href=""><span class="citation" data-cites="textclean">Rinker (<span>2018</span>)</span></a>). Here punctuation is maintained as punctuation is able to characterise syntatic information (<a href=""><span class="citation" data-cites="punc">(<span><strong>punc?</strong></span>)</span></a>). Punctuation is maintained, however, special unicode characters, astrixes, and other punctuation that is not commonly seen in text are removed, only full stops, question marks, commas, exclamation marks, brackets, apostrophes and curly brackets are maintained. Lemmatization is done as commonly appearing words appear in different forms for each president. A lemma is a set of words that have the same stem, where each variation of the word is called a word form. Lemmatization is a process that is able to determine that two words have the same root, to lemmatize is to change all these wordforms into their root. This process of lemmatization is done by morphological parsing, where this separates the morphenes into parts. A morphene, is the smaller building blocks of a word. Lemmatization was done by using a dictionary of common word forms, if a word is a part of a lemma, then it will be matched to the dictionary and replaced by the morphenes that make it up. After performing this lemmatization, the affixes, additional morphenes that aren’t the stem, are still present in the data, these are generally quite random letters that will appear (<a href=""><span class="citation" data-cites="Jurafsky2000SpeechAL">Jurafsky and Martin (<span>2023</span>)</span></a>). The final step in cleaning is to remove these affixes</p>
+<p>There is complexity that comes with using lexical features; the sparsity within the bag-of-words of such features was a the reason why capitalization was not deemed appropriate in conjunction with lexical features (<a href="">@LexVsChar</a>). Capitalization within the transcription of a speech can only indicate the beginning of an idea, sentiment cannot be captured by such. Whereas, in the context of a book, capitalization can be use to convey a strong meaning in a character’s words.</p>
+<p>First the speeches are tokenized into sentences and are given sentence ids. Thereafter sentences were cleaned quite strictly. All digits are removed using a regex operation. Contractions are replaced with their long form via regex pattern matching (<a href="">@textclean</a>). Punctuation is maintained as punctuation is able to characterise syntatic information (<a href="">@Punc</a>). Punctuation is maintained, however, special unicode characters, astrixes, and other punctuation that is not commonly seen in text are removed, only full stops, question marks, commas, exclamation marks, brackets, apostrophes and curly brackets are maintained. Lemmatization is performed as commonly appearing words appear in different forms for each president. A lemma is a set of words that have the same stem, where each variation of the word is called a word form. Lemmatization is a process that is able to determine that two words have the same root. To lemmatize is to change wordforms into their root. This process of lemmatization is done by morphological parsing, where this separates the morphenes into parts. A morphene is a smaller building block of a word. Lemmatization was done by using a dictionary of common wordforms, if a word is a part of a lemma, then it will be matched to the dictionary and replaced by the morphenes that make it up. After performing this lemmatization, the affixes, additional morphenes that aren’t the stem, are still present in the data. Affixes are often random letters that will appear (<a href="">@Jurafsky2000SpeechAL</a>). The final step in cleaning is to remove these affixes</p>
 </section>
 <section id="character-features" class="level3">
 <h3 class="anchored" data-anchor-id="character-features">Character Features</h3>
 <p>Character features are more simplistic than lexical features and are able to capture stylistic nuances. They are able to capture some lexical and contextual information. They do however carry a lot of redundancies resulting in high dimensionality.</p>
 <p>The data here is cleaned differently. In the <a href="./supplementary.html">Supplementary</a>, it is shown that the feature space that includes both punctuation and capitalization performs the best of all the character spaces. A character n-gram of both 3 and 4 features were assessed, and both are decently sized n-grams. Here the character n-gram of 4 contiguous characters will be used.</p>
-<p>First the speeches are tokenized into sentences, where previously, the text would have been set to lower case and the punctuation was included, here both the text maintains it’s capitalization and the punctuation shall remain. To clean these sentences, all digits were removed, followed by the lemmatization of wordforms to stems.</p>
+<p>First the speeches are tokenized into sentences, and given an id. Where previously the text would have been set to lower case and the punctuation was included, here both the text maintains it’s capitalization and the punctuation remain. To clean these sentences, all digits were removed, followed by the lemmatization of wordforms to stems.</p>
 </section>
 <section id="imbalanced-classes" class="level3">
 <h3 class="anchored" data-anchor-id="imbalanced-classes">Imbalanced Classes</h3>
-<p>Both Motlanthe and deKlerk are outliers… To balance the classes</p>
+<p>The data has imbalanced classes present. This means that the distribution of the data across classes is skewed. Motlanthe and de Klerk both only gave one speech. This was Motlanthe’s and de Klerk’s outgoing speeches; every other presidents managed to give more than one speech.</p>
+<p>There are a number of ways to deal with imbalanced classes, for future work one might look into <span class="citation" data-cites="LexVsChar">Stamatatos (<a href="#ref-LexVsChar" role="doc-biblioref">2008</a>)</span> to get an idea of what strategies do actually work on text classification tasks. In this report, these outlying classes were removed from the remainder of the analysis.</p>
 </section>
 </section>
 <section id="bag-of-words" class="level2">
 <h2 class="anchored" data-anchor-id="bag-of-words">Bag of Words</h2>
-<p>It is important that we get the data into a format that can be used by the classifiers to classify a sentence. A bag of words in one such way we can do this. What happens here is that the entirety of text is put into something called a bag of words. This is an unordered set of words which contain the frequency of each word in the document (<a href=""><span class="citation" data-cites="Jurafsky2000SpeechAL">Jurafsky and Martin (<span>2023</span>)</span></a>). For both cases of lexoical features and character features, the pre-processed sentences need to be tokenized down to their desired level. The lexical features are tokenized as unigrams of words, while including punctuation of individual words; the character features are tokenized as n-grams with 4 characters, with the inclusion of punctuation and capitalization. Both types of features included function words, as this was decided to be a stylometric exercise as per the <a href="./supplementary.html">Supplementary</a>.</p>
-<p>In both the cases of the lexical and character features, the most important features are the most frequent. With this understanding, a crude feature selection, can be conducted for both the lexical and the character features.</p>
-<p>After tokenizing, most frequent features were selected. This was tried as 200, 1000, 2000, 4000, 4500 and all the tokens for both the lexical features and the character features. After making these selections, a word bag was created for each selection of top features.</p>
+<p>It is important that we get the data into a format that can be used by the classifiers. A bag of words is one such way to do this. The text is placed into something called a bag of words. This is an unordered set of words that contain the frequency of each word in the document (<a href="">@Jurafsky2000SpeechAL</a>). For both lexical and character features, the pre-processed sentences need to be tokenized down to their desired level. The lexical features are tokenized as unigrams of words, while including punctuation as individual words; the character features are tokenized as n-grams with 4 characters, with the inclusion of punctuation and capitalization. Both types of features included function words, as this was decided to be a stylometric exercise as per the <a href="./supplementary.html">Supplementary</a>. In both cases, the sentence id was maintained over each word to allocate which sentence it belongs to.</p>
+<p>In both cases, lexical and character features, the most important features are the most frequent. With this understanding, a crude feature selection, can be conducted for both.</p>
+<p>After tokenizing, most frequent features were selected. This was tried as 200, 500, 2000, 4500 and all the tokens for both the lexical features and the character features. After making these selections, a word bag was created for each selection of top features.</p>
 </section>
 <section id="term-frequency---inverse-document-frequency-tf-idf" class="level2">
 <h2 class="anchored" data-anchor-id="term-frequency---inverse-document-frequency-tf-idf">Term Frequency - Inverse Document Frequency (TF-IDF)</h2>
@@ -236,64 +242,204 @@ div.csl-indent {
 <p><span class="math display">\[\text{tf(term t in document i)} = \frac{\text{Number of times term t appears in document i}}{\text{Number of terms in document i}}.\]</span></p>
 <p>Inverse document term frequency downweights terms that are frequent in a collection of documents and upweights terms that are not frequent within a collection of documents. It is calculated as,</p>
 <p><span class="math display">\[\text{idf(term t)} = \text{ln}\left(\frac{\text{Number of documents in corpus}}{\text{Number of documents containing term t}}\right).\]</span></p>
-<p>TF-IDF is the multiplication of the two metrics (<a href=""><span class="citation" data-cites="TextMining">Silge and Robinson (<span>2017</span>)</span></a>). TF-IDF measures the importance of a word to a document in a collection. In this analysis this has been done by considering one document to be a sentence. Following this intuition, the quantities above can be calculated.</p>
-<p>In the <a href="./supplementary.html">Supplementary</a>, both the lexical feature approach and the character features were looked into to find which would be better performing for TF-IDF. The character features seemed to show a better result and so will be used in this report.</p>
-<p>Since TF-IDF determines what features are important to which document, this can be seen as a topic-based classification, as function words and commonly occurring tokens amongst the documents will be downweighted resulting in semantic features being strongly weighted. For TF-IDF, all tokens were kept, because some of the highly weighted scores may only appear once in a document and as a result may act as quite a poor classifier out-of-sample, and so it is necessary to leave all possible tokens.</p>
+<p>TF-IDF is the multiplication of the two metrics (<a href="">@TextMining</a>, <span class="citation" data-cites="Durbach2023">Durbach (<a href="#ref-Durbach2023" role="doc-biblioref">2023</a>)</span> ). TF-IDF measures the importance of a word to a document in a collection. In this analysis this has been done by considering one document to be a sentence. Following this intuition, the quantities above can be calculated.</p>
+<p>Since TF-IDF determines what features are important to which document, this can be seen as a topic-based classification, as function words and commonly occurring tokens among the documents will be downweighted resulting in semantic features being strongly weighted. For TF-IDF, all tokens were kept, because some of the highly weighted scores may only appear once in a document and as a result may act as quite a poor classifier out-of-sample, and so it is necessary to leave all possible tokens.</p>
 </section>
 <section id="train-validation-and-testing-splits" class="level2">
 <h2 class="anchored" data-anchor-id="train-validation-and-testing-splits">Train, Validation and Testing Splits</h2>
 <p>For the training, validation and test splits, it would be wise to select sample sizes by sentence and not by word, this will represent each row in the bag of words.</p>
-<p>The data will have a 60:20:20 split of training, validation and test data. The training set will represent 60% of the total number of sentences available, the validation set will represent 20% and the test set will be the remaining 20%.</p>
-<div class="cell" data-layout-align="center">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 8983</code></pre>
-</div>
-</div>
+<p>The data will have a 60:20:20 split of training, validation and test data. The training set will represent 60% of the total number of sentences available, the validation set will represent 20% and the test set will be the remaining 20%. These splits are done for each word bag and for tf-idf.</p>
 </section>
 <section id="naive-bayes-classifier" class="level2">
 <h2 class="anchored" data-anchor-id="naive-bayes-classifier">Naive Bayes Classifier</h2>
-<p>A multinomial naive Bayes classifier was to classify this text. This is a probabilistic classifier, given the document <span class="math inline">\(d\)</span> and classes <span class="math inline">\(c \in C\)</span>, the classifier will predict the class, <span class="math inline">\(\hat{c}\)</span>, with the maximum posterior probabiliity,</p>
+<p>A multinomial naive Bayes classifier was used to classify text. This is a probabilistic classifier, given the document <span class="math inline">\(d\)</span> and classes <span class="math inline">\(c \in C\)</span>, the classifier will predict the class, <span class="math inline">\(\hat{c}\)</span>, with the maximum posterior probability,</p>
 <p><span class="math display">\[\hat{c} = \underset{c\in C}{\arg\max} P(c|d)\]</span></p>
 <p>Using Bayes rule, the above prediction can be further broken down into,</p>
 <p><span class="math display">\[\hat{c} = \underset{c\in C}{\arg\max} P(c|d) = \underset{c\in C}{\arg\max} \frac{P(d|c)P(c)}{P(d)}\]</span></p>
 <p>This can be further simplified by to,</p>
 <p><span class="math display">\[\hat{c} = \underset{c\in C}{\arg\max} P(d|c)P(c) \]</span></p>
-<p>as <span class="math inline">\(P(d)\)</span> stays constant for all classes, which allows us to cancel this out. This equation above is made up of the likehood of the document and te prior probability of the class. The documents can subsequently be divided up into features, be it our lexical or character features above. Following this great number of features, <span class="math inline">\(\{f_i : i = 1,2,...,n\}\)</span>, this classifier makes two simplifying assumptions that would infer it’s naivety, that the tokens are position independent and that the joint likelihood of the features also maintain independence,</p>
+<p>as <span class="math inline">\(P(d)\)</span> stays constant for all classes, which allows us to cancel this out. This equation above is made up of the likelihood of the document and prior probability of the class. The documents can subsequently be divided up into features, be it our lexical or character features above. Following this great number of features, <span class="math inline">\(\{f_i : i = 1,2,...,n\}\)</span>, this classifier makes two simplifying assumptions that would infer it’s naivety, that the tokens are position independent and that the joint likelihood of the features also maintain independence,</p>
 <p><span class="math display">\[P(d|c) = P(f_1, f_2, ..., f_n|c) = P(f_1|c)P(f_2|c)...P(f_n|c)\]</span> The final equation of the naive Bayes classifier then becomes,</p>
-<p><span class="math display">\[c_{NB} = \underset{c\in C}{\arg\max} P(c) \prod_{f\in F} P(f|c).\]</span></p>
-<div class="cell" data-layout-align="center">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.5829621</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.4727171</code></pre>
-</div>
-</div>
-<div class="cell" data-layout-align="center">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.4808013</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.4190317</code></pre>
-</div>
-</div>
+<p><span class="math display">\[\hat{c}_{NB} = \underset{c\in C}{\arg\max} P(c) \prod_{f\in F} P(f|c)\]</span></p>
+<p>(<a href="">@Jurafsky2000SpeechAL</a>).</p>
+<p>This classifier was made with no Laplace smoothing. Laplace smoothing, will be looked into for the final models. This is a simple smoothing algorithm that can be easily implemented in this classifier. It simply adds to the count the number specified before finding probabilities (<a href="">@Jurafsky2000SpeechAL</a>).</p>
 </section>
 <section id="support-vector-machines" class="level2">
 <h2 class="anchored" data-anchor-id="support-vector-machines">Support Vector Machines</h2>
+<p>Support vector machines, SVM, are widely used in the space of text classification (<a href="">@Stylometry</a>). SVMs perform linear operations in upto an infinite number of dimensions. If data is not linearly separable, SVMs can be used to linearly separable in a higher dimension. SVMs allow to find an optimal separating hyperplane for separable and non-separable data.</p>
+<p>The goal is to evaluate the hyperplane such that it creates the greatest margin between the training points of each class and itself. The margin is the distance between the nearest data point to the plane.</p>
+<p>If the feature space is non-linenar we would look to use a set of basis expansions as our input space,</p>
+<p><span class="math display">\[
+h(x_i) = (h_1(x_i), h_2(x_i), ..., h_M(x_i)), \quad i = 1, 2, ..., N
+\]</span></p>
+<p>the inner product of these basis expansions, <span class="math inline">\(h(x)\)</span>, will represent the desired kernal, <span class="math inline">\(K(x, x')\)</span>, used to move feature space to a higher dimension. The hyperplane will therefore be defined as,</p>
+<p><span class="math display">\[
+{f}(x) = h(x)^T\beta + \beta_0
+\]</span></p>
+<p>where <span class="math inline">\(h(x)\)</span> is the kernal. It is difficult to have a hyperplane that perfectly classifies, to tune the model some slack is allowed. This is a soft-margin SVM. Slack are observations that are allowed to be missclassified. SVMs maximise the margin with some regularization,</p>
+<p><span class="math display">\[
+\frac{1}{2}\beta^T\beta + C\sum_{n=1}^N \zeta_n
+\]</span></p>
+<p>subject to,</p>
+<p><span class="math display">\[
+y_i(h(x)^T\beta + \beta_0) \geq 1 - \zeta_n, \quad n = 1,2,...,N \\
+\zeta_n \geq 0, \quad\quad n = 1,2,...,N
+\]</span></p>
+<p>this is a convex optimisation problem (<span class="citation" data-cites="Hastie">Hastie, Tibshirani, and Friedman (<a href="#ref-Hastie" role="doc-biblioref">2001</a>)</span>, <span class="citation" data-cites="Et2">Pienaar (<a href="#ref-Et2" role="doc-biblioref">2023</a>)</span> ) . For multiclass problems the package provided by <span class="citation" data-cites="e1071">Meyer et al. (<a href="#ref-e1071" role="doc-biblioref">2023</a>)</span> uses a one-versus-one approach. This will fit all pairwise classifiers and use a voting system to pick the best ones.</p>
+<p>A base model has been used to explore our data, hyperparameter tuning is used to regularize the model, by using cost constraint.</p>
 </section>
 <section id="feed-forward-neural-networks" class="level2">
 <h2 class="anchored" data-anchor-id="feed-forward-neural-networks">Feed Forward Neural Networks</h2>
+<p>A neural network is a series of non-linear basis functions, this is handled via interconnected nodes over a number of layers. Each layer has a number of nodes and is connected to every other node in the layer before (if any) and after it (if any). The case where there are no layers before the current layer is for the input layer, which is a layer that takes in data. The number of nodes present at the input layer are equal to the number of features in the bag of words. Similarly, the case where there are no layers after the current layer is for the output layer, in this text classification task. Since the task is that of multinomial classification, the number of nodes on this output layer is equivalent to the number of classes available. The layers between the input layer and the output layer are called hidden layers. The output of each layer is passed on as the input to the next layer. The hidden layers are capable of taking a weighted sum of their inputs and applying a non-linear activation function to this to obtain its output (<a href="">@Jurafsky2000SpeechAL</a>, <a href="">@Hastie</a>). Forward and backward passes of the data are used to change the parameters in order to optimize an objective function.</p>
+<p>A general way in which to represent this operation is the following,</p>
+<p><span class="math display">\[a^l_j(i) = \sigma_l\left( \sum_{k = 1}^{d_l - 1} a_k^{l-1}(i)w_{kj}^l + b_j^l \right), \quad l = 1,2,...,L; j = 1,2,...d_l \]</span></p>
+<p>where <span class="math inline">\(l\)</span> represents the number of layers, <span class="math inline">\(d_l\)</span> the number of nodes in layer <span class="math inline">\(l\)</span>, <span class="math inline">\(\sigma_l(.)\)</span> denotes the activation function, <span class="math inline">\(w_{kj}^l\)</span> denotes the weight linking the <span class="math inline">\(k^{th}\)</span> node in layer <span class="math inline">\(l-1\)</span> to the <span class="math inline">\(j^{th}\)</span> node in layer <span class="math inline">\(l\)</span>, <span class="math inline">\(b_j^l\)</span> denotes the <span class="math inline">\(j^{th}\)</span> bias in layer <span class="math inline">\(l\)</span> (<a href="">@Et</a>).</p>
+<p>The activation for the hidden layers has been chosen as the reLu activation function and the output layer uses a soft-max activation function. The classification task uses accuracy rate to evaluate model performance. Like the other models this is just a measure of correctly classified predictions.</p>
+<p>To find the best data in terms of FFNN, the bag of words at different word bags was assessed against a default model with 32 nodes, an input layer with relu activation function, a dropout rate of 0.5, an output layer with a softmax activation function and performacne calculated via accuracy. Later on, hyperparameter tuning to find a better model will happen and used to test the final data.</p>
 </section>
 </section>
 <section id="results" class="level1">
 <h1>Results</h1>
+<section id="validation-results" class="level2">
+<h2 class="anchored" data-anchor-id="validation-results">Validation Results</h2>
+<p>For the FFNN, in general we see that loss increase and accuracy increases, which indicates that the model is learning. The in-sample, IS, model accuracy looks to improve as the data set increases for all different types of dataset. With the model built off TFIDF holding the best IS accuracy.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="report_files/figure-html/FFNN Lexical Fit-1.png" class="img-fluid figure-img" style="width:65.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="report_files/figure-html/FFNN Character Fit-1.png" class="img-fluid figure-img" style="width:65.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="report_files/figure-html/FFNN TFIDF Fit-1.png" class="img-fluid figure-img" style="width:50.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<pre><code>18/18 - 0s - loss: 2.7783 - accuracy: 0.5988 - 112ms/epoch - 6ms/step</code></pre>
+</div>
+<div class="cell-output-display">
+<table id="tab:Validation Results" class="huxtable table table-sm table-striped small" data-quarto-postprocess="true">
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Bag</td>
+<td colspan="3" data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">NB</td>
+<td colspan="3" data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">SVM</td>
+<td colspan="3" data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">FFNN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Count</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Lex.n</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Char.n</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">TFIDF.n</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Lex.s</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Char.s</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">TFIDF.s</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Lex.f</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Char.f</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">TFIDF.f</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">200</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.583</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.594</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.473</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.523</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.511</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.564</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">500</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.578</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.563</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.455</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.486</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.457</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.519</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">2000</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.714</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.518</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.417</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.433</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.409</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.446</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">4500</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.784</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.481</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.613</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.419</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.399</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.431</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">All</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.772</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.823</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.708</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.62&nbsp;</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.64&nbsp;</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.698</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.401</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.382</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.356</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+
+<!-- Add a table of all the results -->
+</section>
+<section id="hyperparameter-tuning-results" class="level2">
+<h2 class="anchored" data-anchor-id="hyperparameter-tuning-results">Hyperparameter Tuning Results</h2>
+<!-- Perform hyperparameter tuning for svm and ffnn on final model -->
+</section>
+<section id="final-model" class="level2">
+<h2 class="anchored" data-anchor-id="final-model">Final Model</h2>
+<!-- Use test set on final models -->
+</section>
 </section>
 <section id="discussion" class="level1">
 <h1>Discussion</h1>
 </section>
 <section id="limitations" class="level1">
 <h1>Limitations</h1>
-<p>A limitation that arises in this study is a lack of candidate authors, as well as minimal data provided for some authors. This is an issue that has been detailed in research before (<a href=""><span class="citation" data-cites="Stylometry">Stamatatos (<span>2009</span>)</span></a>).</p>
+<p>A limitation that arises in this study is a lack of candidate authors, as well as minimal data provided for some authors. This is an issue that has been detailed in research before (<a href="">@Stylometry</a>).</p>
+<p>Perform a recuesive feature elimination (<span class="citation" data-cites="WordFreq">Škorić et al. (<a href="#ref-WordFreq" role="doc-biblioref">2022</a>)</span>) using the rfe function in the package provided by, <span class="citation" data-cites="Caret">Kuhn and Max (<a href="#ref-Caret" role="doc-biblioref">2008</a>)</span> .</p>
 </section>
 <section id="conclusion" class="level1">
 <h1>Conclusion</h1>
@@ -307,29 +453,26 @@ div.csl-indent {
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">Bibliography</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
-<div id="ref-FunctionWords" class="csl-entry" role="listitem">
-Argamon, Shlomo, and Levitan Shlomo. 2005. <span>“Measuring the Usefulness of Function Words for Authorship Attribution.”</span> In <em>Proceeding of the Joint Conference on Association for Literary and Linguistic Computing/Association Computer Humanities</em>.
+<div id="ref-Durbach2023" class="csl-entry" role="listitem">
+Durbach, Ian. 2023. <span>“Bag-of-Words &amp; Tf-Idf Models.”</span> University of Cape Town; HTML file. 2023. <a href="https://05-textmining-03.html">05-textmining-03.html</a>.
 </div>
-<div id="ref-Ngrams" class="csl-entry" role="listitem">
-Coyotl-Morales, Rosa, Luis Villaseñor-Pineda, Manuel Montes, and Paolo Rosso. 2006. <span>“Authorship Attribution Using Word Sequences.”</span> In, 4225:844–53. <a href="https://doi.org/10.1007/11892755_87">https://doi.org/10.1007/11892755_87</a>.
+<div id="ref-Hastie" class="csl-entry" role="listitem">
+Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2001. <span>“The Elements of Statistical Learning.”</span> <em>Aug, Springer</em> 1 (January). <a href="https://doi.org/10.1007/978-0-387-21606-5_7">https://doi.org/10.1007/978-0-387-21606-5_7</a>.
 </div>
-<div id="ref-Jurafsky2000SpeechAL" class="csl-entry" role="listitem">
-Jurafsky, Dan, and James H. Martin. 2023. <span>“Speech and Language Processing - an Introduction to Natural Language Processing, Computational Linguistics, and Speech Recognition.”</span> In <em>Prentice Hall Series in Artificial Intelligence</em>. <a href="https://web.stanford.edu/~jurafsky/slp3/ed3book.pdf">https://web.stanford.edu/~jurafsky/slp3/ed3book.pdf</a>.
+<div id="ref-Caret" class="csl-entry" role="listitem">
+Kuhn, and Max. 2008. <span>“Building Predictive Models in r Using the Caret Package.”</span> <em>Journal of Statistical Software</em> 28 (5): 1–26. <a href="https://doi.org/10.18637/jss.v028.i05">https://doi.org/10.18637/jss.v028.i05</a>.
 </div>
-<div id="ref-textclean" class="csl-entry" role="listitem">
-Rinker, Tyler W. 2018. <em>Textclean: Text Cleaning Tools</em>. Buffalo, New York. <a href="https://github.com/trinker/textclean">https://github.com/trinker/textclean</a>.
+<div id="ref-e1071" class="csl-entry" role="listitem">
+Meyer, David, Evgenia Dimitriadou, Kurt Hornik, Andreas Weingessel, and Friedrich Leisch. 2023. <em>E1071: Misc Functions of the Department of Statistics, Probability Theory Group (Formerly: E1071), TU Wien</em>. <a href="https://CRAN.R-project.org/package=e1071">https://CRAN.R-project.org/package=e1071</a>.
 </div>
-<div id="ref-TextMining" class="csl-entry" role="listitem">
-Silge, Julia, and David Robinson. 2017. <em>Text Mining with r: A Tidy Approach</em>. 1st ed. O’Reilly Media, Inc.
+<div id="ref-Et2" class="csl-entry" role="listitem">
+Pienaar, E. 2023. <span>“Support Vector Machines.”</span> University of Cape Town.
 </div>
 <div id="ref-WordFreq" class="csl-entry" role="listitem">
 Škorić, Mihailo, Ranka Stanković, Milica Ikonić Nešić, Joanna Byszuk, and Maciej Eder. 2022. <span>“Parallel Stylometric Document Embeddings with Deep Learning Based Language Models in Literary Authorship Attribution.”</span> <em>Mathematics</em> 10 (5). <a href="https://doi.org/10.3390/math10050838">https://doi.org/10.3390/math10050838</a>.
 </div>
 <div id="ref-LexVsChar" class="csl-entry" role="listitem">
 Stamatatos, Efstathios. 2008. <span>“Author Identification: Using Text Sampling to Handle the Class Imbalance Problem.”</span> <em>Information Processing &amp; Management</em> 44 (March): 790–99. <a href="https://doi.org/10.1016/j.ipm.2007.05.012">https://doi.org/10.1016/j.ipm.2007.05.012</a>.
-</div>
-<div id="ref-Stylometry" class="csl-entry" role="listitem">
-———. 2009. <span>“A Survey of Modern Authorship Attribution Methods.”</span> <em>Journal of the American Society for Information Science and Technology</em> 60 (3): 538–56. https://doi.org/<a href="https://doi.org/10.1002/asi.21001">https://doi.org/10.1002/asi.21001</a>.
 </div>
 </div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
