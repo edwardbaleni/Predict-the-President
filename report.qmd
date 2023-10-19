@@ -32,17 +32,11 @@ require(kerastuneR)
 
 # Introduction and Literature Review
 
-South Africa's State of the Nation Address (SONA) is an annual event where the president of the country gives a report on the status of the nation. This status entails a highlighting the key challenges and achievements witnessed in the past year as well as a mentioning of the government's goals and objectives for the foreseable future. A number of presidents have taken office between the years of 1994 and 2023. These presidents being FW De Klerk, Nelson Mandela, Thabo Mbeki, Kgalema Motlanthe, Jacob Zuma and Cyril Ramaphosa. The purpose of this study is to create a text classification task that identifies which president was the source of a given sentence. Such a task is often called authorship attribution ([\@Ngrams]()). In such a task is important that one is able to characterize each author, or speaker, in some way that is able to capture the style or ideas of each president.
+South Africa's State of the Nation Address (SONA) is an annual event where the president of the country gives a report on the status of the nation. This status entails highlighting the key challenges and achievements witnessed in the past year as well as a mentioning of the government's goals and objectives for the foreseable future. A number of presidents have taken office between the years of 1994 and 2023. These presidents being FW De Klerk, Nelson Mandela, Thabo Mbeki, Kgalema Motlanthe, Jacob Zuma and Cyril Ramaphosa. The purpose of this study is to create a text classification task that identifies which president was the source of a given sentence. Such a task is often called authorship attribution ([\@Ngrams]()). In such a task it is important that one is able to characterize each author, or speaker, in some way that is able to capture the style or ideas of each president.
 
-Author attribution is a natural language processing (NLP) task ....([\@WordFreq]())....
+There are are a number of ways to characterise authors. In this study a comparison between a topic-based text classification and a style-based text classification will be explored. Text-based text classification, attempts to not use functional words in the classification of texts, this is to find the general ideas, meaning or to identify topics associated with a given text; this provides semantic information. Style-based classification, Stylometry, makes strong use of function words in classification ([\@Stylometry]()). Function words are used to aid in the syntax of a sentence rather than the meaning. These features are not consciously used within a text and as such usage varies between authors; this lack of control over function words have made them ideal for modelling, more specifically in modelling function word frequencies to create an effective attribution technique ([\@FunctionWords]()). Although, the points addressed within each speech is slightly different, the main topic is that of a political address, therefore it is worthwhile to view this research in the context of a style-based text classification as well as a topic-based text classification for comparison.
 
-There are are a number of ways to characterise authors. In this study a comparison between a topic-based text classification and a style-based text classification will be explored. Text-based text classification, attempts to not use functional words in the classification of texts, this is be used to find the general ideas or meaining of texts, as well as being able to identify topics associated with a given text; this provides semantic information. Style-based classification, Stylometry, makes strong use of the function words in classification ([\@Stylometry]()). Function words are used to aid in the syntax of a sentence rather than the meaning. These features that are not consciously used within a text and as such vary between different authors, this lack of control over function words have made them ideal for modelling function word frequencies to create an effective attribution technique ([\@FunctionWords]()). Although, the points addressed within each speech is slightly different, the main topic is that of a political address, therefore it is worthwhile to view this research in the context of a style-based text classification as well as a topic-based text classification.
-
-In this study the classic word bag approach with token frequencies to TF-IDF
-
-Naive Bayes SVM FFNN
-
-In the topics to follow, the data and methodology will be defined. Following this, various models will be used and validated to select the best type of data for the analysis using base models. After this, hyperparameter tuning will be done on the top 3 models to obtain their best performances...
+Many approaches will be assessed in this report. An exploratory data analysis (EDA) is first performed to aid in gaining some understanding about the data. Following this, the data is pre-processed in a number of ways. The ways in which the data is pre-processed is informed by some of the raw results obtained in the [Supplementary](supplementary.qmd). This will be explained in more depth in the sections to come. Following this, it was essential to pick a final feature set to use for modelling or to narrow down the options, this was done by separating the data into a training, validation and test set for each potential feature set; at this stage only the training and validation data was used to look for the best set. Thereafter, after selecting a good feature set, hyperparameter tuning is conducting on all the models being used: Naive Bayes (NB), support vector machine (SVM) and feed-forward neural network (FFNN). After obtaining the hyperparameters for the best models, the training and validation sets are combined and used to build each model, this would serve as the final models for the datasets remaining. These final models can thereafter be used to assess the out-of-sample (OOS) performance with the test set.
 
 # Data and Methodology
 
@@ -707,7 +701,7 @@ $$
 
 this is a convex optimisation problem (@Hastie, @Et2 ) . For multiclass problems the package provided by @e1071 uses a one-versus-one approach. This will fit all pairwise classifiers and use a voting system to pick the best ones.
 
-A base model has been used to explore our data, hyperparameter tuning is used to regularize the model, by using cost constraint.
+A base model has been used to explore our data, hyperparameter tuning is used to regularize the model, by using cost constraint, $C$. This constraint allows us to specify the cost of the violation to the margin. A small cost indicates a large margin, meaning many support vectors will fall on or within the margin. A large cost indicates a narrow margin, indicating much less support vectors on the margin or violating it. The cost was tested at values: 0.1, 1, 10, 50, 100 and 1000
 
 ```{r SVM Classifier Lexical}
 
@@ -814,7 +808,9 @@ where $l$ represents the number of layers, $d_l$ the number of nodes in layer $l
 
 The activation for the hidden layers has been chosen as the reLu activation function and the output layer uses a soft-max activation function. The classification task uses accuracy rate to evaluate model performance. Like the other models this is just a measure of correctly classified predictions.
 
-To find the best data in terms of FFNN, the bag of words at different word bags was assessed against a default model with 32 nodes, an input layer with relu activation function, a dropout rate of 0.5, an output layer with a softmax activation function and performacne calculated via accuracy. Later on, hyperparameter tuning to find a better model will happen and used to test the final data.
+To find the best data in terms of FFNN, the bag of words at different word bags was assessed against a default model with 32 nodes, an input layer with relu activation function, a dropout rate of 0.5, an output layer with a softmax activation function and performance calculated via accuracy. Later on, hyperparameter tuning to find a better model occurs.
+
+A single layer FFNN has been chosen. Hyperparameter tuning will be done on the hidden layer to see if 10, 32 nodes or 64 nodes is better, and to see if changing the learning rate of the adam optimizer will result in a better model. The learning rates used are 0.1 and 0.5.
 
 ```{r Data for FFNN}
 
@@ -1000,7 +996,7 @@ model.tfidf %>% compile(
 
 For the FFNN, in general we see that loss increase and accuracy increases, which indicates that the model is learning. The in-sample, IS, model accuracy looks to improve as the data set increases for all different types of dataset. With the model built off TFIDF holding the best IS accuracy.
 
-```{r FFNN Lexical Fit, fig.cap=""}
+```{r FFNN Lexical Fit, fig.cap="In-sample Loss and accuracy for lexical feature space"}
 history.1.1 <- model.1.1 %>% fit(
   x.train.1.1, y.train.1.1,
   epochs = 50, batch_size = 100,verbose = 0)
@@ -1027,9 +1023,10 @@ history.1.all <- model.1.all %>% fit(
 
 plot_grid(plot(history.1.1), plot(history.1.2), plot(history.1.3), plot(history.1.4), plot(history.1.all), labels = c("200", "500", "2000", "4500", "All"), label_size = 7, label_colour = "red")
 ```
-A similar observation can be made in the below figure. 
 
-```{r FFNN Character Fit, fig.cap=""}
+A similar observation can be made in the below figure.
+
+```{r FFNN Character Fit, fig.cap="In-sample Loss and accuracy for character feature space"}
 history.2.1 <- model.2.1 %>% fit(
   x.train.2.1, y.train.2.1,
   epochs = 50, batch_size = 100,verbose = 0)
@@ -1056,9 +1053,10 @@ history.2.all <- model.2.all %>% fit(
 
 plot_grid(plot(history.2.1), plot(history.2.2), plot(history.2.3), plot(history.2.4), plot(history.2.all), labels = c("200", "500", "2000", "4500", "All"), label_size = 7, label_colour = "red")
 ```
+
 This figure as mentioned above seems to have the best IS accuracy.
 
-```{r FFNN TFIDF Fit, fig.cap="", out.width="50%"}
+```{r FFNN TFIDF Fit, fig.cap="In-sample Loss and accuracy for TFIDF feature space", out.width="50%"}
 history.tfidf <- model.tfidf %>% fit(
   x.train.tfidf, y.train.tfidf,
   epochs = 50, batch_size = 100,verbose = 0)
@@ -1069,7 +1067,8 @@ history.tfidf <- model.tfidf %>% fit(
 
 plot(history.tfidf)
 ```
-Table 1 depicts the results of our analysis of different features over differently sized word bags. It is an analysis, that is capable of depicting how many words are necessary for our models and which models we can look to take forward with which data. We see that for both the naive Bayes classifier and the SVM the missclassification is lowest when using character features at a bag size of 4500 features. The FFNN that the best classification comes when tfidf is considered above all else. In order to find the model that performs best, both these two well performing feature sets will undergo hyperparameter tuning for NB, SVM and FFNN.
+
+Table 1 depicts the results of our analysis of different features over differently sized word bags. It is an analysis, that is capable of depicting the number of words necessary for the models and which models we can look to take forward and which data. We see that for both the NB and the SVM the missclassification is lowest when using character features at a bag size of 4500 features. The FFNN had the best (lowest) missclassification when tfidf is used. In order to find the model that performs best, both these two well performing feature sets will undergo hyperparameter tuning for NB, SVM and FFNN.
 
 ```{r Validation Results}
 # Lexical naive bayes
@@ -1138,58 +1137,62 @@ as_hux(validatedResults) %>%
   style_headers(bold = TRUE) %>%
   set_all_borders()%>% set_caption("Table 1: Validation results depicting performance of differently specified data in each model for different word bags and TFIDF")
 ```
+
 ## Hyperparameter Tuning Results
 
+The Laplace smoothing produced no significant results. Laplace smoothing at parameters 0, 1 and 2 were tried. Each result yielded the same validation accuracy. This is because Laplace smoothing is used to smooth over unseen features; here the word bag has been created and all sets were included during, therefore all sets essentially have the same features present ([\@Jurafsky2000SpeechAL]().
+
 ```{r Laplace Smoothing}
-n_hyper <- 0:4
-tune.n.1 <- list()
-tune.n.2 <- list()
-for (i in 1:5) {
-  char.classifier <- naiveBayes(train.set.char.4[,-1], train.set.char.4[,1], laplace = n_hyper[i])
-  char.p          <- predict(char.classifier, val.set.char.4[,-1])
-  char.t          <- table((char.p), (unlist(val.set.char.4[,1]))) 
-  tune.n.1[[i]]   <- 1 - sum(diag(char.t))/ sum(char.t)
-  
-  classifier      <- naiveBayes(train.set.tfidf[,-1], train.set.tfidf[,1], laplace = n_hyper[i])
-  p               <- predict(classifier, val.set.tfidf[,-1])
-  t               <- table((p), (unlist(val.set.tfidf[,1])))
-  tune.n.2[[i]]   <- 1 - sum(diag(t))/ sum(t)
-}
-
+# n_hyper <- 0:2
+# tune.n.1 <- list()
+# tune.n.2 <- list()
+# for (i in 1:3) {
+#   char.classifier <- naiveBayes(train.set.char.4[,-1], train.set.char.4[,1], laplace = n_hyper[i])
+#   char.p          <- predict(char.classifier, val.set.char.4[,-1])
+#   char.t          <- table((char.p), (unlist(val.set.char.4[,1]))) 
+#   tune.n.1[[i]]   <- 1 - sum(diag(char.t))/ sum(char.t)
+#   
+#   classifier      <- naiveBayes(train.set.tfidf[,-1], train.set.tfidf[,1], laplace = n_hyper[i])
+#   p               <- predict(classifier, val.set.tfidf[,-1])
+#   t               <- table((p), (unlist(val.set.tfidf[,1])))
+#   tune.n.2[[i]]   <- 1 - sum(diag(t))/ sum(t)
+# }
+# save(tune.n.1, tune.n.2, file = "Navie_Hyper.RData")
 
 ```
 
-```{r Cost Complexity}
-svm.classifier.4.2       <- svm(train.set.char.4[,-1], train.set.char.4[,1], type = "C-classification", scale = T)
-svm.p.4.2                <- predict(svm.classifier.4.2, val.set.char.4[,-1])
-svm.t.4.2                <- table((svm.p.4.2), (unlist(val.set.char.4[,1])))
 
-# svm.tfidf.classifier  <- svm(train.set.tfidf[,-1], train.set.tfidf[,1], type = "C-classification", scale = F)
-# svm.tfidf.p           <- predict(svm.tfidf.classifier, val.set.tfidf[,-1])
-# svm.tfidf.t           <- table((svm.tfidf.p), (unlist(val.set.tfidf[,1])))
+
+```{r Cost Complexity, fig.cap="Validation missclassification for both the character features and TFIDF features"}
+cost <- c(0.1, 1, 10, 50, 100, 1000)
+# tune.n.3 <- list()
+# tune.n.4 <- list()
+# 
+#  for (i in 1:3) {
+#    char.classifier <- svm(train.set.char.4[,-1], train.set.char.4[,1], type = "C-classification", scale = T, cost = cost[i])
+#    char.p          <- predict(char.classifier, val.set.char.4[,-1])
+#    char.t          <- table((char.p), (unlist(val.set.char.4[,1]))) 
+#    tune.n.3[[i]]   <- 1 - sum(diag(char.t))/ sum(char.t)
+#    
+#    classifier      <- svm(train.set.tfidf[,-1], train.set.tfidf[,1], type = "C-classification", scale = F, cost = cost[i])
+#    p               <- predict(classifier, val.set.tfidf[,-1])
+#    t               <- table((p), (unlist(val.set.tfidf[,1])))
+#    tune.n.4[[i]]   <- 1 - sum(diag(t))/ sum(t)
+#    
+#    print(paste0("Mod", i))
+#  }
+# 
+# # plot.svm() # Can plot svm
+# tune.n.3 <- unlist(tune.n.3)
+# tune.n.4 <- unlist(tune.n.4)
+# save(tune.n.3, tune.n.4, file = "SVM_Hyper.RData")
+load("SVM_Hyper.RData")
+
+par(mfrow = c(1,2))
+plot(cost, tune.n.3, type = "b", lwd = 1.5, ylab = "Validation Missclassification", xlab = "Cost", main = "Character Features")
+abline(v = 100, col = "lightblue", lwd = 2)
+plot(cost, tune.n.4, type = "b", lwd = 1.5, ylab = "Validation Missclassification", xlab = "Cost", main = "TFIDF")
 ```
-
-```{r}
-# https://cran.r-project.org/web/packages/kerastuneR/vignettes/Introduction.html
-build_model = function(hp) {
-  model = keras_model_sequential()
-  model %>% layer_dense(units=hp$Int('units',
-                                      min_value=32,
-                                      max_value=512,
-                                      step=32),
-                                      input_shape = ncol(x.train.1.4),
-                                      activation='relu') %>% 
-  layer_dense(units=5, activation='softmax') %>% 
-  compile(
-    optimizer= tf$keras$optimizers$Adam(
-      hp$Choice('learning_rate',
-                values=c(1e-2, 1e-3, 1e-4))),
-    loss='binary_crossentropy',
-    metrics='accuracy') 
-  return(model)
-}
-```
-
 
 ```{r FFNN Hyperparameter tuning}
 model.2.4 <- keras_model_sequential() %>%
@@ -1213,21 +1216,14 @@ model.tfidf %>% compile(
   optimizer = optimizer_adam(learning_rate = 0.01),
   metrics = "accuracy"
 )
+
+require(tfruns)
+runs <- tfruns::tunning_run("Tuning.R", 
+                            flags = list(dense_units = c(10, 32, 64), 
+                                         rate = c(0.1, 0.5) ))
 ```
 
-
-```{r FFNN Hyperparameter tuning}
-tf_tuner <-  import("keras")
-
-tuner <- kerastuneR::Hyperband(
-    build_model,
-    objective = 'accuracy',
-    max_trials = 5,
-    executions_per_trial = 3,
-    project_name = 'helloworld')
-```
-
-
+<!-- https://www.youtube.com/watch?v=FscOZT0_ObA -->
 
 <!-- Perform hyperparameter tuning for svm and ffnn on final model -->
 
@@ -1241,7 +1237,7 @@ tuner <- kerastuneR::Hyperband(
 
 A limitation that arises in this study is a lack of candidate authors, as well as minimal data provided for some authors. This is an issue that has been detailed in research before ([\@Stylometry]()).
 
-Perform a recuesive feature elimination (@WordFreq) using the rfe function in the package provided by, @Caret .
+Perform a recuesive feature elimination ([\@WordFreq]()) using the rfe function in the package provided by, ([\@Caret]()) .
 
 # Conclusion
 
