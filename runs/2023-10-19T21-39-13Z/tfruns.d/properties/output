@@ -1,0 +1,18 @@
+
+> FLAGS <- flags(flag_integer("dense_units", 10),
++                flag_integer("rate", 0.01))
+
+> model <- keras_model_sequential() %>%
++   layer_dense(units = FLAGS$dense_units, 
++               activation = "relu", 
++               input_shape  .... [TRUNCATED] 
+
+> model %>% compile(
++   loss = "categorical_crossentropy",
++   optimizer = optimizer_adam(learning_rate = 0.01),
++   metrics = "accuracy"
++ )
+
+> hist <- model %>% fit(
++     x.train.tfidf, y.train.tfidf,
++     epochs = 20, batch_size = 50,verbose = 1)

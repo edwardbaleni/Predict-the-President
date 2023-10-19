@@ -958,10 +958,6 @@ str((unlist(val.set[,1])))
 1 - sum(diag(tt))/ sum(tt)
 ```
 
-
-
-
-
 # Results
 
 <!-- Create one big table to show results -->

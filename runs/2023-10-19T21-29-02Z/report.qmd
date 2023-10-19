@@ -810,9 +810,7 @@ The activation for the hidden layers has been chosen as the reLu activation func
 
 To find the best data in terms of FFNN, the bag of words at different word bags was assessed against a default model with 32 nodes, an input layer with relu activation function, a dropout rate of 0.5, an output layer with a softmax activation function and performance calculated via accuracy. Later on, hyperparameter tuning to find a better model occurs.
 
-A single layer FFNN has been chosen. For the hyperparameter tuning of both models, the hidden layer explores 10, 32, 64 and 128 nodes. The dropout rate has been tried as 0.01 and 0.5. The batch size explored is 50 and 100. The learning rate on the adam optimizer has been set to 0.01.
-
-Keras was used for the FFNN, this library uses cross-validation to find model accuracy. Before for the FFNN the train and validation sets were separated so that the model could be compared to the other classifiers. Since k-fold cross validation is performed from within keras, the train and validation sets can now be combined prior to hyperparameter tuning. The results from this tuning will aid in finding the best model.
+A single layer FFNN has been chosen. Hyperparameter tuning will be done on the hidden layer to see if 10, 32 nodes or 64 nodes is better, and to see if changing the learning rate of the adam optimizer will result in a better model. The learning rates used are 0.1 and 0.5.
 
 ```{r Data for FFNN}
 
@@ -1163,6 +1161,8 @@ The Laplace smoothing produced no significant results. Laplace smoothing at para
 
 ```
 
+
+
 ```{r Cost Complexity, fig.cap="Validation missclassification for both the character features and TFIDF features"}
 cost <- c(0.1, 1, 10, 50, 100, 1000)
 # tune.n.3 <- list()
@@ -1194,32 +1194,38 @@ abline(v = 100, col = "lightblue", lwd = 2)
 plot(cost, tune.n.4, type = "b", lwd = 1.5, ylab = "Validation Missclassification", xlab = "Cost", main = "TFIDF")
 ```
 
-Earlier when looking for a good feature set, it was clear that 50 epochs was too many, so this will be set to 20 epochs.
-
 ```{r FFNN Hyperparameter tuning}
-x.train.2.4 <- rbind(x.train.2.4, x.val.2.4)
-y.train.2.4 <- rbind(y.train.2.4, y.val.2.4)
+model.2.4 <- keras_model_sequential() %>%
+   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x.train.2.4))) %>% 
+   layer_dropout(rate = 0.5) %>%
+   layer_dense(units = 5, activation = 'softmax')
 
-x.train.tfidf <- rbind(x.train.tfidf, x.val.tfidf)
-y.train.tfidf <- rbind(y.train.tfidf, y.val.tfidf)
+model.2.4 %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  metrics = "accuracy"
+)
 
-runs1 <- tfruns::tuning_run("Tuning1.R", 
-                            flags = list(dense_units = c(10, 32, 64, 128), 
-                                         rate = c(0.01, 0.5),
-                                         batch = c(50, 100)))
+model.tfidf <- keras_model_sequential() %>%
+   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x.train.tfidf))) %>% 
+   layer_dropout(rate = 0.5) %>%
+   layer_dense(units = 5, activation = 'softmax')
 
-runs2 <- tfruns::tuning_run("Tuning2.R", 
-                            flags = list(dense_units = c(10, 32, 64, 128), 
-                                         rate = c(0.01, 0.5),
-                                         batch = c(50, 100)))
+model.tfidf %>% compile(
+  loss = "categorical_crossentropy",
+  optimizer = optimizer_adam(learning_rate = 0.01),
+  metrics = "accuracy"
+)
 
-head(runs)
-runs[,c(3,4,5,6,11,12)]
-
-save(runs1, runs2, "FF_Hyper.RData")
-
-load("FF_Hyper.RData")
+require(tfruns)
+runs <- tfruns::tuning_run("Tuning.R", 
+                            flags = list(dense_units = c(10, 32, 64), 
+                                         rate = c(0.1, 0.5) ))
 ```
+
+<!-- https://www.youtube.com/watch?v=FscOZT0_ObA -->
+
+<!-- Perform hyperparameter tuning for svm and ffnn on final model -->
 
 ## Final Model
 

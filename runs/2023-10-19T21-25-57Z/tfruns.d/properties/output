@@ -1,0 +1,3 @@
+
+> FLAGS <- flags(flag_integer("dense_units"),
++                flag_integer("rate"))
