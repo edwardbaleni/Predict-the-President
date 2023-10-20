@@ -1,9 +1,0 @@
-
-> FLAGS <- flags(flag_integer("dense_units", 10),
-+                flag_integer("rate", 0.01),
-+                flag_integer("batch", 50))
-
-> model <- keras_model_sequential() %>%
-+   layer_dense(units = FLAGS$dense_units, 
-+               activation = "relu", 
-+               input_shape  .... [TRUNCATED] 

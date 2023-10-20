@@ -1,4 +1,0 @@
-{
-  "message": "argument \"default\" is missing, with no default",
-  "traceback": ["structure(class = \"tfruns_flag\", list(name = name, type = type, \n    default = default, description = description))", "flag_definition(name = name, type = \"integer\", default = as.integer(default), \n    description = description)", "flag_integer(\"dense_units\")", "flags(flag_integer(\"dense_units\"), flag_integer(\"rate\"))", "eval(ei, envir)", "eval(ei, envir)", "withVisible(eval(ei, envir))", "tfruns::tuning_run(\"Tuning.R\", flags = list(dense_units = c(10, \n    32, 64), rate = c(0.1, 0.5)))"]
-}

@@ -29,9 +29,10 @@ require(huxtable)
 
 ```{r Data}
 set.seed(2023)
-sys.source("sona-first-steps.R" , envir = knitr::knit_global())
-sona <- as_tibble(sona)
+# sys.source("sona-first-steps.R" , envir = knitr::knit_global())
+# sona <- as_tibble(sona)
 load("Stylometric.RData")
+load("TFIDF_supp_results.RData")
 ```
 
 ```{r Pre-Process}
@@ -785,7 +786,7 @@ However, since this is now a style-based classification task, using character fe
 # save(resultsChar, resultsLexical, results, file = "Stylometric.RData")
 ```
 
-```{r Table 2.1}
+```{r Table 2_1}
 tab2 <- data.frame(Name = c("3 Char N-Gram NB", "3 Char N-Gram SVM", "4 Char N-Gram NB", "4 Char N-Gram SVM"), rbind(resultsChar[[1]], resultsChar[[2]], resultsChar[[3]], resultsChar[[4]]), rbind(resultsChar[[5]], resultsChar[[6]], resultsChar[[7]], resultsChar[[8]]))
 
 colnames(tab2) <- c("","200", "2500")
@@ -798,34 +799,30 @@ as_hux(tab2) %>%
   set_top_border(row = 2) %>%
   style_headers(bold = T) %>% 
   set_right_border(everywhere, 1, brdr(3, "double", "grey")) %>%
-  set_caption("Table A: Validation set missclassification rate on NB and SVM models with word bag sizes of 200 and 2500 for different character n-grams")
+  set_caption("Table B: Validation set missclassification rate on NB and SVM models with word bag sizes of 200 and 2500 for different character n-grams")
 ```
 
 
-At this stage we can see that the classification is not that much different from a unigram, however, points of which to consider, is that when using character features certain items become necessary and deserve exploration: the number of characters, the size of the word bag, the inclusion of punctuation.
+At this stage we can see that the classification is not that much different from a unigram, however, points of which to consider, is that when using character features certain items become necessary and deserve exploration: the number of characters, the size of the word bag, the inclusion of punctuation. The number of characters have been chosen to be either 3 or 4, which is consistent with the study ([\@Stylometry]()). The size of the bag and the inclusion of punctuation are two points which need to be further explored. The missclassification has decreased from when the word bag contained 200 words.
 
-The number of characters have been chosen to be either 3 or 4, which is consistent with the study ([\@Stylometry]()). The size of the bag and the inclusion of punctuation are two points which need to be further explored.
+```{r Table 2_2}
+tab3 <- data.frame(Name = c("4 Char N-Gram NB", "4 Char N-Gram SVM"), rbind(resultsChar[[9]], resultsChar[[10]]), rbind(resultsChar[[11]], resultsChar[[12]]))
+
+colnames(tab3) <- c("","No Capitalisation", "Capitalisation")
+
+as_hux(tab3) %>%
+  insert_row("","Punctuation", "", fill = "") %>% 
+  merge_cells(1, 2:3) %>% 
+  set_header_rows(1, T) %>%
+  set_header_cols(1, T)%>%
+  set_top_border(row = 2) %>%
+  style_headers(bold = T) %>% 
+  set_right_border(everywhere, 1, brdr(3, "double", "grey")) %>%
+  set_caption("Table C: Validation set missclassification rate on NB and SVM models with word bag size of 4500 for a 4 character n-gram with punctuation")
+```
 
 
-The missclassification has decreased tremendously from when the word bag contained 200 words.
-
-Now below we look at the inclusion of punctuation
-
-
-A word bag of 2000, 2500, 3000, 4000, 4500 and 5000 were looked at, these tests will not be shown, but can be replicated. The best performing model came out to be with a bag size of 4500 of the configurations tried. Unfortunately, character sequences such as: "..." and "..j" were created when looking at a number of characters of 3, this can not be run by these models. So for simplicity, only when the number of characters equal to 4 was observed here.
-
-
-We clearly see here that there is an improvement when punctuation is included.
-
-Need to check if case matters too. But I don't think it will matter
-
-We see here that if the capitalization is maintained we actually get the best performing svm, and a decently performing naive bayes classifier. With a missclassification of 0.4 for the SVM.
-
-The next step we can look into to improve the the In-sample error, is to look at feature extraction. This would also be helpful in deciding the size of the word bag that is necessary. Until now, the word bag has been decided by trial and error, and by the assumption that a more simplistic representation, i.e using characters, not removing punctuation, not removing capitalization, would require a larger word bad to attain more contextual information.
-
-## Topic-Based Classification
-
-As previously mentioned, it may be more beneficial to look at stlye-based classification over a text-based classification, as the topics within these documents are mostly similar with some differences. However, to further prove this, TF-IDF will be explored as this measurement is perfect for the exploratioon of document topic. However, this will be briefly explored here to see whether it is still a viable option.
+A word bag of 2000, 2500, 3000, 4000, 4500 and 5000 were looked at, these tests will not be shown, but can be replicated. The best performing model came out to be with a bag size of 4500 of the configurations tried. We clearly see here that there is an improvement when punctuation is included. We see here that if the capitalization is maintained we get the best performing SVM, and a decently performing NB, with a missclassification of 0.4 for the SVM. 
 
 ### TF-IDF
 
@@ -964,8 +961,20 @@ As previously mentioned, it may be more beneficial to look at stlye-based classi
 ```
 
 ```{r Table 3}
-load("TFIDF_supp_results.RData")
+tab4 <- data.frame(Name = c("TFIDF NB", "TFIDF SVM"), rbind(results2[[1]], results2[[2]]), rbind(results2[[3]], results2[[4]]))
+
+colnames(tab4) <- c("","No Capitalisation", "Capitalisation")
+
+as_hux(tab4) %>%
+  insert_row("","No Punctuation", "Punctuation", fill = "") %>% 
+  set_header_rows(1, T) %>%
+  set_header_cols(1, T)%>%
+  set_top_border(row = 2) %>%
+  style_headers(bold = T) %>% 
+  set_right_border(everywhere, 1, brdr(3, "double", "grey")) %>%
+  set_caption("Table D: Validation set missclassification rate on NB and SVM models with word bag size of 4500 for a 4 character n-gram with punctuation")
 ```
 
 
-TF-IDF is able to take on both complex word tokens as well as character tokens. The best models above will be compared here. TF-IDF, cannot be divided up into the top n words by TF-IDF in this case, as these types of words only appear once or twice within each document.
+
+TF-IDF is able to take on both complex word tokens as well as character tokens. The best models above will be compared here. TF-IDF, cannot be divided up into the top n words by TF-IDF in this case, as these types of words only appear once or twice within each document. Here TF-IDF is in character features, and it's performance is worse than above.

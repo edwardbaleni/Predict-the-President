@@ -134,7 +134,6 @@ div.csl-indent {
   <li><a href="#introduction-and-literature-review" id="toc-introduction-and-literature-review" class="nav-link" data-scroll-target="#introduction-and-literature-review">Introduction and Literature Review</a></li>
   <li><a href="#data-and-methodology" id="toc-data-and-methodology" class="nav-link" data-scroll-target="#data-and-methodology">Data and Methodology</a>
   <ul class="collapse">
-  <li><a href="#eda" id="toc-eda" class="nav-link" data-scroll-target="#eda">EDA</a></li>
   <li><a href="#pre-processing" id="toc-pre-processing" class="nav-link" data-scroll-target="#pre-processing">Pre-Processing</a>
   <ul class="collapse">
   <li><a href="#lexical-features" id="toc-lexical-features" class="nav-link" data-scroll-target="#lexical-features">Lexical Features</a></li>
@@ -154,9 +153,7 @@ div.csl-indent {
   <li><a href="#hyperparameter-tuning-results" id="toc-hyperparameter-tuning-results" class="nav-link" data-scroll-target="#hyperparameter-tuning-results">Hyperparameter Tuning Results</a></li>
   <li><a href="#final-model" id="toc-final-model" class="nav-link" data-scroll-target="#final-model">Final Model</a></li>
   </ul></li>
-  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a></li>
-  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations">Limitations</a></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#discussion-and-conclusion" id="toc-discussion-and-conclusion" class="nav-link" data-scroll-target="#discussion-and-conclusion">Discussion and Conclusion</a></li>
   <li><a href="#bibliography" id="toc-bibliography" class="nav-link" data-scroll-target="#bibliography">Bibliography</a></li>
   </ul>
 </nav>
@@ -189,25 +186,19 @@ div.csl-indent {
 
 <section id="abstract" class="level1">
 <h1>Abstract</h1>
+<p>In this study, the primary objective was to develop a classifier capable of attributing sentences to specific South African presidents. To achieve this, the research delved into a critical task of feature set selection, exploring a range of potential options, including lexical, character-based, and TF-IDF features set.</p>
+<p>Among the array of feature set options explored, two feature sets stood out as the most promising choices for the final models: TF-IDF and a character set consisting of 4500 features. Notably, the Feedforward Neural Network (FFNN) consistently outperformed other classifiers in this study. However, it is essential to acknowledge that TF-IDF exhibited a certain degree of variability in its performance as a feature set.</p>
+<p>In light of these findings, it is recommended that future research considers employing the FFNN in conjunction with a complete TF-IDF feature set, as this combination displayed superior performance when compared to other models under investigation. This insight serves as a valuable contribution to the development of classifiers for sentence attribution to specific authors, and it highlights the potential for further refinement in this fascinating domain of study.</p>
 </section>
 <section id="introduction-and-literature-review" class="level1">
 <h1>Introduction and Literature Review</h1>
-<p>South Africa’s State of the Nation Address (SONA) is an annual event where the president of the country gives a report on the status of the nation. This status entails a highlighting the key challenges and achievements witnessed in the past year as well as a mentioning of the government’s goals and objectives for the foreseable future. A number of presidents have taken office between the years of 1994 and 2023. These presidents being FW De Klerk, Nelson Mandela, Thabo Mbeki, Kgalema Motlanthe, Jacob Zuma and Cyril Ramaphosa. The purpose of this study is to create a text classification task that identifies which president was the source of a given sentence. Such a task is often called authorship attribution (<a href="">@Ngrams</a>). In such a task is important that one is able to characterize each author, or speaker, in some way that is able to capture the style or ideas of each president.</p>
-<p>Author attribution is a natural language processing (NLP) task ….(<a href="">@WordFreq</a>)….</p>
-<p>There are are a number of ways to characterise authors. In this study a comparison between a topic-based text classification and a style-based text classification will be explored. Text-based text classification, attempts to not use functional words in the classification of texts, this is be used to find the general ideas or meaining of texts, as well as being able to identify topics associated with a given text; this provides semantic information. Style-based classification, Stylometry, makes strong use of the function words in classification (<a href="">@Stylometry</a>). Function words are used to aid in the syntax of a sentence rather than the meaning. These features that are not consciously used within a text and as such vary between different authors, this lack of control over function words have made them ideal for modelling function word frequencies to create an effective attribution technique (<a href="">@FunctionWords</a>). Although, the points addressed within each speech is slightly different, the main topic is that of a political address, therefore it is worthwhile to view this research in the context of a style-based text classification as well as a topic-based text classification.</p>
-<p>In this study the classic word bag approach with token frequencies to TF-IDF</p>
-<p>Naive Bayes SVM FFNN</p>
-<p>In the topics to follow, the data and methodology will be defined. Following this, various models will be used and validated to select the best type of data for the analysis using base models. After this, hyperparameter tuning will be done on the top 3 models to obtain their best performances…</p>
+<p>South Africa’s State of the Nation Address (SONA) is an annual event where the president of the country gives a report on the status of the nation. This status entails highlighting the key challenges and achievements witnessed in the past year as well as a mentioning of the government’s goals and objectives for the foreseable future. A number of presidents have taken office between the years of 1994 and 2023. These presidents being FW De Klerk, Nelson Mandela, Thabo Mbeki, Kgalema Motlanthe, Jacob Zuma and Cyril Ramaphosa. The purpose of this study is to create a text classification task that identifies which president was the source of a given sentence. Such a task is often called authorship attribution (<a href="">@Ngrams</a>). In such a task it is important that one is able to characterize each author, or speaker, in some way that is able to capture the style or ideas of each president.</p>
+<p>There are are a number of ways to characterise authors. In this study a comparison between a topic-based text classification and a style-based text classification will be explored. Text-based text classification, attempts to not use functional words in the classification of texts, this is to find the general ideas, meaning or to identify topics associated with a given text; this provides semantic information. Style-based classification, Stylometry, makes strong use of function words in classification (<a href="">@Stylometry</a>). Function words are used to aid in the syntax of a sentence rather than the meaning. These features are not consciously used within a text and as such usage varies between authors; this lack of control over function words have made them ideal for modelling, more specifically in modelling function word frequencies to create an effective attribution technique (<a href="">@FunctionWords</a>). Although, the points addressed within each speech is slightly different, the main topic is that of a political address, therefore it is worthwhile to view this research in the context of a style-based text classification as well as a topic-based text classification for comparison.</p>
+<p>Many approaches will be assessed in this report. An exploratory data analysis (EDA) is first performed to aid in gaining some understanding about the data. Following this, the data is pre-processed in a number of ways. The ways in which the data is pre-processed is informed by some of the raw results obtained in the <a href="./supplementary.html">Supplementary</a>. This will be explained in more depth in the sections to come. Following this, it was essential to pick a final feature set to use for modelling or to narrow down the options, this was done by separating the data into a training, validation and test set for each potential feature set; at this stage only the training and validation data was used to look for the best set. Thereafter, after selecting a good feature set, hyperparameter tuning is conducting on all the models being used: Naive Bayes (NB), support vector machine (SVM) and feed-forward neural network (FFNN). After obtaining the hyperparameters for the best models, the training and validation sets are combined and used to build each model, this would serve as the final models for the datasets remaining. These final models can thereafter be used to assess the out-of-sample (OOS) performance with the test set.</p>
 </section>
 <section id="data-and-methodology" class="level1">
 <h1>Data and Methodology</h1>
 <p>The data used in this study was sourced from <a href="https://www.gov.za/state-nation-address">gov.za</a>. It is a collection of 36 addresses from 6 different presidents within the years 1994 to 2023. The speakers present in this time span were FW De Klerk, Nelson Mandela, Thabo Mbeki, Kgalema Motlanthe, Jacob Zuma and Cyril Ramaphosa. Web-scraping techniques were used to collect this data, courtesy of Ian Durbach.</p>
-<section id="eda" class="level2">
-<h2 class="anchored" data-anchor-id="eda">EDA</h2>
-<!-- a  great  variety  ofmeasures, including sentence length, word length, word fre-quencies,  character  frequencies,  and  vocabulary  richness -->
-<!-- vocabulary richnessfunctions are attempts to quan-tify the diversity of the vocabulary of a tex -->
-<!-- Perform a quick EDA to explain the data and a quick rationale for removing the outliers -->
-</section>
 <section id="pre-processing" class="level2">
 <h2 class="anchored" data-anchor-id="pre-processing">Pre-Processing</h2>
 <p>After obtaining the data, the first line of each speech is removed. This first line is the date the address is held. The data is then tokenized by sentence. Only sentences with over two words remained for the rest of the analysis. The reason this is done is because the sentences with less than 3 words seemed to either either be made up of digits or unfinished words, most of the time.</p>
@@ -242,7 +233,7 @@ div.csl-indent {
 <p><span class="math display">\[\text{tf(term t in document i)} = \frac{\text{Number of times term t appears in document i}}{\text{Number of terms in document i}}.\]</span></p>
 <p>Inverse document term frequency downweights terms that are frequent in a collection of documents and upweights terms that are not frequent within a collection of documents. It is calculated as,</p>
 <p><span class="math display">\[\text{idf(term t)} = \text{ln}\left(\frac{\text{Number of documents in corpus}}{\text{Number of documents containing term t}}\right).\]</span></p>
-<p>TF-IDF is the multiplication of the two metrics (<a href="">@TextMining</a>, <span class="citation" data-cites="Durbach2023">Durbach (<a href="#ref-Durbach2023" role="doc-biblioref">2023</a>)</span> ). TF-IDF measures the importance of a word to a document in a collection. In this analysis this has been done by considering one document to be a sentence. Following this intuition, the quantities above can be calculated.</p>
+<p>TF-IDF is the multiplication of the two metrics (<a href="">@TextMining</a>, <a href="">@Durbach2023</a> ). TF-IDF measures the importance of a word to a document in a collection. In this analysis this has been done by considering one document to be a sentence. Following this intuition, the quantities above can be calculated.</p>
 <p>Since TF-IDF determines what features are important to which document, this can be seen as a topic-based classification, as function words and commonly occurring tokens among the documents will be downweighted resulting in semantic features being strongly weighted. For TF-IDF, all tokens were kept, because some of the highly weighted scores may only appear once in a document and as a result may act as quite a poor classifier out-of-sample, and so it is necessary to leave all possible tokens.</p>
 </section>
 <section id="train-validation-and-testing-splits" class="level2">
@@ -285,8 +276,8 @@ h(x_i) = (h_1(x_i), h_2(x_i), ..., h_M(x_i)), \quad i = 1, 2, ..., N
 y_i(h(x)^T\beta + \beta_0) \geq 1 - \zeta_n, \quad n = 1,2,...,N \\
 \zeta_n \geq 0, \quad\quad n = 1,2,...,N
 \]</span></p>
-<p>this is a convex optimisation problem (<span class="citation" data-cites="Hastie">Hastie, Tibshirani, and Friedman (<a href="#ref-Hastie" role="doc-biblioref">2001</a>)</span>, <span class="citation" data-cites="Et2">Pienaar (<a href="#ref-Et2" role="doc-biblioref">2023</a>)</span> ) . For multiclass problems the package provided by <span class="citation" data-cites="e1071">Meyer et al. (<a href="#ref-e1071" role="doc-biblioref">2023</a>)</span> uses a one-versus-one approach. This will fit all pairwise classifiers and use a voting system to pick the best ones.</p>
-<p>A base model has been used to explore our data, hyperparameter tuning is used to regularize the model, by using cost constraint.</p>
+<p>this is a convex optimisation problem (<a href="">@Hastie</a>, <a href="">@Et2</a> ) . For multiclass problems the package provided by <a href="">@e1071</a> uses a one-versus-one approach. This will fit all pairwise classifiers and use a voting system to pick the best ones.</p>
+<p>A base model has been used to explore our data, hyperparameter tuning is used to regularize the model, by using cost constraint, <span class="math inline">\(C\)</span>. This constraint allows us to specify the cost of the violation to the margin. A small cost indicates a large margin, meaning many support vectors will fall on or within the margin. A large cost indicates a narrow margin, indicating much less support vectors on the margin or violating it. The cost was tested at values: 0.1, 1, 10, 50, 100 and 1000</p>
 </section>
 <section id="feed-forward-neural-networks" class="level2">
 <h2 class="anchored" data-anchor-id="feed-forward-neural-networks">Feed Forward Neural Networks</h2>
@@ -295,7 +286,9 @@ y_i(h(x)^T\beta + \beta_0) \geq 1 - \zeta_n, \quad n = 1,2,...,N \\
 <p><span class="math display">\[a^l_j(i) = \sigma_l\left( \sum_{k = 1}^{d_l - 1} a_k^{l-1}(i)w_{kj}^l + b_j^l \right), \quad l = 1,2,...,L; j = 1,2,...d_l \]</span></p>
 <p>where <span class="math inline">\(l\)</span> represents the number of layers, <span class="math inline">\(d_l\)</span> the number of nodes in layer <span class="math inline">\(l\)</span>, <span class="math inline">\(\sigma_l(.)\)</span> denotes the activation function, <span class="math inline">\(w_{kj}^l\)</span> denotes the weight linking the <span class="math inline">\(k^{th}\)</span> node in layer <span class="math inline">\(l-1\)</span> to the <span class="math inline">\(j^{th}\)</span> node in layer <span class="math inline">\(l\)</span>, <span class="math inline">\(b_j^l\)</span> denotes the <span class="math inline">\(j^{th}\)</span> bias in layer <span class="math inline">\(l\)</span> (<a href="">@Et</a>).</p>
 <p>The activation for the hidden layers has been chosen as the reLu activation function and the output layer uses a soft-max activation function. The classification task uses accuracy rate to evaluate model performance. Like the other models this is just a measure of correctly classified predictions.</p>
-<p>To find the best data in terms of FFNN, the bag of words at different word bags was assessed against a default model with 32 nodes, an input layer with relu activation function, a dropout rate of 0.5, an output layer with a softmax activation function and performacne calculated via accuracy. Later on, hyperparameter tuning to find a better model will happen and used to test the final data.</p>
+<p>To find the best data in terms of FFNN, the bag of words at different word bags was assessed against a default model with 32 nodes, an input layer with relu activation function, a dropout rate of 0.5, an output layer with a softmax activation function and performance calculated via accuracy. Later on, hyperparameter tuning to find a better model occurs.</p>
+<p>A single layer FFNN has been chosen. For the hyperparameter tuning of both models, the hidden layer explores 10, 32, 64 and 128 nodes. The dropout rate has been tried as 0.01 and 0.5. The batch size explored is 50 and 100. The learning rate on the adam optimizer has been set to 0.01.</p>
+<p>Keras was used for the FFNN, this library uses cross-validation to find model accuracy. Before for the FFNN the train and validation sets were separated so that the model could be compared to the other classifiers. Since k-fold cross validation is performed from within keras, the train and validation sets can now be combined prior to hyperparameter tuning. The results from this tuning will aid in finding the best model.</p>
 </section>
 </section>
 <section id="results" class="level1">
@@ -308,37 +301,44 @@ y_i(h(x)^T\beta + \beta_0) \geq 1 - \zeta_n, \quad n = 1,2,...,N \\
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="report_files/figure-html/FFNN Lexical Fit-1.png" class="img-fluid figure-img" style="width:65.0%"></p>
+<figcaption class="figure-caption">In-sample Loss and accuracy for lexical feature space</figcaption>
 </figure>
 </div>
 </div>
 </div>
+<p>A similar observation can be made in the below figure.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="report_files/figure-html/FFNN Character Fit-1.png" class="img-fluid figure-img" style="width:65.0%"></p>
+<figcaption class="figure-caption">In-sample Loss and accuracy for character feature space</figcaption>
 </figure>
 </div>
 </div>
 </div>
+<p>This figure as mentioned above seems to have the best IS accuracy.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="report_files/figure-html/FFNN TFIDF Fit-1.png" class="img-fluid figure-img" style="width:50.0%"></p>
+<figcaption class="figure-caption">In-sample Loss and accuracy for TFIDF feature space</figcaption>
 </figure>
 </div>
 </div>
 </div>
+<p>Table 1 depicts the results of our analysis of different features over differently sized word bags. It is an analysis, that is capable of depicting the number of words necessary for the models and which models we can look to take forward and which data. We see that for both the NB and the SVM the missclassification is lowest when using character features at a bag size of 4500 features. The FFNN had the best (lowest) missclassification when tfidf is used. In order to find the model that performs best, both these two well performing feature sets will undergo hyperparameter tuning for NB, SVM and FFNN.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output cell-output-stdout">
-<pre><code>18/18 - 0s - loss: 2.7783 - accuracy: 0.5988 - 112ms/epoch - 6ms/step</code></pre>
+<pre><code>18/18 - 0s - loss: 2.8388 - accuracy: 0.6043 - 98ms/epoch - 5ms/step</code></pre>
 </div>
 <div class="cell-output-display">
 <table id="tab:Validation Results" class="huxtable table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>Table 1: Validation results depicting performance of differently specified data in each model for different word bags and TFIDF</caption>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Bag</td>
+<td data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;"></td>
 <td colspan="3" data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">NB</td>
 <td colspan="3" data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">SVM</td>
 <td colspan="3" data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">FFNN</td>
@@ -363,9 +363,9 @@ y_i(h(x)^T\beta + \beta_0) \geq 1 - \zeta_n, \quad n = 1,2,...,N \\
 <td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.473</td>
 <td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.523</td>
 <td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
-<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.511</td>
-<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.564</td>
-<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.53&nbsp;</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.577</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">500</td>
@@ -375,9 +375,9 @@ y_i(h(x)^T\beta + \beta_0) \geq 1 - \zeta_n, \quad n = 1,2,...,N \\
 <td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.455</td>
 <td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.486</td>
 <td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
-<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.457</td>
-<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.519</td>
-<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.451</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.527</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">2000</td>
@@ -387,9 +387,9 @@ y_i(h(x)^T\beta + \beta_0) \geq 1 - \zeta_n, \quad n = 1,2,...,N \\
 <td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.417</td>
 <td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.433</td>
 <td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
-<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.409</td>
-<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.446</td>
-<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.417</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.453</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">4500</td>
@@ -399,9 +399,9 @@ y_i(h(x)^T\beta + \beta_0) \geq 1 - \zeta_n, \quad n = 1,2,...,N \\
 <td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.613</td>
 <td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.419</td>
 <td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
-<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.399</td>
-<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.431</td>
-<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.387</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.44&nbsp;</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">All</td>
@@ -411,9 +411,9 @@ y_i(h(x)^T\beta + \beta_0) \geq 1 - \zeta_n, \quad n = 1,2,...,N \\
 <td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.62&nbsp;</td>
 <td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.64&nbsp;</td>
 <td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.698</td>
-<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.401</td>
-<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.382</td>
-<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.356</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.396</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.397</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0.4pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.36</td>
 </tr>
 </tbody>
 </table>
@@ -421,28 +421,172 @@ y_i(h(x)^T\beta + \beta_0) \geq 1 - \zeta_n, \quad n = 1,2,...,N \\
 
 </div>
 </div>
-
-<!-- Add a table of all the results -->
 </section>
 <section id="hyperparameter-tuning-results" class="level2">
 <h2 class="anchored" data-anchor-id="hyperparameter-tuning-results">Hyperparameter Tuning Results</h2>
-<!-- Perform hyperparameter tuning for svm and ffnn on final model -->
+<p>The Laplace smoothing produced no significant results. Laplace smoothing at parameters 0, 1 and 2 were tried. Each result yielded the same validation accuracy. This is because Laplace smoothing is used to smooth over unseen features; here the word bag has been created and all sets were included during, therefore all sets essentially have the same features present (<a href="">@Jurafsky2000SpeechAL</a>.</p>
+<p>The figure below depicts the validation missclassification across different levels of cost complexity in the SVM. Below we see that for the character features that the best model came about when the cost was 100. The final model for the SVM will have a cost of 100. The cost complexity of the TFIDF features did not change. This may indicate that this data set does not work with a radial kernal. However, for simplicity the two sets of features will have a dataset</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="report_files/figure-html/Cost Complexity-1.png" class="img-fluid figure-img" style="width:65.0%"></p>
+<figcaption class="figure-caption">Validation missclassification for both the character features and TFIDF features</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Earlier when looking for a good feature set, it was clear that 50 epochs was too many, so this will be set to 20 epochs.</p>
+<p>In Table 3 we see that the best hyperparameters for the model built off the character feature set are in fact the same as the default model described at the beginning of the paper. This table depicts the accuracy of the model, which is, <span class="math display">\[\text{accuracy} = 1 - \text{missclassification}.\]</span> So a high accuracy is good.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table id="tab:FFNN Hyper Results 1" class="huxtable table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>Table 2: Cross validated results depicting the best hyperparameters for the character feature set in a single layer FFNN</caption>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Loss</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Accuracy</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Nodes</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">BatchSize</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Learning Rate</td>
+</tr>
+<tr class="even">
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.0043</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.999</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">32</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">100</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.0045</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.999</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">10</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">50</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.01</td>
+</tr>
+<tr class="even">
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.0044</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.999</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">128</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">100</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.0046</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.999</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">64</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">100</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.01</td>
+</tr>
+<tr class="even">
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 0pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.0048</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 0pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.999</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 0pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">32</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 0pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">50</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 0pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.01</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<p>In Table 4 we see that the best hyperparameters for the model built off the TFIDF feature set are in fact the same as the default model described at the beginning of the paper, but with a dropout rate of 0.01 instead of 0.5.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table id="tab:FFNN Hyper Results 2" class="huxtable table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>Table 3: Cross validated results depicting the best hyperparameters for the TFIDF feature set in a single layer FFNN</caption>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Loss</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Accuracy</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Nodes</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">BatchSize</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Learning Rate</td>
+</tr>
+<tr class="even">
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.0085</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.998</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">32</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">100</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.0052</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.997</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">64</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">100</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.01</td>
+</tr>
+<tr class="even">
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.0057</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.997</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">64</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">50</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.0065</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.997</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">32</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">50</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.01</td>
+</tr>
+<tr class="even">
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 0pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.0073</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 0pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.997</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 0pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">128</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 0pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">100</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 0pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.01</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<p>From here on the NB, SVM, and the FFNN can be described under the same constraint for both feature sets.</p>
 </section>
 <section id="final-model" class="level2">
 <h2 class="anchored" data-anchor-id="final-model">Final Model</h2>
-<!-- Use test set on final models -->
+<p>For each model, we began by combining the training and validation data, then we can go ahead and train this new and final model. The</p>
+<p>Table 4 holds the out-of-sample missclassification rates of the final models. The results demonstrate that of the three classifiers observed, the FFNN performed the best over both feature sets. The FFNN obtained a missclassification rate of 0.401 (accuracy of 0.599) when 4500 of the most important character features were considered. It obtained a missclassification of 0.328 (accuracy of 0.672) when using a full feature set of TFIDF.</p>
+<p>Although, the TFIDF feature set trained in a neural network had the best result, it is still necessary to consider the character feature set. The character feaature set did not perform as well but was a lot more consistent over all classifiers. It’s shown to perform massively better under the NB and SVM classifiers over the TFIDF feature set.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<table id="tab:Test Results" class="huxtable table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>Table 4: Test set missclassification rate over each model and feature set</caption>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid double solid solid; border-width: 2pt 3pt 2pt 0pt; border-right-color: rgb(190, 190, 190); padding: 6pt 6pt 6pt 6pt; font-weight: bold;"></td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid double; border-width: 2pt 0pt 2pt 3pt; border-left-color: rgb(190, 190, 190); padding: 6pt 6pt 6pt 6pt; font-weight: bold;">NB</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">SVM</td>
+<td data-quarto-table-cell-role="th" style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: bold;">FFNN</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid double solid solid; border-width: 2pt 3pt 2pt 0pt; border-right-color: rgb(190, 190, 190); padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Character 4500</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid double; border-width: 2pt 0pt 2pt 3pt; border-left-color: rgb(190, 190, 190); padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.479</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.399</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 2pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.401</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th" style="text-align: left; vertical-align: top; white-space: normal; border-style: solid double solid solid; border-width: 2pt 3pt 0pt 0pt; border-right-color: rgb(190, 190, 190); padding: 6pt 6pt 6pt 6pt; font-weight: bold;">TFIDF</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid double; border-width: 2pt 0pt 0pt 3pt; border-left-color: rgb(190, 190, 190); padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.712</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 0pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.717</td>
+<td style="text-align: right; vertical-align: top; white-space: normal; border-style: solid solid solid solid; border-width: 2pt 0pt 0pt 0pt; padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.328</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
 </section>
 </section>
-<section id="discussion" class="level1">
-<h1>Discussion</h1>
-</section>
-<section id="limitations" class="level1">
-<h1>Limitations</h1>
-<p>A limitation that arises in this study is a lack of candidate authors, as well as minimal data provided for some authors. This is an issue that has been detailed in research before (<a href="">@Stylometry</a>).</p>
-<p>Perform a recuesive feature elimination (<span class="citation" data-cites="WordFreq">Škorić et al. (<a href="#ref-WordFreq" role="doc-biblioref">2022</a>)</span>) using the rfe function in the package provided by, <span class="citation" data-cites="Caret">Kuhn and Max (<a href="#ref-Caret" role="doc-biblioref">2008</a>)</span> .</p>
-</section>
-<section id="conclusion" class="level1">
-<h1>Conclusion</h1>
+<section id="discussion-and-conclusion" class="level1">
+<h1>Discussion and Conclusion</h1>
+<p>The study aimed to identify a classifier for attributing sentences to specific presidents. To do this, the study needed to define the most suitable feature space, considering lexical, character, and TF-IDF features as potential options. A limitation was encountered due to a scarcity of candidate authors and insufficient data for some of them, a concern addressed in previous research <a href="">@Stylometry</a>. Consequently, the two presidents with imbalanced data were excluded.</p>
+<p>Certainly, I can help improve the flow of the text. Here’s a more cohesive version:In certain scenarios, feature extraction can significantly enhance model performance. An insightful extension of this study could involve the application of recursive feature elimination (RFE) in conjunction with SVM, utilizing the rfe() function provided by the <a href="">@Caret</a> package (<a href="">@WordFreq</a>). This approach can help us pinpoint the best features across all feature types. Instead of RFE, we employed bags of words with varying word frequencies to construct new feature sets at each stage.From the array of options explored, two feature sets, specifically TFIDF and a character set containing 4500 features, emerged as the most suitable choices for the final models. Ultimately, the FFNN consistently performed well in comparison to the other two classifiers. However, it’s worth noting that TFIDF demonstrated a degree of inconsistency in its performance as a feature set. With this in mind I would suggest using FFNN in conjunction with a full TFIDF feature set as this had significantly better performance than all the other models present.</p>
 </section>
 <section id="bibliography" class="level1">
 
@@ -453,24 +597,6 @@ y_i(h(x)^T\beta + \beta_0) \geq 1 - \zeta_n, \quad n = 1,2,...,N \\
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">Bibliography</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
-<div id="ref-Durbach2023" class="csl-entry" role="listitem">
-Durbach, Ian. 2023. <span>“Bag-of-Words &amp; Tf-Idf Models.”</span> University of Cape Town; HTML file. 2023. <a href="https://05-textmining-03.html">05-textmining-03.html</a>.
-</div>
-<div id="ref-Hastie" class="csl-entry" role="listitem">
-Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2001. <span>“The Elements of Statistical Learning.”</span> <em>Aug, Springer</em> 1 (January). <a href="https://doi.org/10.1007/978-0-387-21606-5_7">https://doi.org/10.1007/978-0-387-21606-5_7</a>.
-</div>
-<div id="ref-Caret" class="csl-entry" role="listitem">
-Kuhn, and Max. 2008. <span>“Building Predictive Models in r Using the Caret Package.”</span> <em>Journal of Statistical Software</em> 28 (5): 1–26. <a href="https://doi.org/10.18637/jss.v028.i05">https://doi.org/10.18637/jss.v028.i05</a>.
-</div>
-<div id="ref-e1071" class="csl-entry" role="listitem">
-Meyer, David, Evgenia Dimitriadou, Kurt Hornik, Andreas Weingessel, and Friedrich Leisch. 2023. <em>E1071: Misc Functions of the Department of Statistics, Probability Theory Group (Formerly: E1071), TU Wien</em>. <a href="https://CRAN.R-project.org/package=e1071">https://CRAN.R-project.org/package=e1071</a>.
-</div>
-<div id="ref-Et2" class="csl-entry" role="listitem">
-Pienaar, E. 2023. <span>“Support Vector Machines.”</span> University of Cape Town.
-</div>
-<div id="ref-WordFreq" class="csl-entry" role="listitem">
-Škorić, Mihailo, Ranka Stanković, Milica Ikonić Nešić, Joanna Byszuk, and Maciej Eder. 2022. <span>“Parallel Stylometric Document Embeddings with Deep Learning Based Language Models in Literary Authorship Attribution.”</span> <em>Mathematics</em> 10 (5). <a href="https://doi.org/10.3390/math10050838">https://doi.org/10.3390/math10050838</a>.
-</div>
 <div id="ref-LexVsChar" class="csl-entry" role="listitem">
 Stamatatos, Efstathios. 2008. <span>“Author Identification: Using Text Sampling to Handle the Class Imbalance Problem.”</span> <em>Information Processing &amp; Management</em> 44 (March): 790–99. <a href="https://doi.org/10.1016/j.ipm.2007.05.012">https://doi.org/10.1016/j.ipm.2007.05.012</a>.
 </div>
