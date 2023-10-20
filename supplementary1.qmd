@@ -144,42 +144,6 @@ Let's train the data on a sample of 1200 sentences for each president and see ho
 ```{r Oversample Split}
 table(sentences$president)
 
-# Let's say each president has 70 sentences (that's close to 1000 words each.)
-# for each president, I would advise removing their first sentence as it appears in all statements in some way.
-
-# train <- sentences %>%
-#   filter(!president %in% c("deKlerk", "Motlanthe")) %>%
-#   group_by(president) %>%
-#   sample_n(size = 1200) %>%
-#   ungroup() %>%
-#   rename( token = speech )
-# 
-# train2 <- as.data.frame(sentences) %>%
-#   filter(president %in% c("deKlerk", "Motlanthe")) %>%
-#   group_by(president) %>%
-#   slice_sample( prop = 0.8 ) %>%
-#   sample_n(size = 1200, replace = T) %>%
-#   ungroup() %>%
-#   rename( token = speech )
-
-# train <- as.data.frame(sentences) %>%
-#   group_by(president) %>%
-#   slice_sample( prop = 0.8 ) %>%
-#   sample_n(size = 1200, replace = T) %>%
-#   ungroup() %>%
-#   rename( token = speech )
-
-
-# train <- bind_rows(train1, train2) %>%
-#   mutate(ids = row_number())
-
-# table(train$president)
-# 
-# test <- sentences %>%
-#   unnest_sentences(token, speech) %>%
-#   anti_join(train, join_by(token)) %>%
-#   mutate(ids = row_number())
-
 over1 <- sentences %>%
   filter(president %in% c("deKlerk", "Motlanthe")) %>%
   group_by(president) %>%
@@ -327,22 +291,22 @@ suppressWarnings(Data_test_corpus <- Corpus(VectorSource(Data_test$speech)))
 suppressWarnings(Data_train_corpus <- Corpus(VectorSource(Data_train$speech)))
 
 # #Corpus Cleaning
-# suppressWarnings(Data_test_corpus_clean <- tm_map(Data_test_corpus, tolower))
-# suppressWarnings(Data_train_corpus_clean <- tm_map(Data_train_corpus, tolower))
-# 
-# suppressWarnings(Data_test_corpus_clean <- tm_map(Data_test_corpus_clean, removeNumbers))
-# suppressWarnings(Data_train_corpus_clean <- tm_map(Data_train_corpus_clean, removeNumbers))
-# 
-# suppressWarnings(Data_test_corpus_clean <- tm_map(Data_test_corpus_clean, removeWords, stopwords()))
-# suppressWarnings(Data_train_corpus_clean <- tm_map(Data_train_corpus_clean, removeWords, stopwords()))
-# 
-# suppressWarnings(Data_test_corpus_clean <- tm_map(Data_test_corpus_clean, removePunctuation))
-# suppressWarnings(Data_train_corpus_clean <- tm_map(Data_train_corpus_clean, removePunctuation))
-# 
-# suppressWarnings(Data_test_corpus_clean <- tm_map(Data_test_corpus_clean, stripWhitespace))
-# suppressWarnings(Data_train_corpus_clean <- tm_map(Data_train_corpus_clean, stripWhitespace))
-# 
-# suppressWarnings(inspect(Data_train_corpus_clean[1]))
+suppressWarnings(Data_test_corpus_clean <- tm_map(Data_test_corpus, tolower))
+suppressWarnings(Data_train_corpus_clean <- tm_map(Data_train_corpus, tolower))
+
+suppressWarnings(Data_test_corpus_clean <- tm_map(Data_test_corpus_clean, removeNumbers))
+suppressWarnings(Data_train_corpus_clean <- tm_map(Data_train_corpus_clean, removeNumbers))
+
+suppressWarnings(Data_test_corpus_clean <- tm_map(Data_test_corpus_clean, removeWords, stopwords()))
+suppressWarnings(Data_train_corpus_clean <- tm_map(Data_train_corpus_clean, removeWords, stopwords()))
+
+suppressWarnings(Data_test_corpus_clean <- tm_map(Data_test_corpus_clean, removePunctuation))
+suppressWarnings(Data_train_corpus_clean <- tm_map(Data_train_corpus_clean, removePunctuation))
+
+suppressWarnings(Data_test_corpus_clean <- tm_map(Data_test_corpus_clean, stripWhitespace))
+suppressWarnings(Data_train_corpus_clean <- tm_map(Data_train_corpus_clean, stripWhitespace))
+
+suppressWarnings(inspect(Data_train_corpus_clean[1]))
 
 # Here all we've done is change train and test to another data type and removed labelling
 ```
@@ -454,25 +418,6 @@ CrossTable(data_val_pred, unlist(Data_train$president[-samp]),
 ```
 
 
-```{r}
-1 - (202 +140 + 102 + 257 + 137 + 136) / 1200 # Normalization when calculating tfidf (Insample)
-1 - (207 + 124 + 98 + 168 + 126 + 130) / 1200 # No normalization when calculating tfidf (Insample)
-
-
-# No laplace
-1 - (15 + 475 + 512 + 14 + 662 + 799) / 4800
-
-# Laplace = 1
-1 - (11 + 504 + 539 + 11 + 684 + 881) / 4800
-
-# Laplace = 2
-1 - (15 + 486 + 473 + 11 + 662 + 884) / 4800
-
-# Laplace = 3
-1 - (15 + 478 + 412 + 10 + 645 + 892) / 4800
-# Starts to dip from here on
-```
-
 ## Proportional Sampling
 
 This would entail obtaining an 80% sample from each presidents total number of speeches. Again the problem with this approach is the underrepresentation of statements made by presidents deKlerk and Motlanthe. Over this I would suggest removing these two presidents from the entire study, as they would be rare cases.
@@ -518,176 +463,4 @@ test <- sentences %>%
   anti_join(train, join_by(token)) %>%
   mutate(ids = row_number())
 
-```
-
-
-```{r}
-Data_train <- train
-Data_test <- test
-
-library(tm)
-
-#Creating Corpus
-  # What this does is essentially save a list of lists of all the information
-suppressWarnings(Data_test_corpus <- Corpus(VectorSource(Data_test$token)))
-suppressWarnings(Data_train_corpus <- Corpus(VectorSource(Data_train$token)))
-
-#Corpus Cleaning
-suppressWarnings(Data_test_corpus_clean <- tm_map(Data_test_corpus, tolower))
-suppressWarnings(Data_train_corpus_clean <- tm_map(Data_train_corpus, tolower))
-
-suppressWarnings(Data_test_corpus_clean <- tm_map(Data_test_corpus_clean, removeNumbers))
-suppressWarnings(Data_train_corpus_clean <- tm_map(Data_train_corpus_clean, removeNumbers))
-
-suppressWarnings(Data_test_corpus_clean <- tm_map(Data_test_corpus_clean, removeWords, stopwords()))
-suppressWarnings(Data_train_corpus_clean <- tm_map(Data_train_corpus_clean, removeWords, stopwords()))
-
-suppressWarnings(Data_test_corpus_clean <- tm_map(Data_test_corpus_clean, removePunctuation))
-suppressWarnings(Data_train_corpus_clean <- tm_map(Data_train_corpus_clean, removePunctuation))
-
-suppressWarnings(Data_test_corpus_clean <- tm_map(Data_test_corpus_clean, stripWhitespace))
-suppressWarnings(Data_train_corpus_clean <- tm_map(Data_train_corpus_clean, stripWhitespace))
-
-suppressWarnings(inspect(Data_train_corpus_clean[1]))
-
-# Here all we've done is change train and test to another data type and removed labelling
-```
-
-```{r}
-cntrl=list(weighting = weightTfIdf)#,
-             #removeNumbers=TRUE,
-             #removeStopwords=TRUE,
-             #removePunctuation=TRUE,
-             #stopwords = T)
-
-train_dtm <- DocumentTermMatrix(Data_train_corpus_clean,
-                                control = cntrl)
-train_dtm <- removeSparseTerms(train_dtm,  0.95)
-
-test_dtm <- DocumentTermMatrix(Data_test_corpus_clean,
-                               control = cntrl)
-test_dtm <- removeSparseTerms(test_dtm, 0.97)
-
-inspect(test_dtm)
-inspect(train_dtm)
-```
-
-The results of modelling with exclusion of the other two are actually still not great. Much worse when the code block below is not commented out even. We get insample of 0.6 missclassification if the below is uncommented and get insample of 0.2 missclassification if the oversampled one is uncommented.
-
-```{r}
-#### Preparing Training and Testing Datasets #####
-### Creating Indicator features for frequent words ###             But why does this work?????????????????
-
-# FreqWords <- findFreqTerms(train_dtm, 5)
-# 
-# #Saving List using Dictionary() Function
-# Dictionary <- function(x) {
-#         if( is.character(x) ) {
-#                 return (x)
-#         }
-#         stop('x is not a character vector')
-# }
-# 
-# data_dict <- Dictionary(findFreqTerms(train_dtm, 5))
-# 
-# #Appending Document Term Matrix to Train and Test Dataset
-# data_train <- DocumentTermMatrix(Data_train_corpus_clean, list(data_dict))
-# data_test <- DocumentTermMatrix(Data_test_corpus_clean, list(data_dict))
-# 
-# #Converting the frequency of word to count
-# convert_counts <- function(x) {
-#         x <- ifelse(x > 0, 1, 0)
-#         x <- factor(x, levels = c(0, 1), labels = c("No", "Yes"))
-#         return(x)
-# }
-# 
-# #Appending count function to Train and Test Dataset
-# data_train <- apply(data_train, MARGIN = 2, convert_counts)
-# data_test <- apply(data_test, MARGIN = 2, convert_counts)
-```
-
-```{r}
-data_train <- as.matrix(train_dtm)
-
-samp <- sample(1:nrow(data_train), size = 6000)
-
-data_test <- as.matrix(test_dtm)
-
-library(e1071)
-data_classifier <- naiveBayes(data_train[samp,], Data_train$president[samp], laplace = 0)
-
-library(gmodels)
-data_val_pred <- predict(data_classifier, data_train[-samp,] )
-CrossTable(data_val_pred, Data_train$president[-samp],
-          prop.chisq = FALSE, prop.t = FALSE,
-          dnn = c('predicted', 'actual'))
-#data_test_pred <- predict(data_classifier, data_test)
-#CrossTable(data_test_pred, Data_test$president,
-#           prop.chisq = FALSE, prop.t = FALSE,
-#           dnn = c('predicted', 'actual'))
-
-
-(tab1 <- table(data_val_pred, Data_train$president[-samp]))
-sum(diag(tab1))/1200  # When findFreqTerms(x) then this is 0.72
-```
-
-
-
-
-######### Something extra
-```{r}
-tt <- over %>%
-  unnest_tokens(word, speech) %>%
-  select(president, word, ids)
-
-word_bag <- tt %>%
-  group_by(word) %>%
-  count() %>%
-  ungroup() %>%
-  #top_n(200, wt = n) %>%
-  select(-n)
-
-tweets_tdf <- tt %>%
-  #inner_join(word_bag) %>%
-  group_by(ids,word) %>%
-  count() %>%  
-  group_by(ids) %>%
-  mutate(total = sum(n)) %>%
-  ungroup()
-
-tweets_tdf <- tweets_tdf %>% #remove the old ones we worked out
-  bind_tf_idf(word, ids, n) %>%
-  group_by(word) %>%
-  top_n(200, tf_idf)
-
-
-tfidf <- tweets_tdf %>% 
-  select(ids, word, tf_idf) %>%  # note the change, using tf-idf
-  pivot_wider(names_from = word, values_from = tf_idf, values_fill = 0)# %>%  
-#  left_join(sentences %>% select(ids, president))
-
-tfidf <- over %>%
-  select(ids, president) %>%
-  rename (Response_President = president) %>%
-  left_join(tfidf, by = "ids")%>%
-  select(-ids)
-
-
-train <- tfidf %>%
-  group_by(Response_President) %>%
-  slice_sample( prop = 0.8 ) %>%
-  ungroup()
-
-
-# train <- bind_rows(train1, train2) %>%
-#   mutate(ids = row_number())
-
-table(train$president)
-
-model <- naive_bayes(Response_President ~., data = train, usekernal = T)
-
-p1 <- predict(model, train[,-1])
-(tab1 <- table(train$Response_President, p1))
-
-plot(model)
 ```
