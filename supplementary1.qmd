@@ -310,50 +310,6 @@ tri_tf_idf %>%
   labs(x = "Count", y = NULL)
 ```
 
-
-```{r Quick analysis to compare uni and bi using random forests}
-require(naivebayes)
-tt <- sentences %>%
-  unnest_tokens(token, speech) %>%
-  count(president, token) %>%
-  ungroup() %>%
-  bind_tf_idf(token, president, n)
-#  top_n(200, wt = tf_idf)
-  
-
-trainer <- uni_tf_idf %>%
-  group_by(president)%>%
-  top_n(200, wt = tf_idf) %>%
-  ungroup %>%
-  select(ids, token, tf_idf) %>%
-  pivot_wider(names_from = token, values_from = tf_idf, values_fill = 0)
-
-trainer <- uni_tf_idf %>%
-  select(ids, president) %>%
-  rename (Response_President = president) %>%
-  left_join(trainer, by = "ids")%>%
-  select(-ids)
-
-model <- naive_bayes(Response_President ~., data = trainer, usekernal = T)
-model <- rpart(Response_President ~ ., method="class", data = trainer[samp,], control =rpart.control(minsplit =1, cp=0))
-
-
-plot(model)
-text(model, use.n = TRUE, all = TRUE, cex=.8)
-val <- trainer[-samp,]
-
-p1 <- predict(model, trainer[,-1])
-(tab1 <- table(trainer$Response_President, p1))
-```
-
-```{r}
-
-```
-
-
-
-
-
 ```{r}
 
 train <- over.train %>%
@@ -516,80 +472,6 @@ CrossTable(data_val_pred, unlist(Data_train$president[-samp]),
 1 - (15 + 478 + 412 + 10 + 645 + 892) / 4800
 # Starts to dip from here on
 ```
-
-
-```{r XGB}
-require(caret)
-require(xgboost)
-# library(doParallel)
-# library(parallel)
-xgb_grid <- expand.grid(nrounds = 500,                   #B - number of trees
-                        max_depth = 6,               #d - interaction depth
-                        eta = 0.01,                           #lambda - learning rate
-                        gamma = 0.1,                        #mindev
-                        colsample_bytree = 1,                #proportion random features per tree
-                        min_child_weight = 6, #also controls tree depth
-                        subsample = 1               #bootstrap proportion
-  )
-  
-  # # Parallelization
- # no_cores <- 10
- # cl <- makePSOCKcluster(no_cores)
- # registerDoParallel(cl)
-  
-  # Set Control
-xgb_cntrl <-  trainControl(method = 'cv', number = 5, verboseIter = T)#, allowParallel = T)
-dat <- data.frame(president = Data_train$president, data_train)[samp[1:1000],]
-
-a <- apply(data_train, 2, as.factor)
-
-xgb <- train(president ~.,
-             data = dat,
-             method = 'xgbTree',
-             trControl = xgb_cntrl,
-             verbose = TRUE,
-             tuneGrid = xgb_grid)
-
- # stopCluster(cl)
- # registerDoSEQ()
-
-
-  
-xgb$results
-
-
-
-
-
-rf_grid <- expand.grid(.mtry = 20,
-                         .min.node.size = 5,
-                         .splitrule = "gini")
-# Set Control
-rf_cntrl <- trainControl(method = 'cv', number = 5, verboseIter = T)
-
-rf <- train(president ~.,
-            data = dat,
-            method = 'ranger',
-            trControl = rf_cntrl,
-            tuneGrid = rf_grid,
-            num.trees = 250,
-            importance = "impurity")
-      
-```
-
-
-```{r Test}
-data_test_pred <- predict(data_classifier, data_test)
-CrossTable(data_test_pred, Data_test$president,
-          prop.chisq = FALSE, prop.t = FALSE,
-          dnn = c('predicted', 'actual'))
-
-(tab1 <- table(data_test_pred, Data_test$president))
-sum(diag(tab1))/4800
-```
-
-
-
 
 ## Proportional Sampling
 
