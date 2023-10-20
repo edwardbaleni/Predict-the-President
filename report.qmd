@@ -48,14 +48,6 @@ sys.source("sona-first-steps.R" , envir = knitr::knit_global())
 sona <- as_tibble(sona)
 ```
 
-## EDA
-
-<!-- a  great  variety  ofmeasures, including sentence length, word length, word fre-quencies,  character  frequencies,  and  vocabulary  richness -->
-
-<!-- vocabulary richnessfunctions are attempts to quan-tify the diversity of the vocabulary of a tex -->
-
-<!-- Perform a quick EDA to explain the data and a quick rationale for removing the outliers -->
-
 ## Pre-Processing
 
 After obtaining the data, the first line of each speech is removed. This first line is the date the address is held. The data is then tokenized by sentence. Only sentences with over two words remained for the rest of the analysis. The reason this is done is because the sentences with less than 3 words seemed to either either be made up of digits or unfinished words, most of the time.
@@ -450,7 +442,7 @@ Inverse document term frequency downweights terms that are frequent in a collect
 
 $$\text{idf(term t)} = \text{ln}\left(\frac{\text{Number of documents in corpus}}{\text{Number of documents containing term t}}\right).$$
 
-TF-IDF is the multiplication of the two metrics ([\@TextMining](), @Durbach2023 ). TF-IDF measures the importance of a word to a document in a collection. In this analysis this has been done by considering one document to be a sentence. Following this intuition, the quantities above can be calculated.
+TF-IDF is the multiplication of the two metrics ([\@TextMining](), [\@Durbach2023]() ). TF-IDF measures the importance of a word to a document in a collection. In this analysis this has been done by considering one document to be a sentence. Following this intuition, the quantities above can be calculated.
 
 Since TF-IDF determines what features are important to which document, this can be seen as a topic-based classification, as function words and commonly occurring tokens among the documents will be downweighted resulting in semantic features being strongly weighted. For TF-IDF, all tokens were kept, because some of the highly weighted scores may only appear once in a document and as a result may act as quite a poor classifier out-of-sample, and so it is necessary to leave all possible tokens.
 
@@ -699,7 +691,7 @@ y_i(h(x)^T\beta + \beta_0) \geq 1 - \zeta_n, \quad n = 1,2,...,N \\
 \zeta_n \geq 0, \quad\quad n = 1,2,...,N
 $$
 
-this is a convex optimisation problem (@Hastie, @Et2 ) . For multiclass problems the package provided by @e1071 uses a one-versus-one approach. This will fit all pairwise classifiers and use a voting system to pick the best ones.
+this is a convex optimisation problem ([\@Hastie](), [\@Et2]() ) . For multiclass problems the package provided by [\@e1071]() uses a one-versus-one approach. This will fit all pairwise classifiers and use a voting system to pick the best ones.
 
 A base model has been used to explore our data, hyperparameter tuning is used to regularize the model, by using cost constraint, $C$. This constraint allows us to specify the cost of the violation to the margin. A small cost indicates a large margin, meaning many support vectors will fall on or within the margin. A large cost indicates a narrow margin, indicating much less support vectors on the margin or violating it. The cost was tested at values: 0.1, 1, 10, 50, 100 and 1000
 
@@ -1228,9 +1220,7 @@ runs1.2 <- runs2[1:5,c(2,3,4, 6, 13)]
 colnames(runs1.2) <- colnames(runs1.1) <- c("Loss", "Accuracy", "Nodes", "BatchSize", "Learning Rate")
 ```
 
-In Table 3 we see that the best hyperparameters for the model built off the character feature set are in fact the same as the default model described at the beginning of the paper. This table depicts the accuracy of the model, which is,
-$$\text{accuracy} = 1 - \text{missclassification}.$$
-So a high accuracy is good.
+In Table 3 we see that the best hyperparameters for the model built off the character feature set are in fact the same as the default model described at the beginning of the paper. This table depicts the accuracy of the model, which is, $$\text{accuracy} = 1 - \text{missclassification}.$$ So a high accuracy is good.
 
 ```{r FFNN Hyper Results 1}
 as_hux(runs1.1) %>%
@@ -1239,6 +1229,7 @@ as_hux(runs1.1) %>%
   style_headers(bold = T) %>% 
   set_caption("Table 2: Cross validated results depicting the best hyperparameters for the character feature set in a single layer FFNN")
 ```
+
 In Table 4 we see that the best hyperparameters for the model built off the TFIDF feature set are in fact the same as the default model described at the beginning of the paper, but with a dropout rate of 0.01 instead of 0.5.
 
 ```{r FFNN Hyper Results 2}
@@ -1248,18 +1239,18 @@ as_hux(runs1.2) %>%
   style_headers(bold = T) %>% 
   set_caption("Table 3: Cross validated results depicting the best hyperparameters for the TFIDF feature set in a single layer FFNN")
 ```
-From here on the NB, SVM, and the FFNN can be described under the same constraint for both feature sets. 
+
+From here on the NB, SVM, and the FFNN can be described under the same constraint for both feature sets.
 
 ## Final Model
 
-For each model, we began by combining the training and validation data, then we can go ahead and train this new and final model. The 
+For each model, we began by combining the training and validation data, then we can go ahead and train this new and final model. The
 
 ```{r Combine data}
 # Combine data
 train.set.char.4 <- rbind(train.set.char.4, val.set.char.4)
 train.set.tfidf  <- rbind(train.set.tfidf, val.set.tfidf)
 ```
-
 
 ```{r Naive Test}
 # naive.char.test.classifier <- naiveBayes(train.set.char.4[,-1], train.set.char.4[,1])
@@ -1274,15 +1265,15 @@ train.set.tfidf  <- rbind(train.set.tfidf, val.set.tfidf)
 ```
 
 ```{r SVM Test}
-svm.char.test.classifier <- svm(train.set.char.4[,-1], train.set.char.4[,1], type = "C-classification", scale = T, cost = 100)
-svm.char.test.p          <- predict(svm.char.test.classifier, test.set.char.4[,-1])
-svm.char.test.t          <- table((svm.char.test.p), (unlist(test.set.char.4[,1])))
-test.s.1                   <- 1 - sum(diag(svm.char.test.t))/ sum(svm.char.test.t)
-
-svm.tfidf.test.classifier <- svm(train.set.tfidf[,-1], train.set.tfidf[,1], type = "C-classification", scale = F, cost = 100)
-svm.tfidf.test.p         <- predict(svm.tfidf.test.classifier, test.set.tfidf[,-1])
-svm.tfidf.test.t         <- table((svm.tfidf.test.p), (unlist(test.set.tfidf[,1])))
-test.s.2                   <- 1 - sum(diag(svm.tfidf.test.t))/ sum(svm.tfidf.test.t)
+# svm.char.test.classifier <- svm(train.set.char.4[,-1], train.set.char.4[,1], type = "C-classification", scale = T, cost = 100)
+# svm.char.test.p          <- predict(svm.char.test.classifier, test.set.char.4[,-1])
+# svm.char.test.t          <- table((svm.char.test.p), (unlist(test.set.char.4[,1])))
+# test.s.1                   <- 1 - sum(diag(svm.char.test.t))/ sum(svm.char.test.t)
+# 
+# svm.tfidf.test.classifier <- svm(train.set.tfidf[,-1], train.set.tfidf[,1], type = "C-classification", scale = F, cost = 100)
+# svm.tfidf.test.p         <- predict(svm.tfidf.test.classifier, test.set.tfidf[,-1])
+# svm.tfidf.test.t         <- table((svm.tfidf.test.p), (unlist(test.set.tfidf[,1])))
+# test.s.2                   <- 1 - sum(diag(svm.tfidf.test.t))/ sum(svm.tfidf.test.t)
 ```
 
 ```{r FFNN Tet}
@@ -1348,7 +1339,7 @@ test.s.2                   <- 1 - sum(diag(svm.tfidf.test.t))/ sum(svm.tfidf.tes
 # test.f.2 <- 1 - (model2 %>% evaluate(x.test.tfidf, y.test.tfidf, batch_size=100, verbose = 0))[2]
 ```
 
-Table 4 holds the out-of-sample missclassification rates of the final models. The results demonstrate that of the three classifiers observed, the FFNN performed the best over both feature sets. The FFNN obtained a missclassification rate of 0.401 (accuracy of 0.599) when 4500 of the most important character features were considered. It obtained a missclassification of 0.328 (accuracy of 0.672) when using a full feature set of TFIDF. 
+Table 4 holds the out-of-sample missclassification rates of the final models. The results demonstrate that of the three classifiers observed, the FFNN performed the best over both feature sets. The FFNN obtained a missclassification rate of 0.401 (accuracy of 0.599) when 4500 of the most important character features were considered. It obtained a missclassification of 0.328 (accuracy of 0.672) when using a full feature set of TFIDF.
 
 Although, the TFIDF feature set trained in a neural network had the best result, it is still necessary to consider the character feature set. The character feaature set did not perform as well but was a lot more consistent over all classifiers. It's shown to perform massively better under the NB and SVM classifiers over the TFIDF feature set.
 
@@ -1371,13 +1362,11 @@ as_hux(tests) %>%
   set_caption("Table 4: Test set missclassification rate over each model and feature set")
 ```
 
-# Limitations
-
-A limitation that arises in this study is a lack of candidate authors, as well as minimal data provided for some authors. This is an issue that has been detailed in research before ([\@Stylometry]()).
-
-Perform a recuesive feature elimination ([\@WordFreq]()) using the rfe function in the package provided by, ([\@Caret]()) .
-
 # Discussion and Conclusion
+
+The study aimed to identify a classifier for attributing sentences to specific presidents. To do this, the study needed to define the most suitable feature space, considering lexical, character, and TF-IDF features as potential options. A limitation was encountered due to a scarcity of candidate authors and insufficient data for some of them, a concern addressed in previous research [\@Stylometry](). Consequently, the two presidents with imbalanced data were excluded.
+
+Certainly, I can help improve the flow of the text. Here's a more cohesive version:In certain scenarios, feature extraction can significantly enhance model performance. An insightful extension of this study could involve the application of recursive feature elimination (RFE) in conjunction with SVM, utilizing the rfe() function provided by the [\@Caret]() package ([\@WordFreq]()). This approach can help us pinpoint the best features across all feature types. Instead of RFE, we employed bags of words with varying word frequencies to construct new feature sets at each stage.From the array of options explored, two feature sets, specifically TFIDF and a character set containing 4500 features, emerged as the most suitable choices for the final models. Ultimately, the FFNN consistently performed well in comparison to the other two classifiers. However, it's worth noting that TFIDF demonstrated a degree of inconsistency in its performance as a feature set. With this in mind I would suggest using FFNN in conjunction with a full TFIDF feature set as this had significantly better performance than all the other models present.
 
 # Bibliography
 
