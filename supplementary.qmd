@@ -71,7 +71,7 @@ This supplementary serves as grounds on which most of the final decisions were b
 
 ## Stylometric Features
 
-The first task is to select the stylometric features. This is deciding how one may choose to represent text. This can either be done by tokenizing by words (lexical features), a number of characters (character features), or in other more sophisticated ways like syntatic features or semantic features. In this study, only lexical features and character features are explored, while the other two require more domain knowledge to properly quantify ([\@Stylometry]()). Another point to address is the usage of token count or TF-IDF weightings, as observations for the study. This initial exploration will be done with frequency, as this is a very stable way in conducting author attribution ([\@WordFreq]()). For each experiment, a Naive Bayes classifier (NB) and a Support Vector Machine (SVM) will be used to inform decisions.
+The first task is to select the stylometric features. This is deciding how one may choose to represent text. This can either be done by tokenizing by words (lexical features), a number of characters (character features), or in other more sophisticated ways like syntatic features or semantic features. In this study, only lexical features and character features are explored, while the other two require more domain knowledge to properly quantify ([@Stylometry]()). Another point to address is the usage of token count or TF-IDF weightings, as observations for the study. This initial exploration will be done with frequency, as this is a very stable way in conducting author attribution ([@WordFreq]()). For each experiment, a Naive Bayes classifier (NB) and a Support Vector Machine (SVM) will be used to inform decisions.
 
 ### Lexical Features
 
@@ -390,8 +390,7 @@ The first task is to select the stylometric features. This is deciding how one m
 # results[[10]] <- 1 - sum(diag(tt))/ sum(tt)
 ```
 
-
-When it comes to lexical features, these can be classed into N-grams. A collection of N contiguous words. The greater N is, the more complex the representation of the feature. It often doesn't show better results and the greater the N the higher the dimensionality of the problem, which will ultimately increase sparsity in the dataset, making it more difficult to classify ([\@Ngrams](), [\@WordFreq]()). To that extent, only unigrams and bigrams will be explored. Often it would seem that unigrams are sufficient amongst the three. It is however, interesting to observe the behaviour of n-grams [\@Tiffani2020OptimizationON]().
+When it comes to lexical features, these can be classed into N-grams. A collection of N contiguous words. The greater N is, the more complex the representation of the feature. It often doesn't show better results and the greater the N the higher the dimensionality of the problem, which will ultimately increase sparsity in the dataset, making it more difficult to classify ([@Ngrams](), [@WordFreq]()). To that extent, only unigrams and bigrams will be explored. Often it would seem that unigrams are sufficient amongst the three. It is however, interesting to observe the behaviour of n-grams [@Tiffani2020OptimizationON]().
 
 For the training, validation and test splits, it would be wise to select sample sizes by sentence and not by word, this will represent each row in the bag of words.
 
@@ -414,11 +413,12 @@ as_hux(tab) %>%
 
 What we see above is that for a word bag of 200 most frequent content words (No Function) that the bigram does indeed perform worse. It is essential that we observe whether allowing functional words will improve the statement made earlier, that this is more directed towards style-based classification. First let's look into whether using functional words will be useful to the analysis. Here we see that this is indeed more of style-based classification than a topic-based classification, this is shown in how the missclassification in general does decrease in both cases of of the bigram and unigram as we allow functional words into the analysis as seen in Table A. At this stage, I would suggest using unigrams and not using stop words for the analysis.
 
-However, since this is now a style-based classification task, using character features has in previous works been shown to capture style, lexical information and some contextual information. It is also able use punctuation and capitalization to infer stylistic approaches ([\@Stylometry]()).
+However, since this is now a style-based classification task, using character features has in previous works been shown to capture style, lexical information and some contextual information. It is also able use punctuation and capitalization to infer stylistic approaches ([@Stylometry]()).
 
 ### Character Features
 
 <!-- Character features -->
+
 ```{r 3 Characters}
 # uni <- data_count %>%
 #   unnest_character_shingles(token, speech, n = 3) 
@@ -624,6 +624,7 @@ However, since this is now a style-based classification task, using character fe
 ```
 
 <!-- Character features with punctuation -->
+
 ```{r Including Punctuation}
 # sentences <- sona %>%
 #   unnest_sentences(speech, speech, strip_punct = F) #%>%
@@ -681,6 +682,7 @@ However, since this is now a style-based classification task, using character fe
 ```
 
 <!-- For nchar = 4, when bag size = 4500, naive bayes = 0.47 and svm = 0.58 -->
+
 ```{r 4 Char Test Bigger Bag No Punc}
 # train.set    <- bag.of.words.bi[bag.of.words.bi$ids_ %in% train, -1]
 # val.set      <- bag.of.words.bi[bag.of.words.bi$ids_ %in% val, -1]
@@ -704,8 +706,8 @@ However, since this is now a style-based classification task, using character fe
 
 <!-- Without spaces: naive = 0.47 svm = 0.42 -->
 
-
 <!-- Character features with punctuation and capitalization -->
+
 ```{r Including Case}
 # sentences <- sona %>%
 #   unnest_sentences(speech, speech, to_lower = F, strip_punct = F)
@@ -802,8 +804,7 @@ as_hux(tab2) %>%
   set_caption("Table B: Validation set missclassification rate on NB and SVM models with word bag sizes of 200 and 2500 for different character n-grams")
 ```
 
-
-At this stage we can see that the classification is not that much different from a unigram, however, points of which to consider, is that when using character features certain items become necessary and deserve exploration: the number of characters, the size of the word bag, the inclusion of punctuation. The number of characters have been chosen to be either 3 or 4, which is consistent with the study ([\@Stylometry]()). The size of the bag and the inclusion of punctuation are two points which need to be further explored. The missclassification has decreased from when the word bag contained 200 words.
+At this stage we can see that the classification is not that much different from a unigram, however, points of which to consider, is that when using character features certain items become necessary and deserve exploration: the number of characters, the size of the word bag, the inclusion of punctuation. The number of characters have been chosen to be either 3 or 4, which is consistent with the study ([@Stylometry]()). The size of the bag and the inclusion of punctuation are two points which need to be further explored. The missclassification has decreased from when the word bag contained 200 words.
 
 ```{r Table 2_2}
 tab3 <- data.frame(Name = c("4 Char N-Gram NB", "4 Char N-Gram SVM"), rbind(resultsChar[[9]], resultsChar[[10]]), rbind(resultsChar[[11]], resultsChar[[12]]))
@@ -821,13 +822,11 @@ as_hux(tab3) %>%
   set_caption("Table C: Validation set missclassification rate on NB and SVM models with word bag size of 4500 for a 4 character n-gram with punctuation")
 ```
 
-
-A word bag of 2000, 2500, 3000, 4000, 4500 and 5000 were looked at, these tests will not be shown, but can be replicated. The best performing model came out to be with a bag size of 4500 of the configurations tried. We clearly see here that there is an improvement when punctuation is included. We see here that if the capitalization is maintained we get the best performing SVM, and a decently performing NB, with a missclassification of 0.4 for the SVM. 
+A word bag of 2000, 2500, 3000, 4000, 4500 and 5000 were looked at, these tests will not be shown, but can be replicated. The best performing model came out to be with a bag size of 4500 of the configurations tried. We clearly see here that there is an improvement when punctuation is included. We see here that if the capitalization is maintained we get the best performing SVM, and a decently performing NB, with a missclassification of 0.4 for the SVM.
 
 ### TF-IDF
 
 <!-- https://www.researchgate.net/publication/270761963_Improving_Native_Language_Identification_with_TF-IDF_Weighting -->
-
 
 ```{r TFIDF Clean}
 # data <- cleaned.sentences %>%
@@ -974,7 +973,5 @@ as_hux(tab4) %>%
   set_right_border(everywhere, 1, brdr(3, "double", "grey")) %>%
   set_caption("Table D: Validation set missclassification rate on NB and SVM models with word bag size of 4500 for a 4 character n-gram with punctuation")
 ```
-
-
 
 TF-IDF is able to take on both complex word tokens as well as character tokens. The best models above will be compared here. TF-IDF, cannot be divided up into the top n words by TF-IDF in this case, as these types of words only appear once or twice within each document. Here TF-IDF is in character features, and it's performance is worse than above.

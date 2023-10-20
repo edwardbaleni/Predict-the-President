@@ -21,7 +21,26 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -152,13 +171,13 @@ ul.task-list li input[type="checkbox"] {
 <p>This supplementary serves as grounds on which most of the final decisions were based.</p>
 <section id="stylometric-features" class="level2">
 <h2 class="anchored" data-anchor-id="stylometric-features">Stylometric Features</h2>
-<p>The first task is to select the stylometric features. This is deciding how one may choose to represent text. This can either be done by tokenizing by words (lexical features), a number of characters (character features), or in other more sophisticated ways like syntatic features or semantic features. In this study, only lexical features and character features are explored, while the other two require more domain knowledge to properly quantify (<a href="">@Stylometry</a>). Another point to address is the usage of token count or TF-IDF weightings, as observations for the study. This initial exploration will be done with frequency, as this is a very stable way in conducting author attribution (<a href="">@WordFreq</a>). For each experiment, a Naive Bayes classifier (NB) and a Support Vector Machine (SVM) will be used to inform decisions.</p>
+<p>The first task is to select the stylometric features. This is deciding how one may choose to represent text. This can either be done by tokenizing by words (lexical features), a number of characters (character features), or in other more sophisticated ways like syntatic features or semantic features. In this study, only lexical features and character features are explored, while the other two require more domain knowledge to properly quantify (<a href=""><span class="citation" data-cites="Stylometry">Stamatatos (<span>2009</span>)</span></a>). Another point to address is the usage of token count or TF-IDF weightings, as observations for the study. This initial exploration will be done with frequency, as this is a very stable way in conducting author attribution (<a href=""><span class="citation" data-cites="WordFreq">Škorić et al. (<span>2022</span>)</span></a>). For each experiment, a Naive Bayes classifier (NB) and a Support Vector Machine (SVM) will be used to inform decisions.</p>
 <section id="lexical-features" class="level3">
 <h3 class="anchored" data-anchor-id="lexical-features">Lexical Features</h3>
 <!-- Unigram and bigram no function words, no punctuation -->
 <!-- Unigram and bigram with stop words and no punc. -->
 <!-- Unigram and bigram with punctuation and function words -->
-<p>When it comes to lexical features, these can be classed into N-grams. A collection of N contiguous words. The greater N is, the more complex the representation of the feature. It often doesn’t show better results and the greater the N the higher the dimensionality of the problem, which will ultimately increase sparsity in the dataset, making it more difficult to classify (<a href="">@Ngrams</a>, <a href="">@WordFreq</a>). To that extent, only unigrams and bigrams will be explored. Often it would seem that unigrams are sufficient amongst the three. It is however, interesting to observe the behaviour of n-grams <a href="">@Tiffani2020OptimizationON</a>.</p>
+<p>When it comes to lexical features, these can be classed into N-grams. A collection of N contiguous words. The greater N is, the more complex the representation of the feature. It often doesn’t show better results and the greater the N the higher the dimensionality of the problem, which will ultimately increase sparsity in the dataset, making it more difficult to classify (<a href=""><span class="citation" data-cites="Ngrams">Coyotl-Morales et al. (<span>2006</span>)</span></a>, <a href=""><span class="citation" data-cites="WordFreq">Škorić et al. (<span>2022</span>)</span></a>). To that extent, only unigrams and bigrams will be explored. Often it would seem that unigrams are sufficient amongst the three. It is however, interesting to observe the behaviour of n-grams <a href=""><span class="citation" data-cites="Tiffani2020OptimizationON">Tiffani (<span>2020</span>)</span></a>.</p>
 <p>For the training, validation and test splits, it would be wise to select sample sizes by sentence and not by word, this will represent each row in the bag of words.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
@@ -207,7 +226,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <p>What we see above is that for a word bag of 200 most frequent content words (No Function) that the bigram does indeed perform worse. It is essential that we observe whether allowing functional words will improve the statement made earlier, that this is more directed towards style-based classification. First let’s look into whether using functional words will be useful to the analysis. Here we see that this is indeed more of style-based classification than a topic-based classification, this is shown in how the missclassification in general does decrease in both cases of of the bigram and unigram as we allow functional words into the analysis as seen in Table A. At this stage, I would suggest using unigrams and not using stop words for the analysis.</p>
-<p>However, since this is now a style-based classification task, using character features has in previous works been shown to capture style, lexical information and some contextual information. It is also able use punctuation and capitalization to infer stylistic approaches (<a href="">@Stylometry</a>).</p>
+<p>However, since this is now a style-based classification task, using character features has in previous works been shown to capture style, lexical information and some contextual information. It is also able use punctuation and capitalization to infer stylistic approaches (<a href=""><span class="citation" data-cites="Stylometry">Stamatatos (<span>2009</span>)</span></a>).</p>
 </section>
 <section id="character-features" class="level3">
 <h3 class="anchored" data-anchor-id="character-features">Character Features</h3>
@@ -258,7 +277,7 @@ ul.task-list li input[type="checkbox"] {
 
 </div>
 </div>
-<p>At this stage we can see that the classification is not that much different from a unigram, however, points of which to consider, is that when using character features certain items become necessary and deserve exploration: the number of characters, the size of the word bag, the inclusion of punctuation. The number of characters have been chosen to be either 3 or 4, which is consistent with the study (<a href="">@Stylometry</a>). The size of the bag and the inclusion of punctuation are two points which need to be further explored. The missclassification has decreased from when the word bag contained 200 words.</p>
+<p>At this stage we can see that the classification is not that much different from a unigram, however, points of which to consider, is that when using character features certain items become necessary and deserve exploration: the number of characters, the size of the word bag, the inclusion of punctuation. The number of characters have been chosen to be either 3 or 4, which is consistent with the study (<a href=""><span class="citation" data-cites="Stylometry">Stamatatos (<span>2009</span>)</span></a>). The size of the bag and the inclusion of punctuation are two points which need to be further explored. The missclassification has decreased from when the word bag contained 200 words.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <table id="tab:Table 2_2" class="huxtable table table-sm table-striped small" data-quarto-postprocess="true">
@@ -328,11 +347,25 @@ ul.task-list li input[type="checkbox"] {
 <p>TF-IDF is able to take on both complex word tokens as well as character tokens. The best models above will be compared here. TF-IDF, cannot be divided up into the top n words by TF-IDF in this case, as these types of words only appear once or twice within each document. Here TF-IDF is in character features, and it’s performance is worse than above.</p>
 
 
+
 </section>
 </section>
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-Ngrams" class="csl-entry" role="listitem">
+Coyotl-Morales, Rosa, Luis Villaseñor-Pineda, Manuel Montes, and Paolo Rosso. 2006. <span>“Authorship Attribution Using Word Sequences.”</span> In, 4225:844–53. <a href="https://doi.org/10.1007/11892755_87">https://doi.org/10.1007/11892755_87</a>.
+</div>
+<div id="ref-WordFreq" class="csl-entry" role="listitem">
+Škorić, Mihailo, Ranka Stanković, Milica Ikonić Nešić, Joanna Byszuk, and Maciej Eder. 2022. <span>“Parallel Stylometric Document Embeddings with Deep Learning Based Language Models in Literary Authorship Attribution.”</span> <em>Mathematics</em> 10 (5). <a href="https://doi.org/10.3390/math10050838">https://doi.org/10.3390/math10050838</a>.
+</div>
+<div id="ref-Stylometry" class="csl-entry" role="listitem">
+Stamatatos, Efstathios. 2009. <span>“A Survey of Modern Authorship Attribution Methods.”</span> <em>Journal of the American Society for Information Science and Technology</em> 60 (3): 538–56. https://doi.org/<a href="https://doi.org/10.1002/asi.21001">https://doi.org/10.1002/asi.21001</a>.
+</div>
+<div id="ref-Tiffani2020OptimizationON" class="csl-entry" role="listitem">
+Tiffani, Ilham Esa. 2020. <span>“Optimization of Na<span>ï</span>ve Bayes Classifier by Implemented Unigram, Bigram, Trigram for Sentiment Analysis of Hotel Review.”</span> <em>Journal of Soft Computing Exploration</em>. <a href="https://api.semanticscholar.org/CorpusID:228958822">https://api.semanticscholar.org/CorpusID:228958822</a>.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
