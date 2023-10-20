@@ -5,4 +5,5 @@ __MACOSX
 .Rhistory
 
 /.quarto/
+
 .Rproj.user
